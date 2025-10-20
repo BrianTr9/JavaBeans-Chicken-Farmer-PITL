@@ -46,7 +46,7 @@ public class EnemyManager implements Tickable, Interactable, RenderableGroup {
     }
 
     public Pigeon mkP(HasPosition hasPosition) {
-        final Pigeon pigeon = new Pigeon(this.spawnX, this.spawnX, hasPosition);
+        final Pigeon pigeon = new Pigeon(this.spawnX, this.spawnY, hasPosition);
         this.Birds.add(pigeon);
         return pigeon;
     }
