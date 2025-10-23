@@ -16,7 +16,7 @@ public class OverlayBuilder {
      *
      * @param label label we are searching for
      * @param contents file contents we are searching through
-     * @return a {@link ArrayList<String>} of lines within the searched for section.
+     * @return a {@link List} of lines within the searched for section.
      * @throws IOException if the section is not found
      */
     public static List<String> getSection(String label, String contents) throws IOException {
