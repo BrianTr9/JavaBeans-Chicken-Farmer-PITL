@@ -27,10 +27,10 @@ public class Dirt extends Tile {
     /**
      * Construct a new untilled dirt tile at the given x, y position.
      *
+     * <p>x and y must be non-negative and within the window bounds.
+     *
      * @param x The x-axis (horizontal) coordinate.
      * @param y The y-axis (vertical) coordinate.
-     * @requires x >= 0, x is less than the window width
-     * @requires y >= 0, y is less than the window height
      */
     public Dirt(int x, int y) {
         super(x, y, dirtArt);
@@ -79,7 +79,8 @@ public class Dirt extends Tile {
      * <p>The cost of the cabbage should be subtracted from the inventory if it is successfully
      * planted.
      *
-     * @stage3
+     * <p>This method implements the stage 3 behaviour for using tools on dirt: hoe, bucket, and
+     * pole interactions are handled here.
      */
     @Override
     public void use(EngineState state, GameState game) {
@@ -99,7 +100,7 @@ public class Dirt extends Tile {
             inventory.addCoins(-Scarecrow.COIN_COST);
             Scarecrow scarecrow = new Scarecrow(this.getX(), this.getY());
             this.placeOn(scarecrow);
-            game.getNpcs().npcs.add(scarecrow);
+            game.getNpcs().addNpc(scarecrow);
         }
     }
 }

@@ -11,11 +11,23 @@ import engine.renderer.Renderable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Manager responsible for non-player characters (NPCs).
+ *
+ * <p>Handles ticking, interaction and rendering of NPCs. Also provides lifecycle management
+ * utilities such as cleanup and adding new NPCs.
+ */
 public class NpcManager implements Interactable, Tickable, RenderableGroup {
-    public final ArrayList<Npc> npcs = new ArrayList<>();
 
+    /** The list of NPCs currently managed. */
+    private final List<Npc> npcs = new ArrayList<>();
+
+    /** Construct a new NPC manager. */
     public NpcManager() {}
 
+    /**
+     * Remove any NPCs marked for removal from the internal list.
+     */
     public void cleanup() {
         for (int i = this.npcs.size() - 1; i >= 0; i -= 1) {
             if (this.npcs.get(i).isMarkedForRemoval()) {
@@ -25,16 +37,28 @@ public class NpcManager implements Interactable, Tickable, RenderableGroup {
     }
 
     /**
-     * @param npc npc to add to the manager for it to well manage/track.
+     * Add an NPC to be managed.
+     *
+     * @param npc the NPC to add
      */
     public void addNpc(Npc npc) {
         this.npcs.add(npc);
     }
 
+    /**
+     * Returns a snapshot list of current NPCs. Modifying the returned list has no effect on the
+     * manager's internal state.
+     *
+     * @return a list of NPCs currently managed
+     */
+    public List<Npc> getNpcs() {
+        return new ArrayList<>(this.npcs);
+    }
+
     @Override
     public void tick(EngineState state, GameState game) {
         this.cleanup();
-        for (Npc npc : npcs) {
+        for (Npc npc : this.npcs) {
             npc.tick(state, game);
         }
     }
@@ -46,19 +70,10 @@ public class NpcManager implements Interactable, Tickable, RenderableGroup {
         }
     }
 
-    /**
-     * Returns an ArrayList<Interactable> of interactable
-     *
-     * @return an ArrayList<Interactable> of interactable
-     */
-    private ArrayList<Interactable> getInteractables() {
-        final ArrayList<Interactable> interactables = new ArrayList<>();
-        for (Npc npc : npcs) {
-            if (npc instanceof Interactable) {
-                interactables.add(npc);
-            }
-        }
-        return interactables;
+    // Private helper to collect interactable NPCs.
+    private List<Interactable> getInteractables() {
+        // Construct a new list of Interactable directly from the NPC collection.
+        return new ArrayList<Interactable>(this.npcs);
     }
 
     @Override
