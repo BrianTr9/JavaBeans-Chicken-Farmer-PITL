@@ -452,7 +452,232 @@ public class PigeonTest {
         assertEquals(0, pigeon.getDirection());
     }
 
+    // NEW TESTS TO DETECT MISSING MUTATIONS
+
+    @Test
+    public void testFirstConstructorSetsAttackingTrue() {
+        // Detects mutation: line 41 setAttacking(true) removed
+        Pigeon pigeon = new Pigeon(100, 100);
+        assertTrue("First constructor must set attacking to true", pigeon.getAttacking());
+
+        // Verify it actually affects behavior - attacking pigeon should try to find cabbage
+        MockCabbage cabbage = new MockCabbage(200, 200);
+        MockTile tile = new MockTile(200, 200);
+        tile.addEntity(cabbage);
+        ((MockWorld) world).addTile(tile);
+
+        pigeon.tick(engineState, gameState);
+        // If attacking wasn't set, tracked target wouldn't be assigned
+        assertNotNull("Pigeon should track cabbage when attacking", pigeon.getTrackedTarget());
+    }
+
+    @Test
+    public void testSecondConstructorSetsSpeed() {
+        // Detects mutation: line 56 setSpeed(1) removed
+        MockPosition target = new MockPosition(300, 100);
+        Pigeon pigeon = new Pigeon(100, 100, target);
+
+        assertEquals("Speed should be set to 1", 1.0, pigeon.getSpeed(), 0.01);
+
+        // Verify speed affects movement
+        int startX = pigeon.getX();
+        pigeon.tick(engineState, gameState);
+        int endX = pigeon.getX();
+
+        // With speed=1 and target to the right, should move ~2 pixels right (baseTickMove + move)
+        assertTrue("Pigeon should move when speed is set", endX > startX);
+    }
+
+    @Test
+    public void testSecondConstructorSetsAttackingTrue() {
+        // Detects mutation: line 58 setAttacking(true) removed
+        MockPosition target = new MockPosition(200, 200);
+        Pigeon pigeon = new Pigeon(100, 100, target);
+
+        assertTrue("Second constructor must set attacking to true", pigeon.getAttacking());
+
+        // Verify attacking state is used by checking it steers towards target
+        // Add a cabbage so it doesn't set attacking=false at end of tick
+        MockCabbage cabbage = new MockCabbage(200, 200);
+        MockTile tile = new MockTile(200, 200);
+        tile.addEntity(cabbage);
+        ((MockWorld) world).addTile(tile);
+
+        pigeon.setSpeed(0);
+        pigeon.tick(engineState, gameState);
+        // Direction should be updated if attacking and has target (45 degrees toward 200,200)
+        assertEquals("Should steer towards target when attacking", 45, pigeon.getDirection());
+    }
+
+    @Test
+    public void testHandleFleeingCalledWhenNotAttacking() {
+        // Detects mutation: line 67 handleFleeing() first call removed
+        // Detects mutation: line 66 conditional !getAttacking() replaced with false
+        Pigeon pigeon = new Pigeon(100, 100);
+        pigeon.setAttacking(false);
+        pigeon.setX(200);
+        pigeon.setY(200);
+        pigeon.setSpeed(0); // freeze to check direction only
+
+        pigeon.tick(engineState, gameState);
+
+        // handleFleeing should set direction towards spawn (100, 100)
+        // From (200, 200) to (100, 100) is angle -135 degrees
+        assertEquals("Should steer towards spawn when fleeing", -135, pigeon.getDirection());
+    }
+
+    @Test
+    public void testSteerToCenterNotCalledWhenHasTarget() {
+        // Detects mutation: line 72 conditional (trackedTarget==null && attacking) replaced with true
+        MockPosition target = new MockPosition(200, 100);
+        Pigeon pigeon = new Pigeon(100, 100, target);
+        pigeon.setSpeed(0);
+
+        pigeon.tick(engineState, gameState);
+
+        // Should steer towards target (0 degrees), NOT towards center
+        assertEquals("Should steer towards target, not center", 0, pigeon.getDirection());
+        assertNotEquals("Should NOT steer to center when has target", -45, pigeon.getDirection());
+    }
+
+    @Test
+    public void testSteerTowardsTargetOnlyWhenAttackingAndHasTarget() {
+        // Detects mutation: line 76 conditional (trackedTarget!=null && attacking) replaced with true
+        MockPosition target = new MockPosition(200, 100);
+        Pigeon pigeon = new Pigeon(100, 100, target);
+        pigeon.setAttacking(false); // Not attacking anymore
+        pigeon.setX(200); // Move away from spawn so fleeing direction is meaningful
+        pigeon.setY(200);
+        pigeon.setSpeed(0);
+        pigeon.setDirection(90); // Set to 90 initially
+
+        pigeon.tick(engineState, gameState);
+
+        // Should NOT steer to target (0 degrees) because not attacking
+        // Instead should steer to spawn (direction from 200,200 to 100,100 is -135 degrees)
+        assertEquals("Should steer to spawn when not attacking", -135, pigeon.getDirection());
+    }
+
+    @Test
+    public void testLifespanTickOnlyWhenNotNull() {
+        // Detects mutation: line 80 conditional (lifespan!=null) replaced with true
+        Pigeon pigeon = new Pigeon(100, 100);
+        pigeon.setLifespan(null);
+
+        // Should not crash when lifespan is null
+        pigeon.tick(engineState, gameState);
+
+        assertFalse("Should not be removed when lifespan is null", pigeon.isMarkedForRemoval());
+    }
+
+    @Test
+    public void testHandleFleeingCalledTwiceWhenNotAttacking() {
+        // Detects mutation: line 88 handleFleeing() second call removed
+        // Detects mutation: line 87 conditional !getAttacking() replaced with false
+        Pigeon pigeon = new Pigeon(100, 100);
+        pigeon.setAttacking(false);
+        pigeon.setX(200);
+        pigeon.setY(200);
+
+        int distanceBefore = pigeon.distanceFrom(100, 100);
+        pigeon.tick(engineState, gameState);
+        int distanceAfter = pigeon.distanceFrom(100, 100);
+
+        // With double handleFleeing call, sprite should be updated
+        // Sprite should be "up" when moving from (200,200) to (100,100)
+        assertSame("Sprite should be updated when fleeing",
+                SpriteGallery.pigeon.getSprite("up"), pigeon.getSprite());
+    }
+
+    @Test
+    public void testTileSelectorOnlySelectsCabbageTiles() {
+        // Detects mutation: line 128 lambda returns true always (empty tiles selected)
+        MockTile emptyTile = new MockTile(200, 200);
+        MockTile cabbageTile = new MockTile(300, 300);
+        MockCabbage cabbage = new MockCabbage(300, 300);
+        cabbageTile.addEntity(cabbage);
+
+        ((MockWorld) world).addTile(emptyTile);
+        ((MockWorld) world).addTile(cabbageTile);
+
+        Pigeon pigeon = new Pigeon(100, 100);
+        pigeon.tick(engineState, gameState);
+
+        // Should only track the cabbage tile, not the empty one
+        assertSame("Should only select tiles with cabbages", cabbageTile, pigeon.getTrackedTarget());
+    }
+
+    @Test
+    public void testTryStealOnlyWhenAttacking() {
+        // Detects mutation: line 151 conditional getAttacking() replaced with true
+        MockCabbage cabbage = new MockCabbage(100, 100);
+        MockTile tile = new MockTile(110, 110);
+        tile.addEntity(cabbage);
+        ((MockWorld) world).addTile(tile);
+
+        Pigeon pigeon = new Pigeon(100, 100, tile);
+        pigeon.setAttacking(false); // Already fleeing
+
+        pigeon.tick(engineState, gameState);
+
+        // Should NOT steal when not attacking
+        assertFalse("Should not steal cabbage when not attacking", cabbage.isMarkedForRemoval());
+    }
+
+    @Test
+    public void testOnlyStealsCabbageNotOtherEntities() {
+        // Detects mutation: line 154 instanceof Cabbage replaced with true
+        MockTile tile = new MockTile(110, 110);
+        MockNonCabbageEntity other = new MockNonCabbageEntity(110, 110);
+        tile.addEntity(other);
+        ((MockWorld) world).addTile(tile);
+
+        Pigeon pigeon = new Pigeon(100, 100, tile);
+
+        pigeon.tick(engineState, gameState);
+
+        // Should NOT steal non-cabbage entities
+        assertFalse("Should not remove non-cabbage entities", other.isMarkedForRemoval());
+        // Note: pigeon will set attacking=false at end because no cabbage found, which is correct
+    }
+
+    @Test
+    public void testMovementDistanceWithSpeed() {
+        // Additional test to ensure speed affects distance traveled
+        MockPosition target = new MockPosition(300, 100);
+        Pigeon pigeon = new Pigeon(100, 100, target);
+
+        // Add a cabbage far away so pigeon keeps attacking and moving
+        MockCabbage cabbage = new MockCabbage(300, 100);
+        MockTile tile = new MockTile(300, 100);
+        tile.addEntity(cabbage);
+        ((MockWorld) world).addTile(tile);
+
+        int startX = pigeon.getX();
+
+        // Multiple ticks to see movement
+        for (int i = 0; i < 5; i++) {
+            pigeon.tick(engineState, gameState);
+        }
+
+        int endX = pigeon.getX();
+
+        // With speed=1, should move roughly 10 pixels (2 per tick * 5 ticks)
+        assertTrue("Should move significant distance with speed set", endX - startX >= 8);
+    }
+
     // Mock Classes
+
+    private static class MockNonCabbageEntity extends Entity {
+        public MockNonCabbageEntity(int x, int y) {
+            super(x, y);
+        }
+
+        @Override
+        public void tick(EngineState state) {
+            // No-op for testing
+        }
+    }
     private static class MockEngineState implements EngineState {
         private final Dimensions dimensions;
 
