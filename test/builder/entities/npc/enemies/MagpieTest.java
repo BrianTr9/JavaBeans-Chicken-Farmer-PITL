@@ -297,7 +297,7 @@ public class MagpieTest {
         Magpie magpie = new Magpie(100, 100, player);
         magpie.setX(300);
         magpie.setY(300);
-        magpie.attacking = false;
+        magpie.setAttacking(false);
 
         int initialDistance = magpie.distanceFrom(100, 100);
 
@@ -353,8 +353,8 @@ public class MagpieTest {
             magpie.tick(engineState, gameState);
         }
 
-        assertTrue(magpie.attacking);
-        assertEquals(0, magpie.coins);
+        assertTrue(magpie.getAttacking());
+        assertEquals(0, magpie.getCoins());
         assertFalse(magpie.isMarkedForRemoval());
     }
 
@@ -377,7 +377,7 @@ public class MagpieTest {
     public void testFleeingUpwardsDirection() {
         Magpie magpie = new Magpie(100, 50, player);
         magpie.setY(200);
-        magpie.attacking = false;
+        magpie.setAttacking(false);
 
         magpie.tick(engineState, gameState);
 
@@ -392,7 +392,7 @@ public class MagpieTest {
     public void testFleeingDownwardsDirection() {
         Magpie magpie = new Magpie(100, 200, player);
         magpie.setY(50);
-        magpie.attacking = false;
+        magpie.setAttacking(false);
 
         magpie.tick(engineState, gameState);
 

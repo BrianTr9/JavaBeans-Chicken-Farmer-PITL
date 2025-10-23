@@ -3,59 +3,43 @@ package builder.entities.npc.spawners;
 import builder.GameState;
 
 import engine.EngineState;
-import engine.timing.RepeatingTimer;
-import engine.timing.TickTimer;
 
-public class EagleSpawner implements Spawner {
+/**
+ * Spawns eagles at regular intervals that fly towards and steal food from the player.
+ *
+ * <p>According to the specification, eagles fly towards the player, steal 3 food upon
+ * reaching them, then return to spawn and remove themselves from the world.
+ */
+public class EagleSpawner extends AbstractBirdSpawner {
 
-    private int x = 0;
-    private int y = 0;
-    private TickTimer timer;
+    private static final int DEFAULT_DURATION = 1000;
 
+    /**
+     * Construct an eagle spawner with default spawn interval.
+     *
+     * @param x The x-coordinate of the spawn location.
+     * @param y The y-coordinate of the spawn location.
+     */
     public EagleSpawner(int x, int y) {
-        this.x = x;
-        this.y = y;
-        this.timer = new RepeatingTimer(1000);
+        super(x, y, DEFAULT_DURATION);
     }
 
+    /**
+     * Construct an eagle spawner with custom spawn interval.
+     *
+     * @param x The x-coordinate of the spawn location.
+     * @param y The y-coordinate of the spawn location.
+     * @param duration The interval (in ticks) between eagle spawns.
+     */
     public EagleSpawner(int x, int y, int duration) {
-        this.x = x;
-        this.y = y;
-        this.timer = new RepeatingTimer(duration);
+        super(x, y, duration);
     }
 
     @Override
-    public TickTimer getTimer() {
-        return this.timer;
-    }
-
-    @Override
-    public void tick(EngineState state, GameState game) {
-        this.timer.tick();
-        if (this.getTimer().isFinished()) {
-            game.getEnemies().spawnX = this.getX();
-            game.getEnemies().spawnY = this.getY();
-            game.getEnemies().Birds.add(game.getEnemies().mkE(game.getPlayer()));
-        }
-    }
-
-    @Override
-    public int getX() {
-        return this.x;
-    }
-
-    @Override
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    @Override
-    public int getY() {
-        return this.y;
-    }
-
-    @Override
-    public void setY(int y) {
-        this.y = y;
+    protected void spawnBird(EngineState state, GameState game) {
+        game.getEnemies().spawnX = this.getX();
+        game.getEnemies().spawnY = this.getY();
+        game.getEnemies().Birds.add(game.getEnemies().mkE(game.getPlayer()));
     }
 }
+

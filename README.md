@@ -77,6 +77,32 @@ java -cp "lib/*:out" org.junit.runner.JUnitCore scenarios.HiveSimulationTest
 - GuardBee targeting that genuinely follows the closest bird while preserving existing timing and tests.
 - Scarecrow that uses encapsulated APIs (`setAttacking`) and matches the inclusive 4-tile rule.
 
+## Spawner Refactoring (Latest)
+- **Removed dead code**: Deleted `BeeHiveSpawner` and `ScarecrowSpawner`
+  - These were incorrectly implemented with wrong costs and keyboard-driven logic
+  - Tower placement is correctly handled by `Grass.java` and `Dirt.java` using HiveHammer and Pole items
+  - They were never used in any .details files or referenced in codebase
+  - Removing them reduces confusion and maintenance burden
+
+- **Created AbstractBirdSpawner**: Base class for all bird spawners
+  - Centralizes common state: spawn position (x, y), RepeatingTimer
+  - Provides shared `distanceFrom()` helper method
+  - Template method pattern: `tick()` calls abstract `spawnBird()` when timer finishes
+  - Benefits: DRY principle, reduced duplication from ~60 lines per spawner to ~20 lines
+
+- **Refactored concrete spawners**: EagleSpawner, MagpieSpawner, PigeonSpawner
+  - All extend `AbstractBirdSpawner` and only implement unique spawning logic
+  - Added comprehensive Javadoc documenting behavior per specification
+  - PigeonSpawner: extracted helper methods (`hasCabbage()`, `findClosestTile()`) for improved readability
+  - Each spawner now has clear single responsibility (SRP)
+  - Made default spawn durations explicit constants for clarity
+
+- **Design improvements**:
+  - **Open/Closed Principle**: Easy to add new bird types by extending AbstractBirdSpawner
+  - **Cohesion**: Each spawner class focuses solely on when/what to spawn
+  - **Coupling**: Reduced coupling by removing duplicated distance calculations
+  - **Maintainability**: Changes to spawner timing logic only need to happen in one place
+
 ## Next steps (deferred improvements)
 - EnemyManager API cleanup: encapsulate internal lists (read-only accessors + add/remove methods), standardize spawn methods (avoid double-add patterns).
 - Magpie refund: align with spec (refund if removed before reaching spawn) and make refunds idempotent; update tests accordingly.

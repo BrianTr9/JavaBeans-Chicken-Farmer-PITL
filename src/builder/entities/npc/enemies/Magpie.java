@@ -10,22 +10,27 @@ import engine.game.HasPosition;
 import engine.timing.FixedTimer;
 import engine.timing.RepeatingTimer;
 
+/**
+ * A magpie enemy that flies towards the player and steals coins.
+ *
+ * <p>According to the specification:
+ * <ul>
+ *   <li>Flies towards the player</li>
+ *   <li>Steals 1 coin when reaching the player</li>
+ *   <li>Returns to spawn after stealing</li>
+ *   <li>Refunds stolen coin if removed before reaching spawn</li>
+ * </ul>
+ */
 public class Magpie extends AbstractBird {
 
     private static final SpriteGroup art = SpriteGallery.magpie;
     private RepeatingTimer directionalUpdateTimer = new RepeatingTimer(30);
-
-    // Backward-compat: Scarecrow sets this field directly; keep it and sync with base attacking
-    public Boolean attacking;
-
-    public int coins = 0;
+    private int coins = 0;
 
     public Magpie(int xCoordinate, int yCoordinate, HasPosition trackedTarget) {
         super(xCoordinate, yCoordinate);
         this.setTrackedTarget(trackedTarget);
         this.setLifespan(new FixedTimer(10000));
-
-        this.attacking = true; // keep public field for compatibility
         this.setAttacking(true);
 
         this.setSprite(art.getSprite("down"));
@@ -37,12 +42,7 @@ public class Magpie extends AbstractBird {
 
     @Override
     public void tick(EngineState engine, GameState game) {
-        // Sync external changes on the public field into the base state before ticking
-        if (this.attacking != null && this.attacking.booleanValue() != this.getAttacking()) {
-            this.setAttacking(this.attacking);
-        }
-
-        // preserve original behavior: one base move, then call move() again later
+        // Preserve original behavior: one base move, then call move() again later
         this.baseTickMove(engine, game);
 
         if (this.getLifespan() != null) {
@@ -70,7 +70,6 @@ public class Magpie extends AbstractBird {
             game.getInventory().addCoins(-1);
             this.coins += 1;
             this.setAttacking(false);
-            this.attacking = false; // keep public field in sync
             this.setSpeed(2); // book it
         }
 
@@ -80,24 +79,10 @@ public class Magpie extends AbstractBird {
             }
         }
 
-        // keep original refund condition using public field (behavior-preserving)
-        if (this.isMarkedForRemoval() && attacking) {
+        // Refund stolen coin if removed before reaching spawn (still attacking means not yet returned)
+        if (this.isMarkedForRemoval() && this.getAttacking()) {
             game.getInventory().addCoins(this.coins);
         }
-
-        // Sync base attacking back to public field so external code sees updated state
-        this.attacking = this.getAttacking();
-    }
-
-    @Override
-    public boolean getAttacking() {
-        return (this.attacking != null) ? this.attacking.booleanValue() : super.getAttacking();
-    }
-
-    @Override
-    public void setAttacking(boolean attacking) {
-        this.attacking = attacking; // keep public field for external access
-        super.setAttacking(attacking); // keep base state aligned
     }
 
     public int getCoins() {

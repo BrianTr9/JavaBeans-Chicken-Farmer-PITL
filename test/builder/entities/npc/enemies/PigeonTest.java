@@ -67,7 +67,7 @@ public class PigeonTest {
 
         assertEquals(100, pigeon.getX());
         assertEquals(100, pigeon.getY());
-        assertTrue(pigeon.attacking);
+        assertTrue(pigeon.getAttacking());
         assertNotNull(pigeon.getSprite());
     }
 
@@ -204,7 +204,7 @@ public class PigeonTest {
     public void testSpriteDownWhenFleeingDownward() {
         Pigeon pigeon = new Pigeon(100, 200);
         pigeon.setY(50);
-        pigeon.attacking = false;
+        pigeon.setAttacking(false);
 
         pigeon.tick(engineState, gameState);
 
@@ -230,7 +230,7 @@ public class PigeonTest {
             pigeon.tick(engineState, gameState);
         }
 
-        assertFalse(pigeon.attacking);
+        assertFalse(pigeon.getAttacking());
     }
 
     @Test
@@ -243,7 +243,7 @@ public class PigeonTest {
         Pigeon pigeon = new Pigeon(100, 100, tile);
         pigeon.tick(engineState, gameState);
 
-        assertFalse(pigeon.attacking);
+        assertFalse(pigeon.getAttacking());
 
         MockCabbage cabbage2 = new MockCabbage(200, 200);
         MockTile tile2 = new MockTile(200, 200);
@@ -252,7 +252,7 @@ public class PigeonTest {
 
         pigeon.tick(engineState, gameState);
 
-        assertFalse(pigeon.attacking);
+        assertFalse(pigeon.getAttacking());
         assertFalse(cabbage2.isMarkedForRemoval());
     }
 

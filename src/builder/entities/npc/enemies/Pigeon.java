@@ -13,16 +13,25 @@ import engine.timing.FixedTimer;
 
 import java.util.List;
 
+/**
+ * A pigeon enemy that flies towards cabbages and steals them.
+ *
+ * <p>According to the specification:
+ * <ul>
+ *   <li>Flies towards the closest cabbage in the world</li>
+ *   <li>If no cabbage exists, returns to spawn</li>
+ *   <li>When reaching a cabbage, steals it by removing it from the world</li>
+ *   <li>After stealing, returns to spawn and removes itself</li>
+ * </ul>
+ */
 public class Pigeon extends AbstractBird {
 
     private static final SpriteGroup art = SpriteGallery.pigeon;
 
-    // Backward-compat: Scarecrow sets this field directly; keep it and bridge to base attacking
-    public Boolean attacking = true;
-
     public Pigeon(int x, int y) {
         super(x, y);
         this.setLifespan(new FixedTimer(3000));
+        this.setAttacking(true);
         // default speed is 1 from Npc; sprite can be set later
     }
 
@@ -32,16 +41,12 @@ public class Pigeon extends AbstractBird {
         this.setTrackedTarget(trackedTarget);
         this.setSpeed(1);
         this.setLifespan(new FixedTimer(3000));
+        this.setAttacking(true);
     }
 
     @Override
     public void tick(EngineState engine, GameState game) {
-        // Sync external changes on the public field into the base state before ticking
-        if (this.attacking != null && this.attacking.booleanValue() != super.getAttacking()) {
-            super.setAttacking(this.attacking);
-        }
-
-        // original behavior: call super.tick(engine, game) then call move() later as well
+        // Original behavior: call super.tick(engine, game) then call move() later as well
         this.baseTickMove(engine, game);
 
         if (!this.getAttacking()) {
@@ -77,9 +82,6 @@ public class Pigeon extends AbstractBird {
             // no cabbages to get
             this.setAttacking(false);
         }
-
-        // Sync base attacking back to public field so external code sees updated state immediately
-        this.attacking = this.getAttacking();
     }
 
     private void handleFleeing(EngineState engine) {
@@ -138,16 +140,5 @@ public class Pigeon extends AbstractBird {
                 }
             }
         }
-    }
-
-    @Override
-    public boolean getAttacking() {
-        return (this.attacking != null) ? this.attacking.booleanValue() : super.getAttacking();
-    }
-
-    @Override
-    public void setAttacking(boolean attacking) {
-        this.attacking = attacking;
-        super.setAttacking(attacking);
     }
 }

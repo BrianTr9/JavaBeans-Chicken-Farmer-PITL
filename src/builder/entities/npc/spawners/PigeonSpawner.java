@@ -6,97 +6,89 @@ import builder.entities.tiles.Tile;
 
 import engine.EngineState;
 import engine.game.Entity;
-import engine.game.HasPosition;
-import engine.timing.RepeatingTimer;
-import engine.timing.TickTimer;
 
 import java.util.List;
 
-public class PigeonSpawner implements Spawner {
+/**
+ * Spawns pigeons at regular intervals that fly towards and steal cabbages.
+ *
+ * <p>According to the specification, pigeons are only spawned if there is at least one
+ * cabbage in the world to steal. Pigeons fly to the closest cabbage, steal it by removing
+ * it from the world, then return to spawn and remove themselves.
+ */
+public class PigeonSpawner extends AbstractBirdSpawner {
 
-    private int x = 0;
-    private int y = 0;
-    private final RepeatingTimer timer;
+    private static final int DEFAULT_DURATION = 100;
 
+    /**
+     * Construct a pigeon spawner with default spawn interval.
+     *
+     * @param x The x-coordinate of the spawn location.
+     * @param y The y-coordinate of the spawn location.
+     */
     public PigeonSpawner(int x, int y) {
-        this.x = x;
-        this.y = y;
-        this.timer = new RepeatingTimer(100);
+        super(x, y, DEFAULT_DURATION);
     }
 
+    /**
+     * Construct a pigeon spawner with custom spawn interval.
+     *
+     * @param x The x-coordinate of the spawn location.
+     * @param y The y-coordinate of the spawn location.
+     * @param duration The interval (in ticks) between pigeon spawn attempts.
+     */
     public PigeonSpawner(int x, int y, int duration) {
-        this.x = x;
-        this.y = y;
-        this.timer = new RepeatingTimer(duration);
+        super(x, y, duration);
     }
 
     @Override
-    public TickTimer getTimer() {
-        return this.timer;
-    }
+    protected void spawnBird(EngineState state, GameState game) {
+        // Find all tiles with cabbages
+        List<Tile> tilesWithCabbages = game.getWorld().tileSelector(this::hasCabbage);
 
-    @Override
-    public void tick(EngineState state, GameState game) {
-        this.timer.tick();
+        // Only spawn if there are cabbages to steal (per specification)
+        if (!tilesWithCabbages.isEmpty()) {
+            Tile closestCabbageTile = findClosestTile(tilesWithCabbages);
 
-        List<Tile> tiles =
-                game.getWorld()
-                        .tileSelector(
-                                tile -> {
-                                    for (Entity entity : tile.getStackedEntities()) {
-                                        if (entity instanceof Cabbage) {
-                                            return true;
-                                        }
-                                    }
-                                    return false;
-                                });
-
-        if (tiles.size() > 0) {
-            int distance = this.distanceFrom(tiles.getFirst());
-            Tile closest = tiles.getFirst();
-            for (Tile tile : tiles) {
-                if (this.distanceFrom(tile) < distance) {
-                    closest = tile;
-                }
-            }
-
-            if (this.getTimer().isFinished()) {
-                game.getEnemies().spawnX = this.getX();
-                game.getEnemies().spawnY = this.getY();
-                game.getEnemies().Birds.add(game.getEnemies().mkP(closest));
-            }
+            game.getEnemies().spawnX = this.getX();
+            game.getEnemies().spawnY = this.getY();
+            game.getEnemies().Birds.add(game.getEnemies().mkP(closestCabbageTile));
         }
     }
 
     /**
-     * Return how far away this npc is from the given position
+     * Check if a tile has a cabbage stacked on it.
      *
-     * @param position the position we are measuring to from this npcs position!
-     * @return integer representation for how far apart they are
+     * @param tile The tile to check.
+     * @return true if the tile has at least one cabbage, false otherwise.
      */
-    public int distanceFrom(HasPosition position) {
-        int deltaX = position.getX() - this.getX();
-        int deltaY = position.getY() - this.getY();
-        return (int) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    private boolean hasCabbage(Tile tile) {
+        for (Entity entity : tile.getStackedEntities()) {
+            if (entity instanceof Cabbage) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    @Override
-    public int getX() {
-        return this.x;
-    }
+    /**
+     * Find the closest tile to this spawner from a list of tiles.
+     *
+     * @param tiles The list of tiles to search (must not be empty).
+     * @return The closest tile to this spawner.
+     */
+    private Tile findClosestTile(List<Tile> tiles) {
+        Tile closest = tiles.get(0);
+        int minDistance = this.distanceFrom(closest);
 
-    @Override
-    public void setX(int x) {
-        this.x = x;
-    }
+        for (Tile tile : tiles) {
+            int distance = this.distanceFrom(tile);
+            if (distance < minDistance) {
+                closest = tile;
+                minDistance = distance;
+            }
+        }
 
-    @Override
-    public int getY() {
-        return this.y;
-    }
-
-    @Override
-    public void setY(int y) {
-        this.y = y;
+        return closest;
     }
 }
