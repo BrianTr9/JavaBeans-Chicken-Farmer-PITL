@@ -37,9 +37,8 @@ public class MagpieSpawner extends AbstractBirdSpawner {
 
     @Override
     protected void spawnBird(EngineState state, GameState game) {
-        game.getEnemies().spawnX = this.getX();
-        game.getEnemies().spawnY = this.getY();
-        game.getEnemies().Birds.add(game.getEnemies().mkM(game.getPlayer()));
+        game.getEnemies().setSpawnX(this.getX());
+        game.getEnemies().setSpawnY(this.getY());
+        game.getEnemies().getBirds().add(game.getEnemies().mkM(game.getPlayer()));
     }
 }
-

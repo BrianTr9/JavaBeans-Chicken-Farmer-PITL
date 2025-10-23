@@ -32,7 +32,7 @@ public class Scarecrow extends Npc {
         final EnemyManager enemies = game.getEnemies();
         final int scareRadius = state.getDimensions().tileSize() * 4; // inclusive radius per spec
 
-        for (Enemy bird : enemies.Birds) {
+        for (Enemy bird : enemies.getBirds()) {
             if (bird instanceof Magpie magpie) {
                 if (this.distanceFrom(magpie) <= scareRadius) {
                     magpie.setAttacking(false); // immediate effect

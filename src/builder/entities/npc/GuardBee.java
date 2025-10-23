@@ -77,7 +77,7 @@ public class GuardBee extends Npc implements Expirable {
         // Determine closest enemy each tick
         Enemy nearest = null;
         int nearestDist = Integer.MAX_VALUE;
-        ArrayList<Enemy> enemies = new ArrayList<>(game.getEnemies().Birds);
+        ArrayList<Enemy> enemies = new ArrayList<>(game.getEnemies().getBirds());
         for (Enemy enemy : enemies) {
             int d = this.distanceFrom(enemy);
             if (d < nearestDist) {

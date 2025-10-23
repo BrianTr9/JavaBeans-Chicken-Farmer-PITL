@@ -58,7 +58,7 @@ public class BeeHive extends Npc {
         super.interact(state, game);
         // Only spawn in interact() to avoid mutating the NpcManager list during tick iteration
         if (this.loaded) {
-            Npc bee = this.checkAndSpawnBee(new ArrayList<>(game.getEnemies().Birds));
+            Npc bee = this.checkAndSpawnBee(new ArrayList<>(game.getEnemies().getBirds()));
             if (bee != null) {
                 game.getNpcs().addNpc(bee);
                 this.loaded = false; // begin reload cycle; timer will tick in tick()

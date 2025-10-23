@@ -142,7 +142,7 @@ public class GuardBeeTest {
     @Test
     public void testRemovesEnemyOnContact() {
         Magpie magpie = new Magpie(110, 110, player);
-        enemyManager.Birds.add(magpie);
+        enemyManager.getBirds().add(magpie);
 
         GuardBee bee = new GuardBee(100, 100, magpie);
 
@@ -161,7 +161,7 @@ public class GuardBeeTest {
     @Test
     public void testRemovesSelfOnContactWithEnemy() {
         Pigeon pigeon = new Pigeon(110, 110);
-        enemyManager.Birds.add(pigeon);
+        enemyManager.getBirds().add(pigeon);
 
         GuardBee bee = new GuardBee(100, 100, pigeon);
 
@@ -177,8 +177,8 @@ public class GuardBeeTest {
     public void testTracksMultipleEnemies() {
         Magpie magpie1 = new Magpie(200, 200, player);
         Magpie magpie2 = new Magpie(300, 300, player);
-        enemyManager.Birds.add(magpie1);
-        enemyManager.Birds.add(magpie2);
+        enemyManager.getBirds().add(magpie1);
+        enemyManager.getBirds().add(magpie2);
 
         GuardBee bee = new GuardBee(100, 100, magpie1);
 
@@ -219,7 +219,7 @@ public class GuardBeeTest {
     @Test
     public void testLocksOntoEnemyWithin300Pixels() {
         Magpie magpie = new Magpie(250, 250, player);
-        enemyManager.Birds.add(magpie);
+        enemyManager.getBirds().add(magpie);
 
         MockPosition farTarget = new MockPosition(500, 500);
         GuardBee bee = new GuardBee(100, 100, farTarget);
@@ -307,7 +307,7 @@ public class GuardBeeTest {
     @Test
     public void testDoesNotRemoveEnemyFarAway() {
         Magpie magpie = new Magpie(500, 500, player);
-        enemyManager.Birds.add(magpie);
+        enemyManager.getBirds().add(magpie);
 
         GuardBee bee = new GuardBee(100, 100, magpie);
 
@@ -336,7 +336,7 @@ public class GuardBeeTest {
     @Test
     public void testWorksWithEagleEnemies() {
         Eagle eagle = new Eagle(110, 110, player);
-        enemyManager.Birds.add(eagle);
+        enemyManager.getBirds().add(eagle);
 
         GuardBee bee = new GuardBee(100, 100, eagle);
 

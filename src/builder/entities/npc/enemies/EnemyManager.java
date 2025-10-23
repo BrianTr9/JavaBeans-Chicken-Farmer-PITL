@@ -17,17 +17,46 @@ import java.util.List;
 
 public class EnemyManager implements Tickable, Interactable, RenderableGroup {
 
-    public final ArrayList<Spawner> spawners = new ArrayList<>();
-    public final ArrayList<Enemy> Birds = new ArrayList<>();
-    public int spawnX;
-    public int spawnY;
+    private final ArrayList<Spawner> spawners = new ArrayList<>();
+    private final ArrayList<Enemy> birds = new ArrayList<>();
+    private int spawnX;
+    private int spawnY;
 
     public EnemyManager(Dimensions dimensions) {}
 
+    // Accessors for encapsulated fields (minimal API surface)
+    public List<Spawner> getSpawners() {
+        return this.spawners;
+    }
+
+    public List<Enemy> getBirds() {
+        return this.birds;
+    }
+
+    public void addBird(Enemy enemy) {
+        this.birds.add(enemy);
+    }
+
+    public int getSpawnX() {
+        return this.spawnX;
+    }
+
+    public void setSpawnX(int spawnX) {
+        this.spawnX = spawnX;
+    }
+
+    public int getSpawnY() {
+        return this.spawnY;
+    }
+
+    public void setSpawnY(int spawnY) {
+        this.spawnY = spawnY;
+    }
+
     public void cleanup() {
-        for (int i = this.Birds.size() - 1; i >= 0; i -= 1) {
-            if (this.Birds.get(i).isMarkedForRemoval()) {
-                this.Birds.remove(i);
+        for (int i = this.birds.size() - 1; i >= 0; i -= 1) {
+            if (this.birds.get(i).isMarkedForRemoval()) {
+                this.birds.remove(i);
             }
         }
     }
@@ -41,13 +70,13 @@ public class EnemyManager implements Tickable, Interactable, RenderableGroup {
 
     public Magpie mkM(Player player) {
         final Magpie magpie = new Magpie(this.spawnX, this.spawnY, player);
-        this.Birds.add(magpie);
+        this.birds.add(magpie);
         return magpie;
     }
 
     public Pigeon mkP(HasPosition hasPosition) {
         final Pigeon pigeon = new Pigeon(this.spawnX, this.spawnY, hasPosition);
-        this.Birds.add(pigeon);
+        this.birds.add(pigeon);
         return pigeon;
     }
 
@@ -62,7 +91,7 @@ public class EnemyManager implements Tickable, Interactable, RenderableGroup {
         for (Spawner spawner : this.spawners) {
             spawner.tick(state, game);
         }
-        for (Enemy bird : Birds) {
+        for (Enemy bird : birds) {
             if (bird instanceof Magpie temp) {
                 temp.tick(state, game);
             }
@@ -82,7 +111,7 @@ public class EnemyManager implements Tickable, Interactable, RenderableGroup {
      */
     public ArrayList<Magpie> getMagpies() {
         final ArrayList<Magpie> magpies = new ArrayList<Magpie>();
-        for (Enemy bird : Birds) {
+        for (Enemy bird : birds) {
             if (bird instanceof Magpie temp) {
                 magpies.add(temp);
             }
@@ -91,7 +120,7 @@ public class EnemyManager implements Tickable, Interactable, RenderableGroup {
     }
 
     public ArrayList<Enemy> getALl() {
-        return this.Birds;
+        return this.birds;
     }
 
     /**
@@ -107,6 +136,6 @@ public class EnemyManager implements Tickable, Interactable, RenderableGroup {
 
     @Override
     public List<Renderable> render() {
-        return new ArrayList<>(this.Birds);
+        return new ArrayList<>(this.birds);
     }
 }
