@@ -86,7 +86,8 @@ public class JavaBeanFarm implements Game {
     }
 
     /**
-     * Constructs a new JavaBean Farm game using the given dimensions, map reader and details reader.
+     * Constructs a new JavaBean Farm game using the given dimensions,
+     * map reader and details reader.
      *
      * @param dimensions The dimensions we want for this game.
      * @param mapReader A reader that contains a description of the world map.
