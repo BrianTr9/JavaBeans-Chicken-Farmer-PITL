@@ -11,15 +11,18 @@ import java.util.List;
 public class OverlayBuilder {
 
     /**
-     * Search the given string for a line equivalent to the given label surrounded by a pair of ':'
-     * then collect all lines of text between that label and the next line that reads as 'end;'
+     * Search the given string for a line equivalent
+     * to the given label surrounded by a pair of ':'
+     * then collect all lines of text between that label and
+     * the next line that reads as 'end;'
      *
      * @param label label we are searching for
      * @param contents file contents we are searching through
      * @return a {@link List} of lines within the searched for section.
      * @throws IOException if the section is not found
      */
-    public static List<String> getSection(String label, String contents) throws IOException {
+    public static List<String> getSection(String label, String contents)
+            throws IOException {
         final String[] lines = contents.split("\n");
         boolean collectingLines = false;
         final List<String> section = new ArrayList<>();
@@ -164,7 +167,8 @@ public class OverlayBuilder {
     }
 
     /** Returns player details parsed from the provided details content. */
-    public static PlayerDetails getPlayerDetailsFromFile(String detailsContent) throws IOException {
+    public static PlayerDetails getPlayerDetailsFromFile(String detailsContent)
+            throws IOException {
         List<String> section = OverlayBuilder.getSection("chickenFarmer", detailsContent);
         assert section.size()
                 == 1; // right now we only expect there to ever be one chicken farmer entry
