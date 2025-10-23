@@ -68,7 +68,16 @@ public class PigeonTest {
         assertEquals(100, pigeon.getX());
         assertEquals(100, pigeon.getY());
         assertTrue(pigeon.getAttacking());
-        assertNotNull(pigeon.getSprite());
+        assertSame("Sprite should be set to pigeon default on construction",
+                SpriteGallery.pigeon.getSprite("default"), pigeon.getSprite());
+    }
+
+    @Test
+    public void testSecondConstructorInitializesLifespan() {
+        HasPosition target = new MockPosition(200, 200);
+        Pigeon pigeon = new Pigeon(100, 100, target);
+        assertNotNull("Lifespan should be initialized in the tracked-target constructor", pigeon.getLifespan());
+        assertFalse(pigeon.getLifespan().isFinished());
     }
 
     @Test
@@ -127,6 +136,27 @@ public class PigeonTest {
     }
 
     @Test
+    public void testAssignsTrackedTargetToClosestCabbageOnTick() {
+        // world contains two cabbage tiles; closest to pigeon is tile2
+        MockCabbage cabbage1 = new MockCabbage(500, 500);
+        MockCabbage cabbage2 = new MockCabbage(250, 250);
+        MockTile tile1 = new MockTile(500, 500);
+        tile1.addEntity(cabbage1);
+        MockTile tile2 = new MockTile(250, 250);
+        tile2.addEntity(cabbage2);
+        ((MockWorld) world).addTile(tile1);
+        ((MockWorld) world).addTile(tile2);
+
+        // Construct with no initial target so tick() must set it
+        Pigeon pigeon = new Pigeon(100, 100);
+        assertNull(pigeon.getTrackedTarget());
+
+        pigeon.tick(engineState, gameState);
+
+        assertSame("Tracked target should be set to the closest cabbage tile", tile2, pigeon.getTrackedTarget());
+    }
+
+    @Test
     public void testStealsCabbageWhenReaching() {
         MockCabbage cabbage = new MockCabbage(100, 100);
         MockTile tile = new MockTile(110, 110);
@@ -176,6 +206,19 @@ public class PigeonTest {
     }
 
     @Test
+    public void testNotRemovedWhenFleeingFarFromSpawn() {
+        Pigeon pigeon = new Pigeon(100, 100);
+        pigeon.setAttacking(false);
+        // Farther than a tile-size (tile = 80px via TileGrid(10, 800))
+        pigeon.setX(500);
+        pigeon.setY(500);
+
+        pigeon.tick(engineState, gameState);
+
+        assertFalse("Pigeon should not be removed while far from spawn during fleeing", pigeon.isMarkedForRemoval());
+    }
+
+    @Test
     public void testRemovedWhenReachingSpawnAfterFleeing() {
         Pigeon pigeon = new Pigeon(100, 100);
         pigeon.setAttacking(false);
@@ -197,7 +240,8 @@ public class PigeonTest {
 
         pigeon.tick(engineState, gameState);
 
-        assertNotNull(pigeon.getSprite());
+        assertSame("Sprite should be 'up' when returning towards a smaller Y (spawn above)",
+                SpriteGallery.pigeon.getSprite("up"), pigeon.getSprite());
     }
 
     @Test
@@ -208,7 +252,8 @@ public class PigeonTest {
 
         pigeon.tick(engineState, gameState);
 
-        assertNotNull(pigeon.getSprite());
+        assertSame("Sprite should be 'down' when returning towards a larger Y (spawn below)",
+                SpriteGallery.pigeon.getSprite("down"), pigeon.getSprite());
     }
 
     @Test
@@ -219,6 +264,18 @@ public class PigeonTest {
         pigeon.tick(engineState, gameState);
 
         assertEquals(0, pigeon.getDirection());
+    }
+
+    @Test
+    public void testSteerToCenterSetsSpriteUpWhenBelowCenter() {
+        // Center of window is (400, 400) with TileGrid(10, 800)
+        // Place pigeon below center (y = 700). With correct logic, sprite becomes 'up'.
+        Pigeon pigeon = new Pigeon(100, 700);
+        // Ensure no cabbages so trackedTarget remains null and steerToCenter path is taken
+        pigeon.tick(engineState, gameState);
+
+        assertSame("Sprite should be 'up' when pigeon is below center and steering to center",
+                SpriteGallery.pigeon.getSprite("up"), pigeon.getSprite());
     }
 
     @Test
@@ -273,6 +330,21 @@ public class PigeonTest {
         int distance = pigeon.distanceFrom(position);
 
         assertEquals(500, distance);
+    }
+
+    @Test
+    public void testSteerToCenterMovesTowardsCenterOnFirstTickWhenNoCabbages() {
+        Pigeon pigeon = new Pigeon(100, 700);
+        int cx = engineState.getDimensions().windowSize() / 2;
+        int cy = engineState.getDimensions().windowSize() / 2;
+        int before = pigeon.distanceFrom(cx, cy);
+
+        // Only a single tick: on this tick, trackedTarget is null and attacking=true,
+        // so steerToCenter is used before attacking is turned off due to no cabbages.
+        pigeon.tick(engineState, gameState);
+
+        int after = pigeon.distanceFrom(cx, cy);
+        assertTrue("Pigeon should move closer to center on the first tick with no cabbages present", after < before);
     }
 
     // Mock Classes
@@ -516,4 +588,3 @@ public class PigeonTest {
         }
     }
 }
-
