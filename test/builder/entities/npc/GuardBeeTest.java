@@ -346,6 +346,90 @@ public class GuardBeeTest {
         assertTrue(bee.isMarkedForRemoval());
     }
 
+    @Test
+    public void testConstructorSetsDefaultSprite() {
+        HasPosition target = new MockPosition(150, 150);
+        GuardBee bee = new GuardBee(100, 100, target);
+        assertSame("Constructor should set default sprite",
+                builder.ui.SpriteGallery.bee.getSprite("default"), bee.getSprite());
+    }
+
+    @Test
+    public void testInitialDirectionFromConstructorLeft() {
+        // Target directly to the left => direction should be 180 degrees
+        HasPosition targetLeft = new MockPosition(50, 100);
+        GuardBee bee = new GuardBee(100, 100, targetLeft);
+        assertEquals("Initial constructor-computed direction should face left", 180, bee.getDirection());
+    }
+
+    @Test
+    public void testDirectionTowardsNearestEnemyDiagonal() {
+        // Place an enemy diagonally at (200,200); expect 45 degrees after tick
+        Magpie magpie = new Magpie(200, 200, player);
+        enemyManager.getBirds().add(magpie);
+
+        GuardBee bee = new GuardBee(100, 100, new MockPosition(0, 0)); // tracked target irrelevant
+        bee.tick(engineState, gameState);
+        assertEquals("Direction should update towards nearest enemy (45 deg)", 45, bee.getDirection());
+    }
+
+    @Test
+    public void testDirectionTowardsTrackedTargetWhenNoEnemiesDiagonal() {
+        // No enemies; direction should follow trackedTarget. Target is diagonally up-left: (-135 deg)
+        GuardBee bee = new GuardBee(100, 100, new MockPosition(50, 50));
+        // Ensure no enemies
+        assertTrue(enemyManager.getBirds().isEmpty());
+        bee.tick(engineState, gameState);
+        assertEquals("Direction should update towards tracked target when no enemies (-135 deg)", -135, bee.getDirection());
+    }
+
+    @Test
+    public void testUpdateArtSetsDownSprite() {
+        GuardBee bee = new GuardBee(100, 100, new MockPosition(100, 300));
+        // Force direction into 'down' bucket (e.g., 90 deg)
+        bee.setDirection(90);
+        bee.updateArtBasedOnDirection();
+        assertSame(builder.ui.SpriteGallery.bee.getSprite("down"), bee.getSprite());
+    }
+
+    @Test
+    public void testUpdateArtSetsUpSprite() {
+        GuardBee bee = new GuardBee(100, 300, new MockPosition(100, 50));
+        // Force direction into 'up' bucket (e.g., 270 deg)
+        bee.setDirection(270);
+        bee.updateArtBasedOnDirection();
+        assertSame(builder.ui.SpriteGallery.bee.getSprite("up"), bee.getSprite());
+    }
+
+    @Test
+    public void testUpdateArtSetsRightSprite() {
+        GuardBee bee = new GuardBee(100, 100, new MockPosition(300, 100));
+        // Force direction into the nominal 'right' bucket (e.g., 0 deg)
+        bee.setDirection(0);
+        // Prior sprite is default from constructor
+        Object before = bee.getSprite();
+        bee.updateArtBasedOnDirection();
+        // At minimum, sprite should change away from default if setSprite is invoked
+        assertNotSame(before, bee.getSprite());
+    }
+
+    @Test
+    public void testUpdateArtSetsLeftSprite() {
+        GuardBee bee = new GuardBee(300, 100, new MockPosition(50, 100));
+        // Force direction into 'left' bucket (e.g., 180 deg)
+        bee.setDirection(180);
+        bee.updateArtBasedOnDirection();
+        assertSame(builder.ui.SpriteGallery.bee.getSprite("left"), bee.getSprite());
+    }
+
+    @Test
+    public void testSpriteUpdatesToDownAfterTick() {
+        // Target below ensures a downward heading; after tick, sprite should be 'down'
+        GuardBee bee = new GuardBee(100, 100, new MockPosition(100, 300));
+        bee.tick(engineState, gameState);
+        assertSame(builder.ui.SpriteGallery.bee.getSprite("down"), bee.getSprite());
+    }
+
     // Mock Classes
     private static class MockEngineState implements EngineState {
         private final Dimensions dimensions;

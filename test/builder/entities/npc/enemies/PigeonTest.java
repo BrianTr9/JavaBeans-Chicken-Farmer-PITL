@@ -347,6 +347,111 @@ public class PigeonTest {
         assertTrue("Pigeon should move closer to center on the first tick with no cabbages present", after < before);
     }
 
+    @Test
+    public void testSelectsClosestCabbageNotLast() {
+        // Closest first, far last: mutated 'd < distance' => true would incorrectly pick last
+        MockCabbage close = new MockCabbage(250, 250);
+        MockCabbage far = new MockCabbage(600, 600);
+        MockTile closeTile = new MockTile(250, 250);
+        closeTile.addEntity(close);
+        MockTile farTile = new MockTile(600, 600);
+        farTile.addEntity(far);
+        ((MockWorld) world).addTile(closeTile); // add closest first
+        ((MockWorld) world).addTile(farTile);   // far last
+
+        Pigeon pigeon = new Pigeon(100, 100);
+        pigeon.tick(engineState, gameState);
+
+        assertSame("Should select truly closest tile, not always-last",
+                closeTile, pigeon.getTrackedTarget());
+    }
+
+    @Test
+    public void testDirectionTowardsCenterOnFirstTickNoCabbages() {
+        // Freeze speed to avoid base move skewing the computed direction
+        Pigeon pigeon = new Pigeon(100, 700);
+        pigeon.setSpeed(0);
+        int cx = engineState.getDimensions().windowSize() / 2;
+        int cy = engineState.getDimensions().windowSize() / 2;
+        // Expected angle from (100,700) to (400,400) is -45 degrees
+        pigeon.tick(engineState, gameState);
+        assertEquals(-45, pigeon.getDirection());
+    }
+
+    @Test
+    public void testFleeingSetsDirectionTowardSpawn() {
+        Pigeon pigeon = new Pigeon(100, 100);
+        // Place pigeon elsewhere, set fleeing, and freeze speed
+        pigeon.setX(300);
+        pigeon.setY(300);
+        pigeon.setAttacking(false);
+        pigeon.setSpeed(0);
+        // Direction from (300,300) to spawn (100,100) is -135 degrees
+        pigeon.tick(engineState, gameState);
+        assertEquals(-135, pigeon.getDirection());
+    }
+
+    @Test
+    public void testDoubleMovePerTickWhenAttacking() {
+        // Target exactly to the right so movement is along +X axis
+        MockPosition target = new MockPosition(200, 100);
+        Pigeon pigeon = new Pigeon(100, 100, target);
+        int beforeX = pigeon.getX();
+        pigeon.tick(engineState, gameState);
+        int afterX = pigeon.getX();
+        assertEquals("Should move twice per tick when attacking (base + explicit move)",
+                beforeX + 2, afterX);
+    }
+
+    @Test
+    public void testDoesNotStealWhenNotClose() {
+        // Put cabbage well outside a tile size distance so it cannot be stolen
+        MockCabbage cabbage = new MockCabbage(600, 600);
+        MockTile farTile = new MockTile(600, 600);
+        farTile.addEntity(cabbage);
+        ((MockWorld) world).addTile(farTile);
+
+        Pigeon pigeon = new Pigeon(100, 100, farTile);
+        assertTrue(pigeon.getAttacking());
+        pigeon.tick(engineState, gameState);
+        assertTrue("Should remain attacking when not close to cabbage", pigeon.getAttacking());
+        assertFalse("Far cabbage should not be stolen", cabbage.isMarkedForRemoval());
+    }
+
+    @Test
+    public void testNoCabbageOnTilesStillStopsAttacking() {
+        // World has tiles but no cabbages; predicate must filter them out
+        MockTile empty1 = new MockTile(200, 200);
+        MockTile empty2 = new MockTile(300, 300);
+        ((MockWorld) world).addTile(empty1);
+        ((MockWorld) world).addTile(empty2);
+
+        Pigeon pigeon = new Pigeon(100, 100);
+        assertTrue(pigeon.getAttacking());
+        pigeon.tick(engineState, gameState);
+        assertFalse("With no cabbages, pigeon should stop attacking even if tiles exist",
+                pigeon.getAttacking());
+    }
+
+    @Test
+    public void testSteerToCenterSetsSpriteDownWhenAboveCenter() {
+        // Above center (y < cy) => steerToCenter should set 'down'
+        Pigeon pigeon = new Pigeon(100, 100);
+        pigeon.tick(engineState, gameState);
+        assertSame(SpriteGallery.pigeon.getSprite("down"), pigeon.getSprite());
+    }
+
+    @Test
+    public void testDirectionTowardsTrackedTargetOverridesInitialDirection() {
+        // Ensure steerTowards(trackedTarget) is called in attacking branch
+        MockPosition target = new MockPosition(200, 100);
+        Pigeon pigeon = new Pigeon(100, 100, target);
+        pigeon.setSpeed(0); // avoid base movement affecting angle
+        pigeon.setDirection(90); // start facing up
+        pigeon.tick(engineState, gameState);
+        assertEquals(0, pigeon.getDirection());
+    }
+
     // Mock Classes
     private static class MockEngineState implements EngineState {
         private final Dimensions dimensions;
