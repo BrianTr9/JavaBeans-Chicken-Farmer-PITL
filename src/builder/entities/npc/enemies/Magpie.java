@@ -79,8 +79,13 @@ public class Magpie extends AbstractBird {
             }
         }
 
-        // Refund stolen coin if removed before reaching spawn (still attacking means not yet returned)
-        if (this.isMarkedForRemoval() && this.getAttacking()) {
+        // Refund stolen coin if removed before reaching spawn:
+        // - If removed while attacking (e.g., lifespan), refund.
+        // - Or if removed and still not within a tile of spawn, refund.
+        if (this.isMarkedForRemoval()
+                && this.coins > 0
+                && this.distanceFrom(this.getSpawnX(), this.getSpawnY())
+                                > engine.getDimensions().tileSize()) {
             game.getInventory().addCoins(this.coins);
         }
     }

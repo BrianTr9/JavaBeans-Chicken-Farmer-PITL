@@ -217,24 +217,26 @@ public class MagpieTest {
     }
 
     /**
-     * Test that magpie returns coins when marked for removal while attacking
+     * Test that magpie returns coins when removed before reaching spawn (after stealing)
      */
     @Test
-    public void testReturnsCoinsWhenRemovedWhileAttacking() {
+    public void testReturnsCoinsWhenRemovedBeforeReachingSpawn() {
         inventory.addCoins(10);
         Magpie magpie = new Magpie(100, 100, player);
         FixedTimer shortTimer = new FixedTimer(1);
         magpie.setLifespan(shortTimer);
 
-        // Simulate stealing coins
+        // Simulate having stolen coins and fleeing back to spawn
         magpie.setCoins(3);
-        magpie.setAttacking(true);
+        magpie.setAttacking(false); // already stole, now fleeing
+        magpie.setX(300); // far from spawn (100,100)
+        magpie.setY(300);
 
         assertEquals(10, inventory.getCoins());
 
         magpie.tick(engineState, gameState);
 
-        // Should return the 3 coins
+        // Should return the 3 coins since removed before reaching spawn
         assertEquals(13, inventory.getCoins());
     }
 
@@ -556,4 +558,3 @@ public class MagpieTest {
         }
     }
 }
-
