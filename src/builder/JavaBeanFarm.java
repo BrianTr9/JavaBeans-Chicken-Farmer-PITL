@@ -5,6 +5,7 @@ import builder.entities.npc.enemies.EnemyManager;
 import builder.entities.npc.spawners.EagleSpawner;
 import builder.entities.npc.spawners.MagpieSpawner;
 import builder.entities.npc.spawners.PigeonSpawner;
+import builder.entities.npc.spawners.Spawner;
 import builder.entities.tiles.Dirt;
 import builder.entities.tiles.Tile;
 import builder.inventory.*;
@@ -37,6 +38,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.function.Function;
 
 /**
  * JavaBeans, a farming game.
@@ -54,6 +56,8 @@ import java.util.StringJoiner;
  */
 public class JavaBeanFarm implements Game {
 
+    private static final int INVENTORY_SIZE = 5;
+
     private final PlayerManager playerManager;
 
     private final NpcManager npcs;
@@ -66,7 +70,7 @@ public class JavaBeanFarm implements Game {
 
     private String readAllReader(Reader reader) throws IOException {
         BufferedReader br = new BufferedReader(reader);
-         StringJoiner sb = new StringJoiner(System.lineSeparator());
+        StringJoiner sb = new StringJoiner(System.lineSeparator());
         String line;
         while ((line = br.readLine()) != null) {
             sb.add(line);
@@ -91,67 +95,28 @@ public class JavaBeanFarm implements Game {
         this.playerManager = new PlayerManager(playerDetails.getX(), playerDetails.getY());
         this.npcs = new NpcManager();
         this.enemies = new EnemyManager(dimensions);
-        final List<SpawnerDetails> magpieSpawnPoints =
-                OverlayBuilder.getMagpieSpawnDetailsFromString(detailsContent);
-        for (SpawnerDetails spawnerDetails : magpieSpawnPoints) {
-            this.enemies.add(
-                    new MagpieSpawner(
-                            spawnerDetails.getX(),
-                            spawnerDetails.getY(),
-                            spawnerDetails.getDuration()));
-        }
-        final List<SpawnerDetails> eagleSpawnPoints =
-                OverlayBuilder.getEagleSpawnDetailsFromString(detailsContent);
-        for (SpawnerDetails spawnerDetails : eagleSpawnPoints) {
-            this.enemies.add(
-                    new EagleSpawner(
-                            spawnerDetails.getX(),
-                            spawnerDetails.getY(),
-                            spawnerDetails.getDuration()));
-        }
-        final List<SpawnerDetails> pigeonSpawnPoints =
-                OverlayBuilder.getPigeonSpawnDetailsFromString(detailsContent);
-        for (SpawnerDetails spawnerDetails : pigeonSpawnPoints) {
-            this.enemies.add(
-                    new PigeonSpawner(
-                            spawnerDetails.getX(),
-                            spawnerDetails.getY(),
-                            spawnerDetails.getDuration()));
-        }
 
+        // Wire enemy spawners from details
+        addSpawners(
+                OverlayBuilder.getMagpieSpawnDetailsFromString(detailsContent),
+                sd -> new MagpieSpawner(sd.getX(), sd.getY(), sd.getDuration()));
+        addSpawners(
+                OverlayBuilder.getEagleSpawnDetailsFromString(detailsContent),
+                sd -> new EagleSpawner(sd.getX(), sd.getY(), sd.getDuration()));
+        addSpawners(
+                OverlayBuilder.getPigeonSpawnDetailsFromString(detailsContent),
+                sd -> new PigeonSpawner(sd.getX(), sd.getY(), sd.getDuration()));
+
+        // Build world from map
         String worldContent = readAllReader(mapReader);
         this.world = WorldBuilder.fromTiles(WorldBuilder.fromString(dimensions, worldContent));
 
-        final List<CabbageDetails> cabbageSpawnPoints =
-                OverlayBuilder.getCabbageSpawnDetailsFromString(detailsContent);
-        for (CabbageDetails cabbageDetails :
-                cabbageSpawnPoints) { // HACK - can I improve this?
-            final int positionX = cabbageDetails.getX();
-            final int positionY = cabbageDetails.getY();
-            final List<Tile> tiles = this.world.tilesAtPosition(positionX, positionY, dimensions);
-            for (Tile tile : tiles) {
-                if (tile instanceof Dirt) {
-                    TinyInventory tempInventory = new TinyInventory(5, 100, 100);
-                    ((Dirt) tile).till();
-                    ((Dirt) tile).plant(tempInventory);
-                }
-            }
-        }
+        // Seed cabbages per details
+        populateInitialCabbages(dimensions, OverlayBuilder.getCabbageSpawnDetailsFromString(detailsContent));
 
-        int inventorySize = 5;
-        this.inventory =
-                new TinyInventory(
-                        inventorySize,
-                        playerDetails.getStartingCoins(),
-                        playerDetails.getStartingFood());
-
-        inventory.setItem(0, new Bucket());
-        inventory.setItem(1, new Hoe());
-        inventory.setItem(2, new Jackhammer());
-        inventory.setItem(3, new HiveHammer());
-        inventory.setItem(4, new Pole());
-
-        this.overlays.add(new InventoryOverlay(dimensions, inventorySize));
+        // Initialize inventory and overlays
+        this.inventory = initializeInventory(INVENTORY_SIZE, playerDetails.getStartingCoins(), playerDetails.getStartingFood());
+        this.overlays.add(new InventoryOverlay(dimensions, INVENTORY_SIZE));
         this.overlays.add(new ResourceOverlay(dimensions));
     }
 
@@ -219,5 +184,39 @@ public class JavaBeanFarm implements Game {
         }
 
         return renderables;
+    }
+
+    // --- Private helpers to keep constructors lean and avoid duplication ---
+
+    private void addSpawners(List<SpawnerDetails> points, Function<SpawnerDetails, Spawner> factory) {
+        for (SpawnerDetails sd : points) {
+            this.enemies.add(factory.apply(sd));
+        }
+    }
+
+    private void populateInitialCabbages(Dimensions dimensions, List<CabbageDetails> cabbages) {
+        for (CabbageDetails cabbageDetails : cabbages) {
+            final int positionX = cabbageDetails.getX();
+            final int positionY = cabbageDetails.getY();
+            final List<Tile> tiles = this.world.tilesAtPosition(positionX, positionY, dimensions);
+            for (Tile tile : tiles) {
+                if (tile instanceof Dirt) {
+                    // Till and plant using a temporary inventory with generous resources
+                    TinyInventory tempInventory = new TinyInventory(5, 100, 100);
+                    ((Dirt) tile).till();
+                    ((Dirt) tile).plant(tempInventory);
+                }
+            }
+        }
+    }
+
+    private Inventory initializeInventory(int size, int startingCoins, int startingFood) {
+        TinyInventory inv = new TinyInventory(size, startingCoins, startingFood);
+        inv.setItem(0, new Bucket());
+        inv.setItem(1, new Hoe());
+        inv.setItem(2, new Jackhammer());
+        inv.setItem(3, new HiveHammer());
+        inv.setItem(4, new Pole());
+        return inv;
     }
 }

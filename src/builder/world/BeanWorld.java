@@ -73,6 +73,7 @@ public class BeanWorld implements RenderableGroup, Tickable, World {
      *
      * @param filter predicate used to filter through the tiles to find those relevant.
      */
+    @Override
     public List<Tile> tileSelector(Predicate<Tile> filter) {
         List<Tile> result = new ArrayList<>();
         for (Tile tile : tiles) {

@@ -1,8 +1,6 @@
 package builder.world;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,18 +9,6 @@ import java.util.List;
  * resources, placement of the player, cabbages, spawner locations and times etc
  */
 public class OverlayBuilder {
-
-    /**
-     * @param filepath - location of the text file we wish to load
-     * @return String representation of the contents of file found at the filepath.
-     * @throws IOException
-     */
-    private static String load(String filepath) throws IOException {
-        if (!filepath.endsWith(".details")) {
-            throw new IllegalArgumentException("incorrect file name must have .details at end!");
-        }
-        return Files.readString(Path.of(filepath));
-    }
 
     /**
      * Search the given string for a line equivalent to the given label surrounded by a pair of ':'
@@ -37,14 +23,15 @@ public class OverlayBuilder {
         final String[] lines = contents.split("\n");
         boolean collectingLines = false;
         final List<String> section = new ArrayList<>();
-        for (int i = 0; i < contents.length(); i++) {
-            if (collectingLines && lines[i].toLowerCase().trim().equals("end;")) {
+        for (int i = 0; i < lines.length; i++) { // iterate over lines, not contents length
+            final String current = lines[i].toLowerCase().trim();
+            if (collectingLines && current.equals("end;")) {
                 return section;
             }
             if (collectingLines) {
-                section.add(lines[i].toLowerCase().trim());
+                section.add(current);
             }
-            if (lines[i].toLowerCase().trim().equals(":" + label.toLowerCase().trim() + ":")) {
+            if (current.equals(":" + label.toLowerCase().trim() + ":")) {
                 collectingLines = true;
             }
         }
@@ -101,39 +88,34 @@ public class OverlayBuilder {
         };
     }
 
-    public static List<SpawnerDetails> getEagleSpawnDetailsFromString(String detailsContent)
-            throws IOException {
-        List<String> section = OverlayBuilder.getSection("eaglespawner", detailsContent);
+    private static List<SpawnerDetails> getSpawnerDetailsForLabel(
+            String label, String detailsContent) throws IOException {
+        final List<String> section = OverlayBuilder.getSection(label, detailsContent);
         final List<SpawnerDetails> list = new ArrayList<>();
         for (String entry : section) {
             list.add(extractSpawnDetailsFromLine(entry));
         }
         return list;
+    }
+
+    public static List<SpawnerDetails> getEagleSpawnDetailsFromString(String detailsContent)
+            throws IOException {
+        return getSpawnerDetailsForLabel("eaglespawner", detailsContent);
     }
 
     public static List<SpawnerDetails> getPigeonSpawnDetailsFromString(String detailsContent)
             throws IOException {
-        List<String> section = OverlayBuilder.getSection("pigeonspawner", detailsContent);
-        final List<SpawnerDetails> list = new ArrayList<>();
-        for (String entry : section) {
-            list.add(extractSpawnDetailsFromLine(entry));
-        }
-        return list;
+        return getSpawnerDetailsForLabel("pigeonspawner", detailsContent);
     }
 
     public static List<SpawnerDetails> getMagpieSpawnDetailsFromString(String detailsContent)
             throws IOException {
-        List<String> section = OverlayBuilder.getSection("magpiespawner", detailsContent);
-        final List<SpawnerDetails> list = new ArrayList<>();
-        for (String entry : section) {
-            list.add(extractSpawnDetailsFromLine(entry));
-        }
-        return list;
+        return getSpawnerDetailsForLabel("magpiespawner", detailsContent);
     }
 
     public static PlayerDetails extractPlayerDetailsFromLine(String line) {
         String[] chunks = line.split(" ");
-        assert chunks.length == 4; // should always be 3 chunks in a correctly shaped line.
+        assert chunks.length == 4; // should always be 4 chunks in a correctly shaped line.
         String[] xChunk = chunks[0].split(":");
         String[] yChunk = chunks[1].split(":");
         String[] coinChunk = chunks[2].split(":");
@@ -184,7 +166,7 @@ public class OverlayBuilder {
         List<String> section = OverlayBuilder.getSection("chickenFarmer", detailsContent);
         assert section.size()
                 == 1; // right now we only expect there to ever be one chicken farmer entry
-        String entry = section.getFirst();
+        String entry = section.get(0);
         return OverlayBuilder.extractPlayerDetailsFromLine(entry);
     }
 
