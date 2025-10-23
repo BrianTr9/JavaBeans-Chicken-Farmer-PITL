@@ -101,4 +101,28 @@ public class Magpie extends Enemy implements Expirable {
 
     @Override
     public void interact(EngineState engine, GameState game) {}
+
+    public Boolean getAttacking() {
+        return this.attacking;
+    }
+
+    public void setAttacking(Boolean attacking) {
+        this.attacking = attacking;
+    }
+
+    public int getCoins() {
+        return this.coins;
+    }
+
+    public void setCoins(int coins) {
+        this.coins = coins;
+    }
+
+    public HasPosition getTrackedTarget() {
+        return this.trackedTarget;
+    }
+
+    public void setTrackedTarget(HasPosition trackedTarget) {
+        this.trackedTarget = trackedTarget;
+    }
 }

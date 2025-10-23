@@ -56,7 +56,7 @@ public class PigeonTest {
 
         assertEquals(100, pigeon.getX());
         assertEquals(100, pigeon.getY());
-        assertTrue(pigeon.attacking);
+        assertTrue(pigeon.getAttacking());
         assertFalse(pigeon.isMarkedForRemoval());
     }
 
@@ -123,7 +123,7 @@ public class PigeonTest {
         pigeon.tick(engineState, gameState);
 
         // Pigeon should still be attacking since cabbage is far away
-        assertTrue(pigeon.attacking);
+        assertTrue(pigeon.getAttacking());
     }
 
     @Test
@@ -135,13 +135,13 @@ public class PigeonTest {
 
         Pigeon pigeon = new Pigeon(100, 100, tile);
 
-        assertTrue(pigeon.attacking);
+        assertTrue(pigeon.getAttacking());
         assertFalse(cabbage.isMarkedForRemoval());
 
         pigeon.tick(engineState, gameState);
 
         assertTrue(cabbage.isMarkedForRemoval());
-        assertFalse(pigeon.attacking);
+        assertFalse(pigeon.getAttacking());
     }
 
     @Test
@@ -149,18 +149,18 @@ public class PigeonTest {
         HasPosition target = new MockPosition(200, 200);
         Pigeon pigeon = new Pigeon(100, 100, target);
 
-        assertTrue(pigeon.attacking);
+        assertTrue(pigeon.getAttacking());
 
         pigeon.tick(engineState, gameState);
 
-        assertFalse(pigeon.attacking);
+        assertFalse(pigeon.getAttacking());
     }
 
     @Test
     public void testFleeToSpawnAfterStealing() {
         HasPosition target = new MockPosition(200, 200);
         Pigeon pigeon = new Pigeon(100, 100, target);
-        pigeon.attacking = false;
+        pigeon.setAttacking(false);
         pigeon.setX(300);
         pigeon.setY(300);
 
@@ -178,7 +178,7 @@ public class PigeonTest {
     @Test
     public void testRemovedWhenReachingSpawnAfterFleeing() {
         Pigeon pigeon = new Pigeon(100, 100);
-        pigeon.attacking = false;
+        pigeon.setAttacking(false);
         pigeon.setX(110);
         pigeon.setY(110);
 
@@ -193,7 +193,7 @@ public class PigeonTest {
     public void testSpriteUpWhenFleeingUpward() {
         Pigeon pigeon = new Pigeon(100, 50);
         pigeon.setY(200);
-        pigeon.attacking = false;
+        pigeon.setAttacking(false);
 
         pigeon.tick(engineState, gameState);
 

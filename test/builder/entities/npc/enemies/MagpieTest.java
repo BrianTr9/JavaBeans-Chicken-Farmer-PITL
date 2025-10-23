@@ -48,10 +48,10 @@ public class MagpieTest {
 
         assertEquals(100, magpie.getX());
         assertEquals(100, magpie.getY());
-        assertTrue(magpie.attacking);
-        assertEquals(0, magpie.coins);
-        assertNotNull(magpie.trackedTarget);
-        assertEquals(player, magpie.trackedTarget);
+        assertTrue(magpie.getAttacking());
+        assertEquals(0, magpie.getCoins());
+        assertNotNull(magpie.getTrackedTarget());
+        assertEquals(player, magpie.getTrackedTarget());
         assertFalse(magpie.isMarkedForRemoval());
     }
 
@@ -110,7 +110,7 @@ public class MagpieTest {
         magpie.tick(engineState, gameState);
 
         // Magpie should move towards target
-        assertTrue(magpie.attacking);
+        assertTrue(magpie.getAttacking());
         // Check that position changed (moved towards target)
         assertTrue(magpie.getX() != initialX || magpie.getY() != initialY);
     }
@@ -141,14 +141,14 @@ public class MagpieTest {
         Magpie magpie = new Magpie(100, 100, closePlayer);
 
         assertEquals(5, inventory.getCoins());
-        assertTrue(magpie.attacking);
-        assertEquals(0, magpie.coins);
+        assertTrue(magpie.getAttacking());
+        assertEquals(0, magpie.getCoins());
 
         magpie.tick(engineState, gameState);
 
         assertEquals(4, inventory.getCoins());
-        assertEquals(1, magpie.coins);
-        assertFalse(magpie.attacking);
+        assertEquals(1, magpie.getCoins());
+        assertFalse(magpie.getAttacking());
         assertEquals(2.0, magpie.getSpeed(), 0.01);
     }
 
@@ -165,8 +165,8 @@ public class MagpieTest {
         magpie.tick(engineState, gameState);
 
         assertEquals(0, inventory.getCoins());
-        assertEquals(0, magpie.coins);
-        assertTrue(magpie.attacking); // Still attacking
+        assertEquals(0, magpie.getCoins());
+        assertTrue(magpie.getAttacking()); // Still attacking
     }
 
     /**
@@ -181,7 +181,7 @@ public class MagpieTest {
 
         magpie.tick(engineState, gameState); // Steal coin
 
-        assertFalse(magpie.attacking);
+        assertFalse(magpie.getAttacking());
 
         // Move player away so magpie can flee
         closePlayer.setX(500);
@@ -193,7 +193,7 @@ public class MagpieTest {
         }
 
         // Should be moving back towards spawn (100, 100)
-        assertFalse(magpie.attacking);
+        assertFalse(magpie.getAttacking());
     }
 
     /**
@@ -205,7 +205,7 @@ public class MagpieTest {
         Magpie magpie = new Magpie(100, 100, player);
 
         // Force attacking to false and position close to spawn
-        magpie.attacking = false;
+        magpie.setAttacking(false);
         magpie.setX(110);
         magpie.setY(110);
 
@@ -227,8 +227,8 @@ public class MagpieTest {
         magpie.setLifespan(shortTimer);
 
         // Simulate stealing coins
-        magpie.coins = 3;
-        magpie.attacking = true;
+        magpie.setCoins(3);
+        magpie.setAttacking(true);
 
         assertEquals(10, inventory.getCoins());
 
@@ -246,8 +246,8 @@ public class MagpieTest {
         inventory.addCoins(10);
         Magpie magpie = new Magpie(100, 100, player);
 
-        magpie.coins = 3;
-        magpie.attacking = false;
+        magpie.setCoins(3);
+        magpie.setAttacking(false);
         magpie.setX(110);
         magpie.setY(110);
 

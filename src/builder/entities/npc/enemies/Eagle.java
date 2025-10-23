@@ -104,4 +104,28 @@ public class Eagle extends Enemy implements Expirable {
             game.getInventory().addFood(this.food);
         }
     }
+
+    public boolean getAttacking() {
+        return this.attacking;
+    }
+
+    public void setAttacking(boolean attacking) {
+        this.attacking = attacking;
+    }
+
+    public int getFood() {
+        return this.food;
+    }
+
+    public void setFood(int food) {
+        this.food = food;
+    }
+
+    public HasPosition getTrackedTarget() {
+        return this.trackedTarget;
+    }
+
+    public void setTrackedTarget(HasPosition trackedTarget) {
+        this.trackedTarget = trackedTarget;
+    }
 }

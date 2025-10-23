@@ -146,4 +146,20 @@ public class Pigeon extends Enemy implements Expirable {
             this.attacking = false;
         }
     }
+
+    public Boolean getAttacking() {
+        return this.attacking;
+    }
+
+    public void setAttacking(Boolean attacking) {
+        this.attacking = attacking;
+    }
+
+    public HasPosition getTrackedTarget() {
+        return this.trackedTarget;
+    }
+
+    public void setTrackedTarget(HasPosition trackedTarget) {
+        this.trackedTarget = trackedTarget;
+    }
 }

@@ -50,8 +50,8 @@ public class EagleTest {
 
         assertEquals(100, eagle.getX());
         assertEquals(100, eagle.getY());
-        assertNotNull(eagle.trackedTarget);
-        assertEquals(player, eagle.trackedTarget);
+        assertNotNull(eagle.getTrackedTarget());
+        assertEquals(player, eagle.getTrackedTarget());
         assertFalse(eagle.isMarkedForRemoval());
         assertEquals(2.0, eagle.getSpeed(), 0.01);
     }
