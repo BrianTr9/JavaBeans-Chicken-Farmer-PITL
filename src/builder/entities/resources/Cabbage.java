@@ -16,12 +16,18 @@ import engine.timing.TimerDuration;
  * collected by the player once grown. A cabbage is initially rendered as 'default' within {@link
  * SpriteGallery#cabbage}.
  *
- * @stage3
+ * <p>This class represents the in-game cabbage resource and manages its growth and harvesting
+ * behaviour.
  */
 public class Cabbage extends Entity implements Interactable {
 
+    /** Timer used to advance cabbage growth stages. */
     private final TickTimer timer = new RepeatingTimer(TimerDuration.SHORT);
-    private static final SpriteGroup art = SpriteGallery.cabbage;
+
+    /** Sprite group used to render cabbage states. */
+    private static final SpriteGroup ART = SpriteGallery.cabbage;
+
+    /** Growth state: 0..4 representing progression from 'default' to 'collectable'. */
     private int growthState = 0;
 
     /** The cost of planting a cabbage, 2 coins. */
@@ -32,26 +38,24 @@ public class Cabbage extends Entity implements Interactable {
      *
      * <p>Initially the cabbage is rendered as 'default' within {@link SpriteGallery#cabbage}.
      *
-     * @requires x >= 0, x is less than the window width
-     * @requires y >= 0, y is less than the window height
+     * <p>x and y must be non-negative and within the window bounds.
+     *
      * @param x The x-axis (horizontal) coordinate.
      * @param y The y-axis (vertical) coordinate.
      */
     public Cabbage(int x, int y) {
         super(x, y);
-        this.setSprite(art.getSprite("default"));
+        this.setSprite(ART.getSprite("default"));
     }
 
     /**
      * Progress the state of the cabbage, updating how it is rendered as required.
      *
-     * <p>The cabbage should progress through the following sprites in {@link
-     * SpriteGallery#cabbage}: 'default', 'budding', 'growing', 'grown', and finally 'collectable'.
+     * <p>The cabbage progresses through the following sprites in {@link SpriteGallery#cabbage}:
+     * 'default', 'budding', 'growing', 'grown', and finally 'collectable'. The cabbage transitions
+     * into its next state periodically.
      *
-     * <p>The cabbage should transition into its next state every 100 ticks.
-     *
-     * @hint To track cabbage state transitions, you may find {@link RepeatingTimer} and {@link
-     *     TimerDuration#SHORT} helpful.
+     * <p>Use {@link RepeatingTimer} and {@link TimerDuration#SHORT} to track timed transitions.
      */
     @Override
     public void tick(EngineState state) {
@@ -64,23 +68,24 @@ public class Cabbage extends Entity implements Interactable {
         }
     }
 
-    /** Updates the displayed art of this entity based on the given progress value. */
+    /** Updates the displayed art of this entity based on the current growth state. */
     private void updateArt() {
-        this.setSprite(
-                art.getSprite(
-                        switch (this.growthState) {
-                            case 0 -> "default";
-                            case 1 -> "budding";
-                            case 2 -> "growing";
-                            case 3 -> "grown";
-                            default -> "collectable";
-                        }));
+        String spriteName =
+            switch (this.growthState) {
+                case 0 -> "default";
+                case 1 -> "budding";
+                case 2 -> "growing";
+                case 3 -> "grown";
+                default -> "collectable";
+            };
+
+        this.setSprite(ART.getSprite(spriteName));
     }
 
     /**
      * Handle collecting a fully grown cabbage. When the player interacts with a fully grown cabbage
-     * the cost of the cabbage should be added to the player's food, 3 coins should be added to the
-     * player's inventory, and the cabbage should be removed from the game.
+     * the cost of the cabbage is added to the player's food, 3 coins are added to the player's
+     * inventory, and the cabbage is removed from the game.
      *
      * @param state The state of the engine, including the mouse, keyboard information and
      *     dimension. Useful for processing keyboard presses or mouse movement. Note that for

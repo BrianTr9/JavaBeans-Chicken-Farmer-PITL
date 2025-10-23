@@ -1,7 +1,6 @@
 package builder.entities.npc.spawners;
 
 import builder.GameState;
-import builder.Tickable;
 
 import engine.EngineState;
 import engine.game.HasPosition;
@@ -20,15 +19,15 @@ import engine.timing.TickTimer;
  *
  * <p>Subclasses implement {@link #spawnBird(EngineState, GameState)} to define
  * what type of bird to create and under what conditions.
- *
- * <p><b>Design rationale:</b> Extracted common fields and logic from concrete spawners
- * to reduce duplication (DRY) and increase cohesion. Each concrete spawner now focuses
- * solely on its unique spawning logic.
  */
 public abstract class AbstractBirdSpawner implements Spawner {
 
-    private int x;
-    private int y;
+    /** Spawn X coordinate for this spawner. */
+    private int spawnX;
+
+    /** Spawn Y coordinate for this spawner. */
+    private int spawnY;
+
     private final RepeatingTimer timer;
 
     /**
@@ -39,8 +38,8 @@ public abstract class AbstractBirdSpawner implements Spawner {
      * @param duration The interval (in ticks) between spawn attempts.
      */
     protected AbstractBirdSpawner(int x, int y, int duration) {
-        this.x = x;
-        this.y = y;
+        this.spawnX = x;
+        this.spawnY = y;
         this.timer = new RepeatingTimer(duration);
     }
 
@@ -60,13 +59,6 @@ public abstract class AbstractBirdSpawner implements Spawner {
     /**
      * Spawn a bird if conditions are met. Called automatically when the timer finishes.
      *
-     * <p>Implementations should:
-     * <ol>
-     *   <li>Check any preconditions for spawning (e.g., target exists)</li>
-     *   <li>Create the appropriate bird type</li>
-     *   <li>Add it to the game's enemy manager</li>
-     * </ol>
-     *
      * @param state The engine state.
      * @param game The game state.
      */
@@ -79,29 +71,28 @@ public abstract class AbstractBirdSpawner implements Spawner {
      * @return The Euclidean distance in pixels.
      */
     protected int distanceFrom(HasPosition position) {
-        int deltaX = position.getX() - this.x;
-        int deltaY = position.getY() - this.y;
+        int deltaX = position.getX() - this.spawnX;
+        int deltaY = position.getY() - this.spawnY;
         return (int) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     }
 
     @Override
     public int getX() {
-        return this.x;
+        return this.spawnX;
     }
 
     @Override
     public void setX(int x) {
-        this.x = x;
+        this.spawnX = x;
     }
 
     @Override
     public int getY() {
-        return this.y;
+        return this.spawnY;
     }
 
     @Override
     public void setY(int y) {
-        this.y = y;
+        this.spawnY = y;
     }
 }
-

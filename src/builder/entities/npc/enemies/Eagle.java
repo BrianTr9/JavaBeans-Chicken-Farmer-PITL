@@ -8,34 +8,56 @@ import engine.art.sprites.SpriteGroup;
 import engine.game.HasPosition;
 import engine.timing.FixedTimer;
 
+/**
+ * An eagle enemy that flies towards the player and steals food.
+ *
+ * <p>Behaviour:
+ * <ul>
+ *   <li>Flies towards the player and on contact steals a fixed amount of food</li>
+ *   <li>After stealing, returns to spawn and removes itself</li>
+ *   <li>If removed before reaching spawn, any stolen food is refunded to the player</li>
+ * </ul>
+ */
 public class Eagle extends AbstractBird {
 
-    private static final SpriteGroup art = SpriteGallery.eagle;
+    /** Eagle sprite group. */
+    private static final SpriteGroup ART = SpriteGallery.eagle;
 
-    // Behavior constants (no behavior change; extracted for clarity)
+    /** Food stolen when the eagle successfully robs the player. */
     private static final int STEAL_FOOD = 3;
+
+    /** Initial flying speed while attacking. */
     private static final int INITIAL_SPEED = 2;
+
+    /** Speed while fleeing/returning to spawn. */
     private static final int FLEE_SPEED = 4;
 
     /** Amount of food currently stolen from the player (Eagle-specific). */
     private int food = 0;
 
+    /**
+     * Construct an Eagle targeting a player-like HasPosition.
+     *
+     * @param x horizontal spawn coordinate
+     * @param y vertical spawn coordinate
+     * @param trackedTarget the target to track (player)
+     */
     public Eagle(int x, int y, HasPosition trackedTarget) {
         super(x, y);
         this.setTrackedTarget(trackedTarget);
         this.setLifespan(new FixedTimer(5000));
 
-        this.setSprite(art.getSprite("default"));
+        this.setSprite(ART.getSprite("default"));
         this.setSpeed(INITIAL_SPEED);
         // Face initial target on spawn (attacking starts true)
         this.steerTowards(getTrackedTarget());
     }
 
     /**
-     * Behavior invariants:
-     * - While attacking: fly towards player, and on contact steal 3 food once, then flee to spawn.
-     * - While fleeing: fly towards spawn; on contact with spawn, despawn.
-     * - If removed before reaching spawn, any stolen food is returned to the player.
+     * Per-tick behaviour for the eagle.
+     *
+     * @param engine the engine state
+     * @param game the game state
      */
     @Override
     public void tick(EngineState engine, GameState game) {
@@ -85,11 +107,11 @@ public class Eagle extends AbstractBird {
         if (getAttacking()) {
             this.steerTowards(getTrackedTarget());
             if (getTrackedTarget() != null) {
-                this.updateVerticalSprite(art, getTrackedTarget().getY());
+                this.updateVerticalSprite(ART, getTrackedTarget().getY());
             }
         } else {
             this.steerTowards(this.getSpawnX(), this.getSpawnY());
-            this.updateVerticalSpriteTowardsSpawn(art, this.getSpawnY());
+            this.updateVerticalSpriteTowardsSpawn(ART, this.getSpawnY());
         }
     }
 
@@ -101,13 +123,14 @@ public class Eagle extends AbstractBird {
         }
     }
 
-    // --- Accessors for common bird attributes are inherited from AbstractBird ---
+    // --- Eagle-specific accessors -----------------------------------------------
 
-    // --- Eagle-specific accessors ---
+    /** Get the amount of food currently held by this eagle (stolen). */
     public int getFood() {
         return this.food;
     }
 
+    /** Set the amount of food currently held by this eagle (stolen). */
     public void setFood(int food) {
         this.food = food;
     }

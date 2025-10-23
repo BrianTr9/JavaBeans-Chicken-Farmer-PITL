@@ -16,18 +16,25 @@ import java.util.List;
 /**
  * A pigeon enemy that flies towards cabbages and steals them.
  *
- * <p>According to the specification:
+ * <p>Behaviour:
  * <ul>
  *   <li>Flies towards the closest cabbage in the world</li>
  *   <li>If no cabbage exists, returns to spawn</li>
- *   <li>When reaching a cabbage, steals it by removing it from the world</li>
+ *   <li>When reaching a cabbage, removes it from the world</li>
  *   <li>After stealing, returns to spawn and removes itself</li>
  * </ul>
  */
 public class Pigeon extends AbstractBird {
 
-    private static final SpriteGroup art = SpriteGallery.pigeon;
+    /** Pigeon sprite group. */
+    private static final SpriteGroup ART = SpriteGallery.pigeon;
 
+    /**
+     * Construct a pigeon at the given coordinates.
+     *
+     * @param x horizontal coordinate
+     * @param y vertical coordinate
+     */
     public Pigeon(int x, int y) {
         super(x, y);
         this.setLifespan(new FixedTimer(3000));
@@ -35,9 +42,16 @@ public class Pigeon extends AbstractBird {
         // default speed is 1 from Npc; sprite can be set later
     }
 
+    /**
+     * Construct a pigeon that immediately tracks a target.
+     *
+     * @param x horizontal coordinate
+     * @param y vertical coordinate
+     * @param trackedTarget the position to track (closest cabbage tile)
+     */
     public Pigeon(int x, int y, HasPosition trackedTarget) {
         super(x, y);
-        this.setSprite(art.getSprite("default"));
+        this.setSprite(ART.getSprite("default"));
         this.setTrackedTarget(trackedTarget);
         this.setSpeed(1);
         this.setLifespan(new FixedTimer(3000));
@@ -86,10 +100,11 @@ public class Pigeon extends AbstractBird {
 
     private void handleFleeing(EngineState engine) {
         this.steerTowards(this.getSpawnX(), this.getSpawnY());
-        if (this.distanceFrom(this.getSpawnX(), this.getSpawnY()) < engine.getDimensions().tileSize()) {
+        if (this.distanceFrom(this.getSpawnX(), this.getSpawnY())
+                < engine.getDimensions().tileSize()) {
             this.markForRemoval();
         }
-        this.updateVerticalSpriteTowardsSpawn(art, this.getSpawnY());
+        this.updateVerticalSpriteTowardsSpawn(ART, this.getSpawnY());
     }
 
     private void steerToCenter(EngineState engine) {
@@ -98,9 +113,9 @@ public class Pigeon extends AbstractBird {
         this.steerTowards(cx, cy);
         // set sprite relative to center (no null deref)
         if (this.getY() < cy) {
-            this.setSprite(art.getSprite("down"));
+            this.setSprite(ART.getSprite("down"));
         } else {
-            this.setSprite(art.getSprite("up"));
+            this.setSprite(ART.getSprite("up"));
         }
     }
 
@@ -116,7 +131,10 @@ public class Pigeon extends AbstractBird {
                                     }
                                     return false;
                                 });
-        if (tiles.isEmpty()) return null;
+        if (tiles.isEmpty()) {
+            return null;
+        }
+
         int distance = this.distanceFrom(tiles.getFirst());
         Tile closest = tiles.getFirst();
         for (Tile tile : tiles) {

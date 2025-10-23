@@ -10,14 +10,26 @@ import builder.ui.SpriteGallery;
 import engine.EngineState;
 import engine.art.sprites.SpriteGroup;
 
+/**
+ * A scarecrow that petrifies nearby magpies and pigeons, causing them to return to spawn.
+ */
 public class Scarecrow extends Npc {
 
+    /**
+     * The coin cost to place a scarecrow.
+     */
     public static final int COIN_COST = 2;
-    private static final SpriteGroup art = SpriteGallery.scarecrow;
+    private static final SpriteGroup ART = SpriteGallery.scarecrow;
 
+    /**
+     * Construct a scarecrow at the given coordinates.
+     *
+     * @param x horizontal coordinate
+     * @param y vertical coordinate
+     */
     public Scarecrow(int x, int y) {
         super(x, y);
-        this.setSprite(art.getSprite("default"));
+        this.setSprite(ART.getSprite("default"));
         this.setSpeed(0);
     }
 

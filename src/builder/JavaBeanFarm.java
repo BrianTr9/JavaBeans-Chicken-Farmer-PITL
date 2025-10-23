@@ -1,5 +1,19 @@
 package builder;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringJoiner;
+import java.util.function.Function;
+
+import engine.EngineState;
+import engine.game.Game;
+import engine.renderer.Dimensions;
+import engine.renderer.Renderable;
+
 import builder.entities.npc.NpcManager;
 import builder.entities.npc.enemies.EnemyManager;
 import builder.entities.npc.spawners.EagleSpawner;
@@ -8,7 +22,8 @@ import builder.entities.npc.spawners.PigeonSpawner;
 import builder.entities.npc.spawners.Spawner;
 import builder.entities.tiles.Dirt;
 import builder.entities.tiles.Tile;
-import builder.inventory.*;
+import builder.inventory.Inventory;
+import builder.inventory.TinyInventory;
 import builder.inventory.items.Bucket;
 import builder.inventory.items.HiveHammer;
 import builder.inventory.items.Hoe;
@@ -26,46 +41,38 @@ import builder.world.SpawnerDetails;
 import builder.world.WorldBuilder;
 import builder.world.WorldLoadException;
 
-import engine.EngineState;
-import engine.game.Game;
-import engine.renderer.Dimensions;
-import engine.renderer.Renderable;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringJoiner;
-import java.util.function.Function;
-
 /**
  * JavaBeans, a farming game.
  *
  * <p>In this game, the player collects coins by mining ores. The player, a chicken farmer, may use
  * those coins to plant cabbages on tilled dirt.
  *
- * <p>This class managers the world instance, player manager, and the inventory instance. The
- * inventory and resource overlays should also be managed by this class.
+ * <p>This class manages the world instance, player manager, and the inventory instance. The
+ * inventory and resource overlays are also managed by this class.
  *
  * <p>In stage 0, this class will store the Brutus character to wander around.
- *
- * @stage1part This class manages the player manager.
- * @stage2part This class manages the world instance.
  */
 public class JavaBeanFarm implements Game {
 
+    /** The number of inventory slots available to the player. */
     private static final int INVENTORY_SIZE = 5;
 
+    /** The manager responsible for the player. */
     private final PlayerManager playerManager;
 
+    /** The manager responsible for non-player characters. */
     private final NpcManager npcs;
+
+    /** The manager responsible for enemy entities. */
     private final EnemyManager enemies;
 
+    /** The game world. */
     private final BeanWorld world;
 
+    /** The player's inventory. */
     private final Inventory inventory;
+
+    /** Overlays rendered on top of the game (resource/inventory UI). */
     private final List<Overlay> overlays = new ArrayList<>();
 
     private String readAllReader(Reader reader) throws IOException {
@@ -79,13 +86,14 @@ public class JavaBeanFarm implements Game {
     }
 
     /**
-     * Constructs a new JavaBean Farm game using the given dimensions, mapPath and detailPath
+     * Constructs a new JavaBean Farm game using the given dimensions, map reader and details reader.
      *
      * @param dimensions The dimensions we want for this game.
-     * @param mapReader A reader the contains a description of the world map.
-     * @param detailReader A reader the contains the overlay details for the game, e.g. spawner locations.
-     * @throws IOException If the game is unable to find or open the default world map file.
-     * @throws WorldLoadException If the default world map file cannot be parsed successfully.
+     * @param mapReader A reader that contains a description of the world map.
+     * @param detailReader A reader that contains the overlay details for the game, e.g. spawner
+     *     locations.
+     * @throws IOException If the game is unable to find or open the provided readers.
+     * @throws WorldLoadException If the provided world details cannot be parsed successfully.
      */
     public JavaBeanFarm(Dimensions dimensions, Reader mapReader, Reader detailReader)
             throws IOException, WorldLoadException {
@@ -109,31 +117,57 @@ public class JavaBeanFarm implements Game {
 
         // Build world from map
         String worldContent = readAllReader(mapReader);
-        this.world = WorldBuilder.fromTiles(WorldBuilder.fromString(dimensions, worldContent));
+        this.world = WorldBuilder.fromTiles(
+                WorldBuilder.fromString(dimensions, worldContent));
 
         // Seed cabbages per details
-        populateInitialCabbages(dimensions, OverlayBuilder.getCabbageSpawnDetailsFromString(detailsContent));
+        populateInitialCabbages(
+                dimensions,
+                OverlayBuilder.getCabbageSpawnDetailsFromString(detailsContent));
 
         // Initialize inventory and overlays
-        this.inventory = initializeInventory(INVENTORY_SIZE, playerDetails.getStartingCoins(), playerDetails.getStartingFood());
+        this.inventory = initializeInventory(
+                playerDetails.getStartingCoins(), playerDetails.getStartingFood());
         this.overlays.add(new InventoryOverlay(dimensions, INVENTORY_SIZE));
         this.overlays.add(new ResourceOverlay(dimensions));
     }
 
-    public JavaBeanFarm(Dimensions dimensions, String mapFile, String detailsFile) throws IOException, WorldLoadException {
+    /**
+     * Constructs a new JavaBean Farm game using file paths for the map and details files.
+     *
+     * @param dimensions The dimensions we want for this game.
+     * @param mapFile Path to the map file.
+     * @param detailsFile Path to the details file.
+     * @throws IOException If the game is unable to find or open the provided files.
+     * @throws WorldLoadException If the provided world details cannot be parsed successfully.
+     */
+    public JavaBeanFarm(
+            Dimensions dimensions,
+            String mapFile,
+            String detailsFile)
+            throws IOException, WorldLoadException {
         this(dimensions, new FileReader(mapFile), new FileReader(detailsFile));
     }
 
     /**
-     * Ticks the internal game state forward by one frame. a
+     * Ticks the internal game state forward by one frame.
      *
      * @param state The state of the engine, including the mouse, keyboard information and
      *     dimension. Useful for processing keyboard presses or mouse movement.
-     * @stage1part The player manager should be progressed via {@link
-     *     PlayerManager#tick(EngineState, GameState)}.
-     * @stage2part The world should be progressed via {@link BeanWorld#tick(EngineState,
-     *     GameState)}.
+     *
+     * <p>Progression order:
+     * <ul>
+     *   <li>
+     *     Advance the player manager via
+     *     {@link PlayerManager#tick(EngineState, GameState)}.
+     *   </li>
+     *   <li>
+     *     Advance the world via
+     *     {@link BeanWorld#tick(EngineState, GameState)}.
+     *   </li>
+     * </ul>
      */
+    @Override
     public void tick(EngineState state) {
         GameState game =
                 new JavaBeanGameState(
@@ -160,12 +194,22 @@ public class JavaBeanFarm implements Game {
      * returned.
      *
      * @return The list of renderables required to draw the whole game.
-     * @stage2part Any renderables of the world (i.e. {@link BeanWorld#render()}) must be rendered
-     *     behind everything else, i.e., first in the returned list.
-     * @stage1part Any renderables of the player (i.e. {@link PlayerManager#render()}) must be
-     *     rendered after the world but before overlays.
-     *     <p>Overlays, i.e., {@link ResourceOverlay} and {@link InventoryOverlay} must be rendered
-     *     last in any order.
+     *
+     * <p>Rendering order:
+     * <ol>
+     *   <li>
+     *     The world's renderables (from {@link BeanWorld#render()}) must be first so they are
+     *     drawn behind everything else.
+     *   </li>
+     *   <li>
+     *     The player's renderables (from {@link PlayerManager#render()}) must come after the
+     *     world but before overlays.
+     *   </li>
+     *   <li>
+     *     Overlays ({@link ResourceOverlay} and {@link InventoryOverlay}) must be rendered last,
+     *     in any order.
+     *   </li>
+     * </ol>
      */
     @Override
     public List<Renderable> render() {
@@ -188,21 +232,27 @@ public class JavaBeanFarm implements Game {
 
     // --- Private helpers to keep constructors lean and avoid duplication ---
 
-    private void addSpawners(List<SpawnerDetails> points, Function<SpawnerDetails, Spawner> factory) {
+    private void addSpawners(
+            List<SpawnerDetails> points,
+            Function<SpawnerDetails, Spawner> factory) {
         for (SpawnerDetails sd : points) {
             this.enemies.add(factory.apply(sd));
         }
     }
 
-    private void populateInitialCabbages(Dimensions dimensions, List<CabbageDetails> cabbages) {
+    private void populateInitialCabbages(
+            Dimensions dimensions,
+            List<CabbageDetails> cabbages) {
         for (CabbageDetails cabbageDetails : cabbages) {
             final int positionX = cabbageDetails.getX();
             final int positionY = cabbageDetails.getY();
-            final List<Tile> tiles = this.world.tilesAtPosition(positionX, positionY, dimensions);
+            final List<Tile> tiles =
+                    this.world.tilesAtPosition(positionX, positionY, dimensions);
             for (Tile tile : tiles) {
                 if (tile instanceof Dirt) {
                     // Till and plant using a temporary inventory with generous resources
-                    TinyInventory tempInventory = new TinyInventory(5, 100, 100);
+                    TinyInventory tempInventory = new TinyInventory(
+                            5, 100, 100);
                     ((Dirt) tile).till();
                     ((Dirt) tile).plant(tempInventory);
                 }
@@ -210,8 +260,11 @@ public class JavaBeanFarm implements Game {
         }
     }
 
-    private Inventory initializeInventory(int size, int startingCoins, int startingFood) {
-        TinyInventory inv = new TinyInventory(size, startingCoins, startingFood);
+    private Inventory initializeInventory(int startingCoins, int startingFood) {
+        TinyInventory inv = new TinyInventory(
+                INVENTORY_SIZE,
+                startingCoins,
+                startingFood);
         inv.setItem(0, new Bucket());
         inv.setItem(1, new Hoe());
         inv.setItem(2, new Jackhammer());

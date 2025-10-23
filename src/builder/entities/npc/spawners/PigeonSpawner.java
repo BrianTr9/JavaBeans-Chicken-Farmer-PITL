@@ -21,16 +21,6 @@ public class PigeonSpawner extends AbstractBirdSpawner {
     private static final int DEFAULT_DURATION = 100;
 
     /**
-     * Construct a pigeon spawner with default spawn interval.
-     *
-     * @param x The x-coordinate of the spawn location.
-     * @param y The y-coordinate of the spawn location.
-     */
-    public PigeonSpawner(int x, int y) {
-        super(x, y, DEFAULT_DURATION);
-    }
-
-    /**
      * Construct a pigeon spawner with custom spawn interval.
      *
      * @param x The x-coordinate of the spawn location.
@@ -78,10 +68,12 @@ public class PigeonSpawner extends AbstractBirdSpawner {
      * @return The closest tile to this spawner.
      */
     private Tile findClosestTile(List<Tile> tiles) {
-        Tile closest = tiles.get(0);
+        final java.util.Iterator<Tile> it = tiles.iterator();
+        Tile closest = it.next();
         int minDistance = this.distanceFrom(closest);
 
-        for (Tile tile : tiles) {
+        while (it.hasNext()) {
+            Tile tile = it.next();
             int distance = this.distanceFrom(tile);
             if (distance < minDistance) {
                 closest = tile;

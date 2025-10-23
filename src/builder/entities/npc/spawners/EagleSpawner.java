@@ -15,16 +15,6 @@ public class EagleSpawner extends AbstractBirdSpawner {
     private static final int DEFAULT_DURATION = 1000;
 
     /**
-     * Construct an eagle spawner with default spawn interval.
-     *
-     * @param x The x-coordinate of the spawn location.
-     * @param y The y-coordinate of the spawn location.
-     */
-    public EagleSpawner(int x, int y) {
-        super(x, y, DEFAULT_DURATION);
-    }
-
-    /**
      * Construct an eagle spawner with custom spawn interval.
      *
      * @param x The x-coordinate of the spawn location.

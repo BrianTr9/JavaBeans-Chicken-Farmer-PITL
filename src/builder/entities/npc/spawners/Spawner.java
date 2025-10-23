@@ -9,24 +9,56 @@ import engine.timing.TickTimer;
 
 /**
  * A spawner is responsible for spawning specific types of {@link builder.entities.npc.Npc}s or
- * {@link builder.entities.npc.enemies.Enemy}s
+ * {@link builder.entities.npc.enemies.Enemy}s.
  */
 public interface Spawner extends HasPosition, Tickable {
 
-    public TickTimer getTimer();
+    /**
+     * Get the internal timer used to control spawn intervals.
+     *
+     * @return the TickTimer used by this spawner
+     */
+    TickTimer getTimer();
 
+    /**
+     * Progress the spawner by one tick. Implementations may spawn entities when their timer
+     * finishes.
+     *
+     * @param state the engine state for this tick
+     * @param game the current game state
+     */
     @Override
-    public void tick(EngineState state, GameState game);
+    void tick(EngineState state, GameState game);
 
+    /**
+     * Get the X coordinate of this spawner.
+     *
+     * @return the horizontal coordinate in pixels
+     */
     @Override
-    public int getX();
+    int getX();
 
+    /**
+     * Set the X coordinate of this spawner.
+     *
+     * @param x the horizontal coordinate in pixels
+     */
     @Override
-    public void setX(int x);
+    void setX(int x);
 
+    /**
+     * Get the Y coordinate of this spawner.
+     *
+     * @return the vertical coordinate in pixels
+     */
     @Override
-    public int getY();
+    int getY();
 
+    /**
+     * Set the Y coordinate of this spawner.
+     *
+     * @param y the vertical coordinate in pixels
+     */
     @Override
-    public void setY(int y);
+    void setY(int y);
 }

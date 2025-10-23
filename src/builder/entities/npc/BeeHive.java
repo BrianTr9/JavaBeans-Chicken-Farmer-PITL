@@ -17,14 +17,20 @@ public class BeeHive extends Npc {
     public static final int TIMER = 240;
     public static final int FOOD_COST = 2;
     public static final int COIN_COST = 2;
-    private static final SpriteGroup art = SpriteGallery.hive;
+    private static final SpriteGroup ART = SpriteGallery.hive;
     private boolean loaded = true;
 
     private final RepeatingTimer timer = new RepeatingTimer(TIMER);
 
+    /**
+     * Construct a new BeeHive located at the given coordinates.
+     *
+     * @param x horizontal coordinate
+     * @param y vertical coordinate
+     */
     public BeeHive(int x, int y) {
         super(x, y);
-        this.setSprite(art.getSprite("default"));
+        this.setSprite(ART.getSprite("default"));
         this.setSpeed(0);
     }
 
@@ -66,6 +72,13 @@ public class BeeHive extends Npc {
         }
     }
 
+    /**
+     * Check the provided targets for a bird within detection range and spawn a GuardBee if
+     * the hive is loaded.
+     *
+     * @param targets the list of enemy birds to consider
+     * @return a new GuardBee to spawn, or null if none should be spawned
+     */
     public Npc checkAndSpawnBee(ArrayList<Enemy> targets) {
         for (Enemy enemy : targets) {
             if (this.distanceFrom(enemy) < DETECTION_DISTANCE && this.loaded) {

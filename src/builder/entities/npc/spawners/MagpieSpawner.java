@@ -15,16 +15,6 @@ public class MagpieSpawner extends AbstractBirdSpawner {
     private static final int DEFAULT_DURATION = 360;
 
     /**
-     * Construct a magpie spawner with default spawn interval.
-     *
-     * @param x The x-coordinate of the spawn location.
-     * @param y The y-coordinate of the spawn location.
-     */
-    public MagpieSpawner(int x, int y) {
-        super(x, y, DEFAULT_DURATION);
-    }
-
-    /**
      * Construct a magpie spawner with custom spawn interval.
      *
      * @param x The x-coordinate of the spawn location.

@@ -7,10 +7,10 @@ import builder.player.Player;
 import builder.world.World;
 
 /**
- * An implementation of the game state for the JavaBean game. Stores the world, player, and
- * inventory.
+ * An implementation of the game state for the JavaBean game.
  *
- * @hint As with {@link GameState}, you can create this class incrementally through each stage.
+ * <p>This class stores the world, player, inventory and managers required by the game and
+ * provides accessors used by game subsystems.
  */
 public class JavaBeanGameState implements GameState {
     private final World world;
@@ -25,6 +25,8 @@ public class JavaBeanGameState implements GameState {
      * @param world The world of the game.
      * @param player The player of the game.
      * @param inventory The inventory of the player.
+     * @param npcs The NPC manager for the game.
+     * @param enemies The enemy manager for the game.
      */
     public JavaBeanGameState(
             World world,
@@ -39,34 +41,31 @@ public class JavaBeanGameState implements GameState {
         this.enemies = enemies;
     }
 
+    /** Returns the NPC manager for this game state. */
+    @Override
     public NpcManager getNpcs() {
         return this.npcs;
     }
 
+    /** Returns the enemy manager for this game state. */
     @Override
     public EnemyManager getEnemies() {
         return this.enemies;
     }
 
-    /**
-     * @stage2
-     */
+    /** Returns the current game world. */
     @Override
     public World getWorld() {
         return world;
     }
 
-    /**
-     * @stage1
-     */
+    /** Returns the current player. */
     @Override
     public Player getPlayer() {
         return player;
     }
 
-    /**
-     * @stage3
-     */
+    /** Returns the current inventory for the player. */
     @Override
     public Inventory getInventory() {
         return inventory;

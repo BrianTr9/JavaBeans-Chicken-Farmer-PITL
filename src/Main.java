@@ -11,8 +11,6 @@ import java.io.IOException;
 
 /**
  * A main class to execute the JavaBean game.
- *
- * @provided
  */
 public class Main {
     private static final int SIZE = 800;
@@ -28,7 +26,10 @@ public class Main {
     public static void main(String[] args) throws IOException, WorldLoadException {
         Dimensions dimensions = new TileGrid(TILES_PER_ROW, SIZE);
         Game game =
-                new JavaBeanFarm(dimensions, new FileReader("resources/uqLogo.map"), new FileReader("resources/uqLogo.details"));
+                new JavaBeanFarm(
+                        dimensions,
+                        new FileReader("resources/uqLogo.map"),
+                        new FileReader("resources/uqLogo.details"));
         Engine engine = new Engine(game, dimensions);
 
         // Optionally uncomment this line to turn on debug mode

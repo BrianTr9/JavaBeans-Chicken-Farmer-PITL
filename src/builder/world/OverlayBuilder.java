@@ -23,8 +23,8 @@ public class OverlayBuilder {
         final String[] lines = contents.split("\n");
         boolean collectingLines = false;
         final List<String> section = new ArrayList<>();
-        for (int i = 0; i < lines.length; i++) { // iterate over lines, not contents length
-            final String current = lines[i].toLowerCase().trim();
+        for (String rawLine : lines) {
+            final String current = rawLine.toLowerCase().trim();
             if (collectingLines && current.equals("end;")) {
                 return section;
             }
@@ -38,19 +38,16 @@ public class OverlayBuilder {
         throw new IOException("Section not Found!");
     }
 
-    /**
-     * @param line line to process.
-     * @return a new {@link SpawnerDetails} holding the information extracted from the line.
-     */
+    /** Returns a new SpawnerDetails parsed from a single line. */
     public static SpawnerDetails extractSpawnDetailsFromLine(String line) {
         String[] chunks = line.split(" ");
         assert chunks.length == 3; // should always be 3 chunks in a correctly shaped line.
-        String[] xChunk = chunks[0].split(":");
-        String[] yChunk = chunks[1].split(":");
-        String[] durationChunk = chunks[2].split(":");
-        final int x = Integer.parseInt(xChunk[1]);
-        final int y = Integer.parseInt(yChunk[1]);
-        final int duration = Integer.parseInt(durationChunk[1]);
+        String[] xchunk = chunks[0].split(":");
+        String[] ychunk = chunks[1].split(":");
+        String[] durationchunk = chunks[2].split(":");
+        final int x = Integer.parseInt(xchunk[1]);
+        final int y = Integer.parseInt(ychunk[1]);
+        final int duration = Integer.parseInt(durationchunk[1]);
         return new SpawnerDetails() {
             @Override
             public int getX() {
@@ -98,32 +95,36 @@ public class OverlayBuilder {
         return list;
     }
 
+    /** Returns eagle spawner details parsed from the details content. */
     public static List<SpawnerDetails> getEagleSpawnDetailsFromString(String detailsContent)
             throws IOException {
         return getSpawnerDetailsForLabel("eaglespawner", detailsContent);
     }
 
+    /** Returns pigeon spawner details parsed from the details content. */
     public static List<SpawnerDetails> getPigeonSpawnDetailsFromString(String detailsContent)
             throws IOException {
         return getSpawnerDetailsForLabel("pigeonspawner", detailsContent);
     }
 
+    /** Returns magpie spawner details parsed from the details content. */
     public static List<SpawnerDetails> getMagpieSpawnDetailsFromString(String detailsContent)
             throws IOException {
         return getSpawnerDetailsForLabel("magpiespawner", detailsContent);
     }
 
+    /** Parses a player details line into a PlayerDetails instance. */
     public static PlayerDetails extractPlayerDetailsFromLine(String line) {
         String[] chunks = line.split(" ");
         assert chunks.length == 4; // should always be 4 chunks in a correctly shaped line.
-        String[] xChunk = chunks[0].split(":");
-        String[] yChunk = chunks[1].split(":");
-        String[] coinChunk = chunks[2].split(":");
-        String[] foodChunk = chunks[3].split(":");
-        final int x = Integer.parseInt(xChunk[1]);
-        final int y = Integer.parseInt(yChunk[1]);
-        final int coins = Integer.parseInt(coinChunk[1]);
-        final int food = Integer.parseInt(foodChunk[1]);
+        String[] xchunk = chunks[0].split(":");
+        String[] ychunk = chunks[1].split(":");
+        String[] coinchunk = chunks[2].split(":");
+        String[] foodchunk = chunks[3].split(":");
+        final int x = Integer.parseInt(xchunk[1]);
+        final int y = Integer.parseInt(ychunk[1]);
+        final int coins = Integer.parseInt(coinchunk[1]);
+        final int food = Integer.parseInt(foodchunk[1]);
         return new PlayerDetails() {
             @Override
             public int getStartingFood() {
@@ -162,14 +163,16 @@ public class OverlayBuilder {
         };
     }
 
+    /** Returns player details parsed from the provided details content. */
     public static PlayerDetails getPlayerDetailsFromFile(String detailsContent) throws IOException {
         List<String> section = OverlayBuilder.getSection("chickenFarmer", detailsContent);
         assert section.size()
                 == 1; // right now we only expect there to ever be one chicken farmer entry
-        String entry = section.get(0);
+        final String entry = section.get(0);
         return OverlayBuilder.extractPlayerDetailsFromLine(entry);
     }
 
+    /** Returns cabbage spawn details parsed from the details content. */
     public static List<CabbageDetails> getCabbageSpawnDetailsFromString(String detailsContent)
             throws IOException {
         final List<String> section = OverlayBuilder.getSection("cabbages", detailsContent);
@@ -182,10 +185,10 @@ public class OverlayBuilder {
 
     private static CabbageDetails extractCabbageDetailsFromLine(String line) {
         final String[] chunks = line.split(" ");
-        String[] xChunk = chunks[0].split(":");
-        String[] yChunk = chunks[1].split(":");
-        final int x = Integer.parseInt(xChunk[1]);
-        final int y = Integer.parseInt(yChunk[1]);
+        String[] xchunk = chunks[0].split(":");
+        String[] ychunk = chunks[1].split(":");
+        final int x = Integer.parseInt(xchunk[1]);
+        final int y = Integer.parseInt(ychunk[1]);
         return new CabbageDetails() {
             @Override
             public int getX() {

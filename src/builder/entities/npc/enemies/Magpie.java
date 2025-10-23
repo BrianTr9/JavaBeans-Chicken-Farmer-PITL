@@ -23,17 +23,29 @@ import engine.timing.RepeatingTimer;
  */
 public class Magpie extends AbstractBird {
 
-    private static final SpriteGroup art = SpriteGallery.magpie;
-    private RepeatingTimer directionalUpdateTimer = new RepeatingTimer(30);
+    /** Magpie sprite group. */
+    private static final SpriteGroup ART = SpriteGallery.magpie;
+
+    /** Timer used to update directional heading periodically. */
+    private final RepeatingTimer directionalUpdateTimer = new RepeatingTimer(30);
+
+    /** Number of coins currently stolen by this magpie. */
     private int coins = 0;
 
-    public Magpie(int xCoordinate, int yCoordinate, HasPosition trackedTarget) {
-        super(xCoordinate, yCoordinate);
+    /**
+     * Construct a magpie that will target the provided player-like position.
+     *
+     * @param x horizontal spawn coordinate
+     * @param y vertical spawn coordinate
+     * @param trackedTarget the player to track
+     */
+    public Magpie(int x, int y, HasPosition trackedTarget) {
+        super(x, y);
         this.setTrackedTarget(trackedTarget);
         this.setLifespan(new FixedTimer(10000));
         this.setAttacking(true);
 
-        this.setSprite(art.getSprite("down"));
+        this.setSprite(ART.getSprite("down"));
 
         double deltaX = trackedTarget.getX() - this.getX();
         double deltaY = trackedTarget.getY() - this.getY();
@@ -54,18 +66,19 @@ public class Magpie extends AbstractBird {
 
         if (this.getAttacking()) {
             this.steerTowards(getTrackedTarget());
-            this.updateVerticalSprite(art, getTrackedTarget().getY());
+            this.updateVerticalSprite(ART, getTrackedTarget().getY());
         } else {
             this.steerTowards(this.getSpawnX(), this.getSpawnY());
-            this.updateVerticalSpriteTowardsSpawn(art, this.getSpawnY());
+            this.updateVerticalSpriteTowardsSpawn(ART, this.getSpawnY());
         }
+
         this.move();
         this.directionalUpdateTimer.tick();
 
         Player player = game.getPlayer();
 
-        final boolean hasHitPlayer =
-                this.distanceFrom(player.getX(), player.getY()) < engine.getDimensions().tileSize();
+        final boolean hasHitPlayer = this.distanceFrom(player.getX(), player.getY())
+                < engine.getDimensions().tileSize();
         if (hasHitPlayer && game.getInventory().getCoins() > 0 && this.getAttacking()) {
             game.getInventory().addCoins(-1);
             this.coins += 1;
@@ -74,7 +87,8 @@ public class Magpie extends AbstractBird {
         }
 
         if (!this.getAttacking()) {
-            if (this.distanceFrom(this.getSpawnX(), this.getSpawnY()) < engine.getDimensions().tileSize()) {
+            if (this.distanceFrom(this.getSpawnX(), this.getSpawnY())
+                    < engine.getDimensions().tileSize()) {
                 this.markForRemoval();
             }
         }
@@ -82,18 +96,27 @@ public class Magpie extends AbstractBird {
         // Refund stolen coin if removed before reaching spawn:
         // - If removed while attacking (e.g., lifespan), refund.
         // - Or if removed and still not within a tile of spawn, refund.
-        if (this.isMarkedForRemoval()
-                && this.coins > 0
+        if (this.isMarkedForRemoval() && this.coins > 0
                 && this.distanceFrom(this.getSpawnX(), this.getSpawnY())
-                                > engine.getDimensions().tileSize()) {
+                        > engine.getDimensions().tileSize()) {
             game.getInventory().addCoins(this.coins);
         }
     }
 
+    /**
+     * Get the number of coins currently held by this magpie.
+     *
+     * @return the number of stolen coins
+     */
     public int getCoins() {
         return this.coins;
     }
 
+    /**
+     * Set the number of coins currently held by this magpie.
+     *
+     * @param coins the number of coins to set
+     */
     public void setCoins(int coins) {
         this.coins = coins;
     }

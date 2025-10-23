@@ -12,30 +12,32 @@ import engine.timing.FixedTimer;
 import java.util.ArrayList;
 
 /**
- * A highly trained Guard Bee... don't think about that too much. This is our projectile class,
- * basically a bullet.
+ * A highly trained Guard Bee used as a short-lived projectile that hunts birds.
  */
 public class GuardBee extends Npc implements Expirable {
 
     private final int spawnX;
     private final int spawnY;
     private static final int SPEED = 2;
-    private static final SpriteGroup art = SpriteGallery.bee;
+    private static final SpriteGroup ART = SpriteGallery.bee;
     private FixedTimer lifespan = new FixedTimer(300);
     private final HasPosition trackedTarget;
 
     /**
-     * @param xCoordinate horizontal spawning position
-     * @param yCoordinate vertical spawning position
+     * Construct a GuardBee spawned at the given coordinates that initially tracks the
+     * supplied target.
+     *
+     * @param x horizontal spawning position
+     * @param y vertical spawning position
      * @param trackedTarget target with a position we want this to track (initial aim)
      */
-    public GuardBee(int xCoordinate, int yCoordinate, HasPosition trackedTarget) {
-        super(xCoordinate, yCoordinate);
-        this.setSprite(art.getSprite("default"));
+    public GuardBee(int x, int y, HasPosition trackedTarget) {
+        super(x, y);
+        this.setSprite(ART.getSprite("default"));
         this.trackedTarget = trackedTarget;
 
-        this.spawnX = xCoordinate;
-        this.spawnY = yCoordinate;
+        this.spawnX = x;
+        this.spawnY = y;
 
         double deltaX = trackedTarget.getX() - this.getX();
         double deltaY = trackedTarget.getY() - this.getY();
@@ -53,18 +55,21 @@ public class GuardBee extends Npc implements Expirable {
         this.lifespan = timer;
     }
 
+    /**
+     * Update the sprite used to render the bee based on its current movement direction.
+     */
     public void updateArtBasedOnDirection() {
         boolean goingUp = (this.getDirection() >= 230 && this.getDirection() < 310);
         boolean goingDown = (this.getDirection() >= 40 && this.getDirection() < 140);
         boolean goingRight = (this.getDirection() >= 310 && this.getDirection() < 40);
         if (goingDown) {
-            this.setSprite(art.getSprite("down"));
+            this.setSprite(ART.getSprite("down"));
         } else if (goingUp) {
-            this.setSprite(art.getSprite("up"));
+            this.setSprite(ART.getSprite("up"));
         } else if (goingRight) {
-            this.setSprite(art.getSprite("right"));
+            this.setSprite(ART.getSprite("right"));
         } else {
-            this.setSprite(art.getSprite("left"));
+            this.setSprite(ART.getSprite("left"));
         }
     }
 
