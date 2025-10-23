@@ -30,31 +30,47 @@ public class BeeHive extends Npc {
 
     @Override
     public void tick(EngineState state, GameState game) {
+        // Preserve base movement (no-op since speed=0), but call for consistency
         super.tick(state);
-        this.timer.tick();
+
+        if (!loaded) {
+            if (isPlayerOnHive(state, game)) {
+                this.timer.tick();
+                this.timer.tick();
+                this.timer.tick();
+            } else {
+                this.timer.tick();
+            }
+            if (this.timer.isFinished()) {
+                this.loaded = true;
+            }
+        }
+    }
+
+    private boolean isPlayerOnHive(EngineState state, GameState game) {
+        return this.distanceFrom(game.getPlayer().getX(), game.getPlayer().getY())
+                < state.getDimensions().tileSize();
     }
 
     @Override
     public void interact(EngineState state, GameState game) {
+        // No timer ticking or spawning here; handled in tick() to avoid double-counting
         super.interact(state, game);
-
-        timer.tick();
-        timer.tick();
-        Npc npc = this.checkAndSpawnBee(game.getEnemies().Birds);
-        if (npc != null) {
-            game.getNpcs().npcs.add(npc);
-        }
-        if (timer.isFinished()) {
-            this.loaded = true;
+        // Only spawn in interact() to avoid mutating the NpcManager list during tick iteration
+        if (this.loaded) {
+            Npc bee = this.checkAndSpawnBee(new ArrayList<>(game.getEnemies().Birds));
+            if (bee != null) {
+                game.getNpcs().addNpc(bee);
+                this.loaded = false; // begin reload cycle; timer will tick in tick()
+            }
         }
     }
 
     public Npc checkAndSpawnBee(ArrayList<Enemy> targets) {
         for (Enemy enemy : targets) {
             if (this.distanceFrom(enemy) < DETECTION_DISTANCE && this.loaded) {
-                this.loaded = false;
-                return new GuardBee(
-                        this.getX(), this.getY(), enemy); // can only spawn one bee in a frame
+                // can only spawn one bee in a frame
+                return new GuardBee(this.getX(), this.getY(), enemy);
             }
         }
         return null;

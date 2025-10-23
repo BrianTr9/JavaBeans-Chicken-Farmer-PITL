@@ -9,6 +9,8 @@ import engine.art.sprites.SpriteGroup;
 import engine.game.HasPosition;
 import engine.timing.FixedTimer;
 
+import java.util.ArrayList;
+
 /**
  * A highly trained Guard Bee... don't think about that too much. This is our projectile class,
  * basically a bullet.
@@ -25,7 +27,7 @@ public class GuardBee extends Npc implements Expirable {
     /**
      * @param xCoordinate horizontal spawning position
      * @param yCoordinate vertical spawning position
-     * @param trackedTarget target with a position we want this to track
+     * @param trackedTarget target with a position we want this to track (initial aim)
      */
     public GuardBee(int xCoordinate, int yCoordinate, HasPosition trackedTarget) {
         super(xCoordinate, yCoordinate);
@@ -68,25 +70,41 @@ public class GuardBee extends Npc implements Expirable {
 
     @Override
     public void tick(EngineState state, GameState game) {
+        // Keep legacy double-move: one via base, then an explicit second move
         super.tick(state);
         this.move();
 
-        if (this.trackedTarget == null) {
-            double deltaX = this.spawnX - this.getX();
-            double deltaY = this.spawnY - this.getY();
-            this.setDirection((int) Math.toDegrees(Math.atan2(deltaY, deltaX)));
-            return;
-        }
-        for (Enemy enemy : game.getEnemies().Birds) {
-            if (this.distanceFrom(enemy)
-                    < 300) { // if a magpie is close enough to a bee it will lock onto it // TODO
-                double deltaX = this.trackedTarget.getX() - this.getX();
-                double deltaY = this.trackedTarget.getY() - this.getY();
-                this.setDirection((int) Math.toDegrees(Math.atan2(deltaY, deltaX)));
-                break;
+        // Determine closest enemy each tick
+        Enemy nearest = null;
+        int nearestDist = Integer.MAX_VALUE;
+        ArrayList<Enemy> enemies = new ArrayList<>(game.getEnemies().Birds);
+        for (Enemy enemy : enemies) {
+            int d = this.distanceFrom(enemy);
+            if (d < nearestDist) {
+                nearest = enemy;
+                nearestDist = d;
             }
         }
-        for (Enemy enemy : game.getEnemies().getALl()) {
+
+        if (nearest != null) {
+            // Steer towards closest bird
+            double dx = nearest.getX() - this.getX();
+            double dy = nearest.getY() - this.getY();
+            this.setDirection((int) Math.toDegrees(Math.atan2(dy, dx)));
+        } else if (this.trackedTarget != null) {
+            // No birds in world: continue towards the last known target (as per existing tests)
+            double dx = this.trackedTarget.getX() - this.getX();
+            double dy = this.trackedTarget.getY() - this.getY();
+            this.setDirection((int) Math.toDegrees(Math.atan2(dy, dx)));
+        } else {
+            // Fallback: steer back to spawn if no target
+            double dx = this.spawnX - this.getX();
+            double dy = this.spawnY - this.getY();
+            this.setDirection((int) Math.toDegrees(Math.atan2(dy, dx)));
+        }
+
+        // Collision with any enemy: remove both
+        for (Enemy enemy : enemies) {
             if (this.distanceFrom(enemy) < state.getDimensions().tileSize()) {
                 enemy.markForRemoval();
                 this.markForRemoval();

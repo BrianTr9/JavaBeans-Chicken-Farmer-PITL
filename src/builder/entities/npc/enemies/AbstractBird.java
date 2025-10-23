@@ -65,21 +65,6 @@ abstract class AbstractBird extends Enemy implements Expirable {
         return this.spawnY;
     }
 
-    /** Turn to face the given target position. */
-    protected void steerTowards(HasPosition target) {
-        if (target == null) return;
-        final double deltaX = target.getX() - this.getX();
-        final double deltaY = target.getY() - this.getY();
-        this.setDirection((int) Math.toDegrees(Math.atan2(deltaY, deltaX)));
-    }
-
-    /** Turn to face the given x,y position. */
-    protected void steerTowards(int x, int y) {
-        final double deltaX = x - this.getX();
-        final double deltaY = y - this.getY();
-        this.setDirection((int) Math.toDegrees(Math.atan2(deltaY, deltaX)));
-    }
-
     /**
      * Update sprite based on whether the target y is below or above current y, using provided art.
      * Chooses "down" when target is below current y, otherwise "up".

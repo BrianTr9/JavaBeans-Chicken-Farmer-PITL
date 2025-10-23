@@ -78,4 +78,18 @@ public class Npc extends Entity implements Interactable, Tickable, Directable {
         int deltaY = yCoordinate - this.getY();
         return (int) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     }
+
+    // --- Shared steering helpers for all NPCs ---
+    protected void steerTowards(HasPosition target) {
+        if (target == null) return;
+        final double deltaX = target.getX() - this.getX();
+        final double deltaY = target.getY() - this.getY();
+        this.setDirection((int) Math.toDegrees(Math.atan2(deltaY, deltaX)));
+    }
+
+    protected void steerTowards(int x, int y) {
+        final double deltaX = x - this.getX();
+        final double deltaY = y - this.getY();
+        this.setDirection((int) Math.toDegrees(Math.atan2(deltaY, deltaX)));
+    }
 }

@@ -10,8 +10,6 @@ import builder.ui.SpriteGallery;
 import engine.EngineState;
 import engine.art.sprites.SpriteGroup;
 
-import java.util.ArrayList;
-
 public class Scarecrow extends Npc {
 
     public static final int COIN_COST = 2;
@@ -31,31 +29,18 @@ public class Scarecrow extends Npc {
     @Override
     public void interact(EngineState state, GameState game) {
         super.interact(state, game);
-        EnemyManager enemies = game.getEnemies();
-        final ArrayList<Magpie> magpies = new ArrayList<>();
-        final ArrayList<Pigeon> pigeons = new ArrayList<>();
+        final EnemyManager enemies = game.getEnemies();
+        final int scareRadius = state.getDimensions().tileSize() * 4; // inclusive radius per spec
+
         for (Enemy bird : enemies.Birds) {
-            if (bird instanceof Magpie) {
-                magpies.add((Magpie) bird);
-            }
-            if (bird instanceof Pigeon) {
-                pigeons.add((Pigeon) bird);
-            }
-        }
-
-        final int scareRadius = state.getDimensions().tileSize() * 4;
-
-        for (Magpie magpie : magpies) {
-            if (this.distanceFrom(magpie) <= scareRadius) {
-                magpie.attacking = false;
-                // trigger the scare animation
-            }
-        }
-
-        for (Pigeon pigeon : pigeons) {
-            if (this.distanceFrom(pigeon) <= scareRadius) {
-                pigeon.attacking = false;
-                // trigger the scare animation
+            if (bird instanceof Magpie magpie) {
+                if (this.distanceFrom(magpie) <= scareRadius) {
+                    magpie.setAttacking(false); // immediate effect
+                }
+            } else if (bird instanceof Pigeon pigeon) {
+                if (this.distanceFrom(pigeon) <= scareRadius) {
+                    pigeon.setAttacking(false); // immediate effect
+                }
             }
         }
     }
