@@ -1,7 +1,6 @@
 package builder.entities.npc.enemies;
 
 import builder.GameState;
-import builder.entities.npc.Expirable;
 import builder.player.Player;
 import builder.ui.SpriteGallery;
 
@@ -11,26 +10,25 @@ import engine.game.HasPosition;
 import engine.timing.FixedTimer;
 import engine.timing.RepeatingTimer;
 
-public class Magpie extends Enemy implements Expirable {
+public class Magpie extends AbstractBird {
 
     private static final SpriteGroup art = SpriteGallery.magpie;
-    private FixedTimer lifespan = new FixedTimer(10000);
-    public HasPosition trackedTarget;
-    public Boolean attacking;
-    public int coins = 0;
-
     private RepeatingTimer directionalUpdateTimer = new RepeatingTimer(30);
 
-    private final int spawnX;
-    private final int spawnY;
+    // Backward-compat: Scarecrow sets this field directly; keep it and sync with base attacking
+    public Boolean attacking;
+
+    public int coins = 0;
 
     public Magpie(int xCoordinate, int yCoordinate, HasPosition trackedTarget) {
         super(xCoordinate, yCoordinate);
-        this.spawnX = xCoordinate;
-        this.spawnY = yCoordinate;
-        this.trackedTarget = trackedTarget;
+        this.setTrackedTarget(trackedTarget);
+        this.setLifespan(new FixedTimer(10000));
+
+        this.attacking = true; // keep public field for compatibility
+        this.setAttacking(true);
+
         this.setSprite(art.getSprite("down"));
-        this.attacking = true;
 
         double deltaX = trackedTarget.getX() - this.getX();
         double deltaY = trackedTarget.getY() - this.getY();
@@ -38,41 +36,28 @@ public class Magpie extends Enemy implements Expirable {
     }
 
     @Override
-    public FixedTimer getLifespan() {
-        return lifespan;
-    }
-
-    @Override
-    public void setLifespan(FixedTimer timer) {
-        this.lifespan = timer;
-    }
-
-    @Override
     public void tick(EngineState engine, GameState game) {
-        super.tick(engine, game);
-        this.lifespan.tick();
-        if (this.lifespan.isFinished()) {
-            this.markForRemoval();
+        // Sync external changes on the public field into the base state before ticking
+        if (this.attacking != null && this.attacking.booleanValue() != this.getAttacking()) {
+            this.setAttacking(this.attacking);
         }
-        if (this.attacking) {
-            double deltaX = trackedTarget.getX() - this.getX();
-            double deltaY = trackedTarget.getY() - this.getY();
-            this.setDirection((int) Math.toDegrees(Math.atan2(deltaY, deltaX)));
-            /** target is below */
-            if (trackedTarget.getY() > this.getY()) {
-                this.setSprite(art.getSprite("down"));
-            } else {
-                this.setSprite(art.getSprite("up"));
+
+        // preserve original behavior: one base move, then call move() again later
+        this.baseTickMove(engine, game);
+
+        if (this.getLifespan() != null) {
+            this.getLifespan().tick();
+            if (this.getLifespan().isFinished()) {
+                this.markForRemoval();
             }
+        }
+
+        if (this.getAttacking()) {
+            this.steerTowards(getTrackedTarget());
+            this.updateVerticalSprite(art, getTrackedTarget().getY());
         } else {
-            double deltaX = this.spawnX - this.getX();
-            double deltaY = this.spawnY - this.getY();
-            this.setDirection((int) Math.toDegrees(Math.atan2(deltaY, deltaX)));
-            if (this.spawnY < this.getY()) {
-                this.setSprite(art.getSprite("up"));
-            } else {
-                this.setSprite(art.getSprite("down"));
-            }
+            this.steerTowards(this.getSpawnX(), this.getSpawnY());
+            this.updateVerticalSpriteTowardsSpawn(art, this.getSpawnY());
         }
         this.move();
         this.directionalUpdateTimer.tick();
@@ -81,33 +66,38 @@ public class Magpie extends Enemy implements Expirable {
 
         final boolean hasHitPlayer =
                 this.distanceFrom(player.getX(), player.getY()) < engine.getDimensions().tileSize();
-        if (hasHitPlayer && game.getInventory().getCoins() > 0 && this.attacking) {
+        if (hasHitPlayer && game.getInventory().getCoins() > 0 && this.getAttacking()) {
             game.getInventory().addCoins(-1);
             this.coins += 1;
-            this.attacking = false;
+            this.setAttacking(false);
+            this.attacking = false; // keep public field in sync
             this.setSpeed(2); // book it
         }
 
-        if (!attacking) {
-            if (this.distanceFrom(spawnX, spawnY) < engine.getDimensions().tileSize()) {
+        if (!this.getAttacking()) {
+            if (this.distanceFrom(this.getSpawnX(), this.getSpawnY()) < engine.getDimensions().tileSize()) {
                 this.markForRemoval();
             }
         }
 
+        // keep original refund condition using public field (behavior-preserving)
         if (this.isMarkedForRemoval() && attacking) {
             game.getInventory().addCoins(this.coins);
         }
+
+        // Sync base attacking back to public field so external code sees updated state
+        this.attacking = this.getAttacking();
     }
 
     @Override
-    public void interact(EngineState engine, GameState game) {}
-
-    public Boolean getAttacking() {
-        return this.attacking;
+    public boolean getAttacking() {
+        return (this.attacking != null) ? this.attacking.booleanValue() : super.getAttacking();
     }
 
-    public void setAttacking(Boolean attacking) {
-        this.attacking = attacking;
+    @Override
+    public void setAttacking(boolean attacking) {
+        this.attacking = attacking; // keep public field for external access
+        super.setAttacking(attacking); // keep base state aligned
     }
 
     public int getCoins() {
@@ -116,13 +106,5 @@ public class Magpie extends Enemy implements Expirable {
 
     public void setCoins(int coins) {
         this.coins = coins;
-    }
-
-    public HasPosition getTrackedTarget() {
-        return this.trackedTarget;
-    }
-
-    public void setTrackedTarget(HasPosition trackedTarget) {
-        this.trackedTarget = trackedTarget;
     }
 }

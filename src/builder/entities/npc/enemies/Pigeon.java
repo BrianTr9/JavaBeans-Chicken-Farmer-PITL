@@ -1,7 +1,6 @@
 package builder.entities.npc.enemies;
 
 import builder.GameState;
-import builder.entities.npc.Expirable;
 import builder.entities.resources.Cabbage;
 import builder.entities.tiles.Tile;
 import builder.ui.SpriteGallery;
@@ -14,98 +13,96 @@ import engine.timing.FixedTimer;
 
 import java.util.List;
 
-public class Pigeon extends Enemy implements Expirable {
+public class Pigeon extends AbstractBird {
 
     private static final SpriteGroup art = SpriteGallery.pigeon;
-    private FixedTimer lifespan = new FixedTimer(3000);
-    private HasPosition trackedTarget;
+
+    // Backward-compat: Scarecrow sets this field directly; keep it and bridge to base attacking
     public Boolean attacking = true;
-    private int spawnX = 0;
-    private int spawnY = 0;
 
     public Pigeon(int x, int y) {
         super(x, y);
-        this.spawnX = x;
-        this.spawnY = y;
+        this.setLifespan(new FixedTimer(3000));
+        // default speed is 1 from Npc; sprite can be set later
     }
 
     public Pigeon(int x, int y, HasPosition trackedTarget) {
         super(x, y);
         this.setSprite(art.getSprite("default"));
-        this.spawnX = x;
-        this.spawnY = y;
-        this.trackedTarget = trackedTarget;
+        this.setTrackedTarget(trackedTarget);
         this.setSpeed(1);
-    }
-
-    @Override
-    public FixedTimer getLifespan() {
-        return lifespan;
-    }
-
-    @Override
-    public void setLifespan(FixedTimer timer) {
-        this.lifespan = timer;
+        this.setLifespan(new FixedTimer(3000));
     }
 
     @Override
     public void tick(EngineState engine, GameState game) {
-        super.tick(engine, game);
-        if (!this.attacking) {
-            double deltaX = (this.spawnX - this.getX());
-            double deltaY = (this.spawnY - this.getY());
-            this.setDirection((int) Math.toDegrees(Math.atan2(deltaY, deltaX)));
-
-            if (this.distanceFrom(this.spawnX, this.spawnY)
-                    < engine.getDimensions().tileSize()) { // get close to spawn
-                this.markForRemoval();
-            }
-            if (this.spawnY < this.getY()) {
-                this.setSprite(art.getSprite("up"));
-            } else {
-                this.setSprite(art.getSprite("down"));
-            }
+        // Sync external changes on the public field into the base state before ticking
+        if (this.attacking != null && this.attacking.booleanValue() != super.getAttacking()) {
+            super.setAttacking(this.attacking);
         }
+
+        // original behavior: call super.tick(engine, game) then call move() later as well
+        this.baseTickMove(engine, game);
+
+        if (!this.getAttacking()) {
+            handleFleeing(engine);
+        }
+
         this.move();
-        if (this.trackedTarget == null
-                && this
-                        .attacking) { // if the pigeon has no target, it should go to the center of
-                                      // the screen if its hunting
-            double deltaX = ((double) engine.getDimensions().windowSize() / 2 - this.getX());
-            double deltaY = ((double) engine.getDimensions().windowSize() / 2 - this.getY());
-            this.setDirection((int) Math.toDegrees(Math.atan2(deltaY, deltaX)));
-            if (trackedTarget.getY() > this.getY()) {
-                this.setSprite(art.getSprite("down"));
-            } else {
-                this.setSprite(art.getSprite("up"));
-            }
-        } else {
-            // do nothing
+
+        if (this.getTrackedTarget() == null && this.getAttacking()) {
+            steerToCenter(engine);
         }
-        if (this.trackedTarget != null && this.attacking) {
-            double deltaX = (this.trackedTarget.getX() - this.getX());
-            double deltaY = (this.trackedTarget.getY() - this.getY());
-            this.setDirection((int) Math.toDegrees(Math.atan2(deltaY, deltaX)));
-        } else {
-            // do nothing
+
+        if (this.getTrackedTarget() != null && this.getAttacking()) {
+            this.steerTowards(this.getTrackedTarget());
         }
-        this.lifespan.tick();
-        if (this.lifespan.isFinished()) {
-            this.markForRemoval();
-        } else {
-            // do nothing
-        }
-        if (!attacking) {
-            if (this.distanceFrom(spawnX, spawnY) < engine.getDimensions().tileSize()) {
+
+        if (this.getLifespan() != null) {
+            this.getLifespan().tick();
+            if (this.getLifespan().isFinished()) {
                 this.markForRemoval();
-            }
-            if (this.spawnY < this.getY()) {
-                this.setSprite(art.getSprite("up"));
-            } else {
-                this.setSprite(art.getSprite("down"));
             }
         }
 
+        if (!this.getAttacking()) {
+            handleFleeing(engine); // duplicate original behavior
+        }
+
+        final Tile closest = findClosestCabbage(game);
+        if (closest != null) {
+            this.setTrackedTarget(closest);
+            tryStealFromClosest(engine, closest);
+        } else {
+            // no cabbages to get
+            this.setAttacking(false);
+        }
+
+        // Sync base attacking back to public field so external code sees updated state immediately
+        this.attacking = this.getAttacking();
+    }
+
+    private void handleFleeing(EngineState engine) {
+        this.steerTowards(this.getSpawnX(), this.getSpawnY());
+        if (this.distanceFrom(this.getSpawnX(), this.getSpawnY()) < engine.getDimensions().tileSize()) {
+            this.markForRemoval();
+        }
+        this.updateVerticalSpriteTowardsSpawn(art, this.getSpawnY());
+    }
+
+    private void steerToCenter(EngineState engine) {
+        final int cx = engine.getDimensions().windowSize() / 2;
+        final int cy = engine.getDimensions().windowSize() / 2;
+        this.steerTowards(cx, cy);
+        // set sprite relative to center (no null deref)
+        if (this.getY() < cy) {
+            this.setSprite(art.getSprite("down"));
+        } else {
+            this.setSprite(art.getSprite("up"));
+        }
+    }
+
+    private Tile findClosestCabbage(GameState game) {
         List<Tile> tiles =
                 game.getWorld()
                         .tileSelector(
@@ -113,53 +110,44 @@ public class Pigeon extends Enemy implements Expirable {
                                     for (Entity entity : tile.getStackedEntities()) {
                                         if (entity instanceof Cabbage) {
                                             return true;
-                                        } else {
-                                            // do nothing
                                         }
                                     }
                                     return false;
                                 });
-        if (tiles.size() > 0) {
-            int distance = this.distanceFrom(tiles.getFirst());
-            Tile closest = tiles.getFirst();
-            for (Tile tile : tiles) {
-                if (this.distanceFrom(tile) < distance) {
-                    closest = tile;
-                } else {
-                    // do nothing
-                }
+        if (tiles.isEmpty()) return null;
+        int distance = this.distanceFrom(tiles.getFirst());
+        Tile closest = tiles.getFirst();
+        for (Tile tile : tiles) {
+            final int d = this.distanceFrom(tile);
+            if (d < distance) {
+                closest = tile;
+                distance = d;
             }
-            this.trackedTarget = closest;
+        }
+        return closest;
+    }
 
-            if (this.attacking
-                    && this.distanceFrom(this.trackedTarget) < engine.getDimensions().tileSize()) {
-                for (Entity entity : closest.getStackedEntities()) {
-                    if (entity instanceof Cabbage cabbage) {
-                        cabbage.markForRemoval();
-                        this.attacking = false;
-                    } else {
-                        // do nothing
-                    }
+    private void tryStealFromClosest(EngineState engine, Tile closest) {
+        if (this.getAttacking()
+                && this.distanceFrom(this.getTrackedTarget()) < engine.getDimensions().tileSize()) {
+            for (Entity entity : closest.getStackedEntities()) {
+                if (entity instanceof Cabbage cabbage) {
+                    cabbage.markForRemoval();
+                    this.setAttacking(false); // start fleeing
+                    break;
                 }
             }
-        } else { // no cabbages to get
-            this.attacking = false;
         }
     }
 
-    public Boolean getAttacking() {
-        return this.attacking;
+    @Override
+    public boolean getAttacking() {
+        return (this.attacking != null) ? this.attacking.booleanValue() : super.getAttacking();
     }
 
-    public void setAttacking(Boolean attacking) {
+    @Override
+    public void setAttacking(boolean attacking) {
         this.attacking = attacking;
-    }
-
-    public HasPosition getTrackedTarget() {
-        return this.trackedTarget;
-    }
-
-    public void setTrackedTarget(HasPosition trackedTarget) {
-        this.trackedTarget = trackedTarget;
+        super.setAttacking(attacking);
     }
 }
