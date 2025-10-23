@@ -1,110 +1,143 @@
-# Refactoring Summary (Assignment 2)
+# JavaBeanFarm — Refactoring Summary
 
-This document concisely summarizes the refactorings made, why they were done, and how they improve readability and design while preserving behavior. It highlights the changes we are most proud of and how they map to the spec and course topics.
+This README documents the recent refactorings applied to the JavaBeanFarm codebase and the current behavioural/implementation status for bird enemies, defensive towers, and related systems. It combines the prior refactoring brief, the repository state, and a small code audit of the current sources to give a single-source, accurate snapshot for maintainers.
 
-## Overview
-- Goal: reduce duplication, increase cohesion, and make bird/tower behaviors clear and spec-aligned, without breaking existing gameplay.
-- Strategy: introduce a focused abstraction for birds, centralize shared motion helpers, fix spec mismatches, and make spawning and interactions safe and deterministic.
+High-level plan
+- Centralize shared bird behaviour in `AbstractBird`.
+- Centralize steering/movement helpers in `Npc` and remove duplication.
+- Keep existing tests green while clarifying known follow-ups where behaviour differs from the spec.
+- Make BeeHive spawning concurrency-safe and keep GuardBee targeting test-compatible.
 
-## Key Refactorings (final state)
-- Shared bird base: `AbstractBird`
-  - Centralizes common state: `attacking`, `trackedTarget`, `spawnX/spawnY`, `lifespan`.
-  - Provides shared helpers for sprite orientation (up/down) and proximity checks (`isNear`), plus a base movement hook (`baseTickMove`).
-  - Steer helpers are now inherited from `Npc` (deduplicated here).
-
-- Steering centralized in `Npc`
-  - Added `protected steerTowards(HasPosition)` and `protected steerTowards(int,int)` so all NPCs (birds, guard bees, etc.) share consistent direction-setting logic.
-  - Removed duplicate steering methods from `AbstractBird` (DRY).
-
-- Birds (Eagle, Magpie, Pigeon)
-  - Eagle: clean tick with small helpers, preserves semantics: fly to player, steal 3 food once, flee faster, despawn at spawn, refund if removed before reaching spawn. Keeps “two moves per tick” ordering to preserve original timing.
-  - Magpie: migrated to `AbstractBird`; kept a public `attacking` bridge (synced via getters/setters) to maintain compatibility with external code/tests. Behavior preserved: steals one coin, flees, original refund condition retained to keep tests green.
-  - Pigeon: migrated to `AbstractBird`; hunts closest cabbage (null-safe), steals by removing cabbage, flees to spawn, despawns. If no cabbage exists, returns to spawn. Public `attacking` bridge preserved for compatibility.
-
+Contents
+- Birds (shared + per-type)
 - Scarecrow
-  - Spec-aligned scare radius: inclusive at ≤ 4 tiles (magpies/pigeons only; eagles unaffected).
-  - Refactor: single pass over enemies and use `setAttacking(false)` (no direct public field mutation). This improves encapsulation and makes intent clear.
+- BeeHive & GuardBee
+- Spawners
+- Npc/shared improvements
+- Known follow-ups
+- Build & tests
+- Git history snapshot
 
-- BeeHive
-  - Reload timing per spec: reloads every 240 ticks; boosted to 80 ticks when the player stands on the hive (within one tile).
-  - Concurrency-safe spawning: spawns a single `GuardBee` only when loaded and a bird is within 350px; spawning moved to `interact()` (not `tick()`) to avoid mutating lists during iteration and prevent concurrent modification issues. Adds bees via `NpcManager.addNpc`.
+---
 
-- GuardBee
-  - Tracks the closest bird each tick (spec), removes both on contact (< tile size), and despawns on lifespan expiry. If no birds exist, continues toward the last known target (to match existing tests); if no target at all, heads back to spawn.
-  - Uses the shared `Npc.steerTowards` helpers. Keeps legacy “two moves per tick” ordering.
+## Birds (shared + per-type)
 
-## Why these changes (justification)
-- Single Responsibility Principle (SRP):
-  - Shared bird concerns live in `AbstractBird` (state/lifespan/sprite), while concrete birds focus on their unique stealing/targeting behavior.
-  - Steering resides in `Npc`, so each class has one reason to change.
-- Open/Closed Principle (OCP):
-  - Adding a new bird requires minimal, safe code in a dedicated subclass. Common mechanics are inherited.
-- Liskov Substitution (LSP):
-  - Birds behave uniformly as `Enemy`/`Npc`; `NpcManager` and `EnemyManager` use polymorphism without special-casing logic.
-- DRY + Cohesion:
-  - Deduplicated steering and sprite logic; fewer places to update and fewer chances for divergence.
-- Safety + Determinism:
-  - BeeHive spawning moved to `interact()` to avoid concurrent modification during `tick()` iteration.
-  - Explicit spec-boundaries (Scarecrow ≤ 4 tiles inclusive; BeeHive reload boost only when on-hive).
+### AbstractBird (new base)
+- Consolidates shared bird state and helpers used by all birds:
+  - attacking flag, trackedTarget, spawnX/spawnY, lifespan management
+  - helpers for sprite orientation, near checks and movement hooks
+- No steering duplication: steering helpers were consolidated into `Npc` and reused by `AbstractBird`.
+- Goal: reduce duplication, make bird implementations concise and focused on stealing/attack semantics.
 
-## Behavior notes (locked/preserved)
-- Birds still use the legacy “double-move per tick” ordering where it existed (e.g., Eagle, Magpie, Pigeon, GuardBee) to preserve movement cadence.
-- Magpie keeps the original coin-refund condition to remain compatible with existing tests (documented intentionally; see Next Steps).
-- BeeHive spawns at most one guard bee per availability window and immediately enters reload.
+### Eagle
+- Behaviour implemented to match the specification:
+  - Flies toward the player; on contact steals 3 food once; switches to flee mode and increases speed.
+  - Returns to its spawn and despawns on arrival.
+  - If removed before reaching its spawn, stolen food is refunded to the player.
+- Implementation preserves legacy ordering (`baseTickMove` then `move`) to remain compatible with existing tests.
 
-## Testing notes
-- Unit tests (e.g., `GuardBeeTest`) continue to pass with the updated targeting behavior (closest target, fallback to last known target).
-- System tests (e.g., Hive scenarios) are protected against concurrent list mutation due to spawning happening in `interact()`.
-- Recommended new tests (if extending the suite):
-  - BeeHive reload timing: 240 ticks normally, 80 ticks when the player stands on the hive.
-  - Scarecrow boundary at exactly 4 tiles (inclusive) for Magpie/Pigeon, and no effect on Eagle.
+### Magpie
+- Migrated to `AbstractBird` and uses `Npc` steering helpers.
+- Behaviour: flies to the player, steals 1 coin (if available), flees to spawn and despawns on arrival.
+- Refund semantics: refund logic is intentionally preserved as implemented in the current codebase to avoid breaking existing tests. The current implementation does not refund a coin in the common interrupted-on-the-way-home case; this is a known divergence from the spec and is listed as a follow-up item below.
 
-### How to build and run tests (example)
-```bash
-# From the project root
-javac -cp "lib/*:src:test" -d out $(find src test -name "*.java")
+### Pigeon
+- Migrated to `AbstractBird` and keeps the nearest-cabbage selection logic.
+- Behaviour: targets the closest cabbage, removes the cabbage when it reaches it, then returns to spawn and despawns.
+- If no cabbage exists at spawn time the pigeon returns immediately to spawn.
+- Refund semantics: pigeons currently mark the cabbage for removal immediately upon stealing and do not implement an automatic refund if the pigeon is removed before returning to spawn. This is a known difference from the original specification and is listed as a follow-up.
 
-# Run a unit test class
-java -cp "lib/*:out" org.junit.runner.JUnitCore builder.entities.npc.GuardBeeTest
+### Summary status (Birds)
+- Shared behaviour: centralized and encapsulated in `AbstractBird` (Done).
+- Eagle: spec-aligned including refund (Done).
+- Magpie: stealing & returning behaviour done; refund semantics preserved from prior refactor (kept for test compatibility) and flagged for follow-up.
+- Pigeon: steal & return behaviour done; refund missing (flagged).
 
-# Run a scenario/system test (example)
-java -cp "lib/*:out" org.junit.runner.JUnitCore scenarios.HiveSimulationTest
-```
+---
 
-## Highlights (what we’re proud of)
-- A clean `AbstractBird` + Npc steering centralization that reduces duplication and clarifies intent across all birds.
-- BeeHive timing logic that exactly matches the spec and avoids runtime hazards by moving spawn to `interact()`.
-- GuardBee targeting that genuinely follows the closest bird while preserving existing timing and tests.
-- Scarecrow that uses encapsulated APIs (`setAttacking`) and matches the inclusive 4-tile rule.
+## Scarecrow
+- Behaviour: scares `Magpie` and `Pigeon` instances within a radius of 4 tiles (inclusive). Affected birds have `setAttacking(false)` applied so they stop attacking and return to spawn.
+- `Eagle` is not affected by Scarecrow.
+- Implementation details:
+  - Uses setters (no public field writes) and iterates the enemy list in-place (no unnecessary intermediate collections).
 
-## Spawner Refactoring (Latest)
-- **Removed dead code**: Deleted `BeeHiveSpawner` and `ScarecrowSpawner`
-  - These were incorrectly implemented with wrong costs and keyboard-driven logic
-  - Tower placement is correctly handled by `Grass.java` and `Dirt.java` using HiveHammer and Pole items
-  - They were never used in any .details files or referenced in codebase
-  - Removing them reduces confusion and maintenance burden
+---
 
-- **Created AbstractBirdSpawner**: Base class for all bird spawners
-  - Centralizes common state: spawn position (x, y), RepeatingTimer
-  - Provides shared `distanceFrom()` helper method
-  - Template method pattern: `tick()` calls abstract `spawnBird()` when timer finishes
-  - Benefits: DRY principle, reduced duplication from ~60 lines per spawner to ~20 lines
+## BeeHive and GuardBee
 
-- **Refactored concrete spawners**: EagleSpawner, MagpieSpawner, PigeonSpawner
-  - All extend `AbstractBirdSpawner` and only implement unique spawning logic
-  - Added comprehensive Javadoc documenting behavior per specification
-  - PigeonSpawner: extracted helper methods (`hasCabbage()`, `findClosestTile()`) for improved readability
-  - Each spawner now has clear single responsibility (SRP)
-  - Made default spawn durations explicit constants for clarity
+### BeeHive
+- Constants and costs follow the spec: reload interval `240` ticks, coin cost `2`, food cost `2`, detection distance `350` px.
+- Reload acceleration: when the player stands on the hive (detected as within one tile), the reload timer advances 3x per tick (effectively 80 ticks if the player stands on it the whole time).
+- Spawn safety: spawning is done from `interact()` rather than directly mutating during `tick()` to avoid concurrent modifications on the NPC manager during tick iteration. When loaded and a target bird is in range, `interact()` spawns one `GuardBee`, adds it via `NpcManager.addNpc(...)`, and sets `loaded = false` to begin reload.
 
-- **Design improvements**:
-  - **Open/Closed Principle**: Easy to add new bird types by extending AbstractBirdSpawner
-  - **Cohesion**: Each spawner class focuses solely on when/what to spawn
-  - **Coupling**: Reduced coupling by removing duplicated distance calculations
-  - **Maintainability**: Changes to spawner timing logic only need to happen in one place
+### GuardBee
+- Targeting: each tick the guard bee steers to the closest bird in the world.
+- When no birds are present, it continues toward the last known target (this was intentionally preserved to remain compatible with existing unit tests). If there is no known target, the bee steers back to its spawn.
+- On collision with a bird (distance < tileSize) the bee and the bird are removed; the bee also expires after its lifespan.
+- Movement and rendering preserve the legacy "double-move per tick" ordering to maintain compatibility with prior behaviour and tests.
 
-## Next steps (deferred improvements)
-- EnemyManager API cleanup: encapsulate internal lists (read-only accessors + add/remove methods), standardize spawn methods (avoid double-add patterns).
-- Magpie refund: align with spec (refund if removed before reaching spawn) and make refunds idempotent; update tests accordingly.
-- Remove public `attacking` bridges in Magpie/Pigeon after ensuring all callers (e.g., Scarecrow) exclusively use setters.
-- Consider unifying `isNear` helpers in `Npc` (like steering) to remove duplication across subclasses.
+---
+
+## Spawners
+- Spawner behaviour is now standardized by `AbstractBirdSpawner`:
+  - Holds `x`, `y` spawn coordinates and a `RepeatingTimer` for spawn intervals.
+  - Concrete spawners implement `spawnBird(EngineState, GameState)` which is invoked when the timer finishes.
+- Pigeon spawners only create pigeons when there is at least one cabbage tile in the world (spec requirement).
+- Timers and spawn intervals are preserved and configurable from details files.
+
+---
+
+## Npc (shared improvements)
+- Steering helpers and common movement behaviour moved to `Npc`:
+  - `steerTowards(HasPosition)` and `steerTowards(x,y)` are protected helpers used across birds and `GuardBee`.
+- `AbstractBird` uses these helpers and therefore no longer duplicates steering code.
+- Concurrency safety: BeeHive spawn moved to `interact()` to avoid modifying NPC collections during iteration.
+
+---
+
+## Cross-cutting improvements and design wins
+- Reduced duplication: major steering and movement logic consolidated into `Npc` and `AbstractBird`.
+- Encapsulation: public fields on enemies were converted to private with accessors; Scarecrow and other callers now use setters.
+- SOLID alignment:
+  - SRP: `Npc` handles motion; `AbstractBird` holds shared bird state; concrete birds implement type-specific behaviour.
+  - OCP & LSP: adding new bird types is easier and safer.
+- Tests: refactors were done with a comprehensive test-suite; behaviour-preserving choices were made when tests depended on a specific interpretation of the spec.
+
+---
+
+## Known follow-ups (recommended)
+- Standardize refund semantics for stolen items:
+  - Magpie: current refund logic is preserved for test compatibility but differs from a strict reading of the spec. Consider changing to refund when a magpie is removed before it reaches its spawn.
+  - Pigeon: implement refund/restore of stolen cabbage if the pigeon is removed before returning to its spawn (requires a strategy: delay removal or re-add the cabbage to the tile/world).
+- `EnemyManager` / spawner API hardening:
+  - Provide encapsulated `spawnX`/`spawnY` and `mkX(...)` / add/remove wrappers rather than exposing mutable public lists.
+- Consider moving `isNear(...)` into `Npc` too so all distance helpers live in one place.
+
+---
+
+## Build & tests
+- After the refactors described, the project compiles and the scenario tests in `test/scenarios/` were preserved and kept green per repository notes.
+- Unit tests were added/updated for bird enemies and towers to exercise the extraction points and edge cases (lifespan expiry, steal-and-refund semantics, scare radius, guard-bee targeting).
+
+### How to run (project-specific commands depend on your environment)
+- Use the repository's standard build and test commands (JUnit + the provided engine dependencies in `lib/`).
+
+---
+
+## Git snapshot (recent)
+- d3bc550 Refactor spawners files; Fix setters getters from enemies and test folder
+- cec259b Write README
+- b4bd074 Refactor NPC, BeeHive, GuardBee, Scarecrow; Adjust AbstractBird
+- f4bc041 Refactor enemies files
+- 03eb16a Add getters and setters; Adjust tests
+- a162516 Create initial JUnit Tests for Eagle, Pigeon, Magpie, GuardBee and Scarecrow
+- 0eb5278 Fix the rate increase in BeeHive's interact()
+- 8a04b26 Fix the scare zone of Scarecrow to Pigeon
+- ff96f28 Fix Pigeon initial default sprite
+
+---
+
+## Contact / next steps
+- If you want, I can implement the Magpie/Pigeon refund changes now and run the unit tests. I recommend doing that as a small follow-up branch and adjusting tests that intentionally relied on the prior behaviour.
+
+This file is the single-source summary of the recent refactors; keep it up-to-date as behaviour is tightened to match the specification exactly.
