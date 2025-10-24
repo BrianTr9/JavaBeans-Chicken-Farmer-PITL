@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import builder.ui.SpriteGallery;
 
 /**
  * Comprehensive unit tests for the Eagle class.
@@ -268,7 +269,8 @@ public class EagleTest {
 
         eagle.tick(engineState, gameState);
 
-        assertNotNull(eagle.getSprite());
+        assertSame("Sprite should be 'down' when target is below",
+                SpriteGallery.eagle.getSprite("down"), eagle.getSprite());
     }
 
     /**
@@ -282,7 +284,8 @@ public class EagleTest {
 
         eagle.tick(engineState, gameState);
 
-        assertNotNull(eagle.getSprite());
+        assertSame("Sprite should be 'up' when target is above",
+                SpriteGallery.eagle.getSprite("up"), eagle.getSprite());
     }
 
     /**
@@ -293,20 +296,35 @@ public class EagleTest {
         inventory.addFood(10);
         MockPlayer closePlayer = new MockPlayer(110, 110);
         gameState = new MockGameState(closePlayer, inventory);
-        Eagle eagle = new Eagle(100, 50, closePlayer);
+        Eagle eagle = new Eagle(100, 50, closePlayer); // spawnY = 50 (spawn above)
 
-        // Move eagle down after construction
-        eagle.setY(300);
+        // Place eagle near the player so it will steal on the first tick
+        eagle.setX(100);
+        eagle.setY(110);
 
-        eagle.tick(engineState, gameState); // Steal food
+        eagle.tick(engineState, gameState); // Steal food (sets attacking=false and speed=4)
 
-        // Move player away
+        // Move player away so subsequent tick uses fleeing branch
         closePlayer.setX(500);
         closePlayer.setY(500);
 
-        eagle.tick(engineState, gameState); // Flee
+        eagle.tick(engineState, gameState); // Flee toward spawn at y=50
 
-        assertNotNull(eagle.getSprite());
+        assertSame("Sprite should be 'up' when fleeing towards spawn above",
+                SpriteGallery.eagle.getSprite("up"), eagle.getSprite());
+    }
+
+    @Test
+    public void testSpriteDownWhenFleeingToSpawnBelow() {
+        // Spawn at y=300; place eagle above spawn and set fleeing
+        Eagle eagle = new Eagle(100, 300, player);
+        eagle.setAttacking(false);
+        eagle.setY(50); // current y < spawn y => should aim downwards
+
+        eagle.tick(engineState, gameState);
+
+        assertSame("Sprite should be 'down' when fleeing towards spawn below",
+                SpriteGallery.eagle.getSprite("down"), eagle.getSprite());
     }
 
     /**
@@ -517,4 +535,3 @@ public class EagleTest {
         }
     }
 }
-

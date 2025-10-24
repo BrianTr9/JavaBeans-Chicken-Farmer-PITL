@@ -3,6 +3,7 @@ package builder.entities.npc.enemies;
 import builder.GameState;
 import builder.inventory.Inventory;
 import builder.player.Player;
+import builder.ui.SpriteGallery;
 import engine.EngineState;
 import engine.renderer.Dimensions;
 import engine.renderer.TileGrid;
@@ -273,7 +274,7 @@ public class MagpieTest {
         magpie.tick(engineState, gameState);
 
         // Sprite should be "down" when target is below
-        assertNotNull(magpie.getSprite());
+        assertSame(SpriteGallery.magpie.getSprite("down"), magpie.getSprite());
     }
 
     /**
@@ -288,7 +289,7 @@ public class MagpieTest {
         magpie.tick(engineState, gameState);
 
         // Sprite should be "up" when target is above
-        assertNotNull(magpie.getSprite());
+        assertSame(SpriteGallery.magpie.getSprite("up"), magpie.getSprite());
     }
 
     /**
@@ -384,7 +385,7 @@ public class MagpieTest {
         magpie.tick(engineState, gameState);
 
         // Should move upwards towards spawn
-        assertNotNull(magpie.getSprite());
+        assertSame(SpriteGallery.magpie.getSprite("up"), magpie.getSprite());
     }
 
     /**
@@ -399,7 +400,7 @@ public class MagpieTest {
         magpie.tick(engineState, gameState);
 
         // Should move downwards towards spawn
-        assertNotNull(magpie.getSprite());
+        assertSame(SpriteGallery.magpie.getSprite("down"), magpie.getSprite());
     }
 
     // ========== Mock Classes ==========
