@@ -270,6 +270,23 @@ public class PigeonSpawnerTest {
         assertSame("Should track the tile with cabbages", tile, pigeon.getTrackedTarget());
     }
 
+    @Test
+    public void testMockPlayerCoordinates() {
+        // Ensure player coordinate getters return configured values (kills getX/getY mutants)
+        Player player = gameState.getPlayer();
+        assertNotNull(player);
+        assertEquals(400, player.getX());
+        assertEquals(400, player.getY());
+    }
+
+    @Test
+    public void testMockPlayerIdAndDamage() {
+        // Ensure ID and damage are as expected (kills getID/getDamage mutants)
+        Player player = gameState.getPlayer();
+        assertEquals("mock-player", player.getID());
+        assertEquals(1, player.getDamage());
+    }
+
     // Mock Classes
 
     private static class MockNonCabbageEntity extends Entity {

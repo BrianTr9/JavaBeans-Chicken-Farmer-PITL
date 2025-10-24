@@ -202,6 +202,38 @@ public class EagleSpawnerTest {
         assertEquals("Should spawn on second tick of new cycle", 2, enemyManager.getBirds().size());
     }
 
+    @Test
+    public void testGameStateProvidesNonNullInventory() {
+        // Ensure inventory is available and functional (kills mutant returning null)
+        assertNotNull("Inventory should be non-null", gameState.getInventory());
+        gameState.getInventory().addCoins(2);
+        gameState.getInventory().addFood(3);
+        assertEquals(2, gameState.getInventory().getCoins());
+        assertEquals(3, gameState.getInventory().getFood());
+    }
+
+    @Test
+    public void testGameStateProvidesNonNullWorld() {
+        // Ensure world is available (kills mutant returning null)
+        assertNotNull("World should be non-null", gameState.getWorld());
+        assertNotNull("allTiles should return a list", gameState.getWorld().allTiles());
+        assertTrue("Default mock world should be empty", gameState.getWorld().allTiles().isEmpty());
+    }
+
+    @Test
+    public void testMockPlayerCoordinates() {
+        // Ensure player coordinate getters return the configured values (kills getX/getY mutants)
+        assertEquals(400, player.getX());
+        assertEquals(400, player.getY());
+    }
+
+    @Test
+    public void testMockPlayerIdAndDamage() {
+        // Ensure ID and damage are as expected (kills getID/getDamage mutants)
+        assertEquals("mock-player", player.getID());
+        assertEquals(1, player.getDamage());
+    }
+
     // Mock Classes
 
     private static class MockEngineState implements EngineState {
