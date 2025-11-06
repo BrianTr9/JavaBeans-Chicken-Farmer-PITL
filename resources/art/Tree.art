@@ -1,0 +1,27 @@
+tree:default:
+|   !!   |
+|  !GG!  |
+| !GGGG! |
+| !GGGG! |
+| GG@@GG |
+|  @NN@  |
+|   NN   |
+|  NNNN  |
+tree:damaged:
+|  @  @  |
+| @n @n@ |
+|  @nN   |
+| N #N n |
+| @NNNn@ |
+|  @NN@  |
+|   N#   |
+|  NNNN  |
+tree:felled:
+|  NNNN  |
+| NT___N |
+| NNT_NN |
+| NnNNTN |
+| NnnnTN |
+| NnnTTN |
+| NnTTnN |
+|  NNNN  |

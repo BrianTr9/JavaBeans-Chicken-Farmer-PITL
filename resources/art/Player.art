@@ -1,0 +1,36 @@
+player:left:
+|     ## |
+|    #   |
+|  #***  |
+|  P##*  |
+|  ###*  |
+| #kkkk# |
+| kKKKKk |
+| kkkkkk |
+player:right:
+| ##     |
+|   #    |
+|  ****  |
+|  *##P  |
+|  *###  |
+| #kkkk# |
+| kKKKKk |
+| kkkkkk |
+player:up:
+|  *     |
+|   *    |
+|  ****  |
+|  ####  |
+|  ####  |
+| ##kk## |
+| kk  kk |
+| kk  kk |
+player:down:
+|  *     |
+|   *    |
+|  ****  |
+|  PppP  |
+|  #PP#  |
+| #*##*# |
+| kk  kk |
+| kk  kk |

@@ -1,0 +1,46 @@
+progress:full:
+|  .ww.  |
+| .WWWW. |
+|.WWWWWW.|
+|WWWWWWWW|
+|WWWWWWWW|
+|.WWWWWW.|
+| .WWWW. |
+|  .ww.  |
+progress:3of4:
+|   .w.  |
+|   .WW. |
+|   .WWW.|
+|....WWWW|
+|WWWWWWWW|
+|.WWWWWW.|
+| .WWWW. |
+|  .ww.  |
+progress:2of4:
+|   .w.  |
+|   .WW. |
+|   .WWW.|
+|   .WWWW|
+|   .WWWW|
+|   .WWW.|
+|   .WW. |
+|   .w.  |
+progress:1of4:
+|   .w.  |
+|   .WW. |
+|   .WWW.|
+|   .WWWW|
+|    ....|
+|        |
+|        |
+|        |
+progress:start:
+|    .   |
+|    w.  |
+|    W.  |
+|    Ww. |
+|        |
+|        |
+|        |
+|        |
+

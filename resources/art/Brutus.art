@@ -1,0 +1,108 @@
+brutus:right:
+|    RRR |
+|  RRRRRR|
+| O OOOO |
+| O.Obok |
+| .ObbRO |
+| ....kO |
+|  *.#.* |
+|   R R  |
+brutus:right1:
+|    RRR |
+|  RRRRRR|
+| O OOOO |
+| O.Obok |
+| .ObbRO |
+| ....kO |
+|  *R#.* |
+|     R  |
+brutus:right2:
+|    RRR |
+|  RRRRRR|
+| O OOOO |
+| O.Obok |
+| .ObbRO |
+| ....kO |
+|  *.#R* |
+|   R    |
+brutus:left:
+|  RRR   |
+|RRRRRR  |
+| OOOO O |
+| kobO.O |
+| ORbbO. |
+| Ok.... |
+| *.#.*  |
+|  R R   |
+brutus:left1:
+|  RRR   |
+|RRRRRR  |
+| OOOO O |
+| kobO.O |
+| ORbbO. |
+| Ok.... |
+| *R#.*  |
+|    R   |
+brutus:left2:
+|  RRR   |
+|RRRRRR  |
+| OOOO O |
+| kobO.O |
+| ORbbO. |
+| Ok.... |
+| *.#R*  |
+|  R     |
+brutus:up:
+|  RRR   |
+|RRRRRRR |
+| Ob.bO  |
+| O...O  |
+|  O.O   |
+| Ob.bO  |
+| *.#.*  |
+|  R R   |
+brutus:up1:
+|  RRR   |
+|RRRRRRR |
+| Ob.bO  |
+| O...O  |
+|  O.O   |
+| Ob.bO  |
+| *.#R*  |
+|  R     |
+brutus:up2:
+|  RRR   |
+|RRRRRRR |
+| Ob.bO  |
+| O...O  |
+|  O.O   |
+| Ob.bO  |
+| *R#.*  |
+|    R   |
+brutus:down:
+|  RRR   |
+|RRRRRRR |
+| Ok.kO  |
+| O.k.O  |
+|  OOO   |
+| Ob.bO  |
+| *.#.*  |
+|  R R   |
+brutus:down1:
+|  RRR   |
+|RRRRRRR |
+| Ok.kO  |
+| O.k.O  |
+|  OOO   |
+| Ob.bO  |
+| *.#R*  |
+|  R     |
+brutus:down2:
+|  RRR   |
+|RRRRRRR |
+| Ok.kO  |
+| O.k.O  |
+|  OOO   |
+| Ob.bO  |
+| *R#.*  |
+|    R   |

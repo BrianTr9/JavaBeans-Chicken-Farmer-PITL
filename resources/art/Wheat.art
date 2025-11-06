@@ -1,0 +1,36 @@
+wheat:default:
+|        |
+|        |
+|  y y y |
+|  Y Y Y |
+|        |
+|        |
+| y y y  |
+| Y Y Y  |
+wheat:growth:
+|        |
+|  y     |
+|  Y y y |
+|  Y Y Y |
+|        |
+|   y y  |
+| y Y Y  |
+| Y Y Y  |
+wheat:grown:
+|        |
+|  y y y |
+|  Y Y Y |
+|  Y Y Y |
+|        |
+| y y y  |
+| Y Y Y  |
+| Y Y Y  |
+wheat:harvestable:
+|      y |
+|  yy y  |
+|    yty |
+|   ptYYy|
+|  pPRy Y|
+| ytR Y  |
+|yYY     |
+| Y      |

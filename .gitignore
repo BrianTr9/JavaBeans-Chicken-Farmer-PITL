@@ -1,0 +1,17 @@
+# IDE
+.idea/
+*.iml
+out/
+*.class
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+*.jar
+*.zip
+*.exe
+
+# Optional: Exclude only problematic files, keep engine.jar
+!lib/engine.jar

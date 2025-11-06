@@ -1,0 +1,46 @@
+heart:full:
+|        |
+| RR RR  |
+|RrrRrrR |
+|RrrrrrR |
+| RrrrR  |
+|  RrR   |
+|   R    |
+|        |
+heart:3of4:
+|        |
+| RR     |
+|RrrR    |
+|RrrRR   |
+| RrrrR  |
+|  RrR   |
+|   R    |
+|        |
+heart:2of4:
+|        |
+| RR     |
+|RrrR    |
+|RrrR    |
+| RrR    |
+|  RR    |
+|   R    |
+|        |
+heart:1of4:
+|        |
+| RR     |
+|RrrR    |
+|RrrR    |
+| RR     |
+|        |
+|        |
+|        |
+heart:dead:
+|        |
+|  WWWW  |
+| WBWWBW |
+| wbWWbw |
+|  wWWw  |
+|   ww   |
+|        |
+|        |
+

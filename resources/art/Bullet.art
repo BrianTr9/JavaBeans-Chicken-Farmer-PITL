@@ -1,0 +1,55 @@
+bullet:up:
+|   c    |
+|  c c   |
+|        |
+|        |
+|        |
+|        |
+|        |
+|        |
+bullet:left:
+|        |
+|        |
+| c      |
+|c       |
+| c      |
+|        |
+|        |
+|        |
+bullet:right:
+|        |
+|        |
+|     c  |
+|      c |
+|     c  |
+|        |
+|        |
+|        |
+bullet:down:
+|        |
+|        |
+|        |
+|        |
+|        |
+|        |
+|  c c   |
+|   c    |
+bullet:ball:
+|        |
+|        |
+|   c    |
+|  cCc   |
+|   c    |
+|        |
+|        |
+|        |
+bullet:enemyball:
+|        |
+|        |
+|    R   |
+|   RPR  |
+|    R   |
+|        |
+|        |
+|        |
+

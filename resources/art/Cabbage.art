@@ -1,0 +1,45 @@
+cabbage:default:
+|        |
+|        |
+|        |
+|   gg   |
+|   GG   |
+|        |
+|        |
+|        |
+cabbage:budding:
+|        |
+|  @  @  |
+|  !@G@  |
+| @!G@!  |
+| G@@!G  |
+|  GGG   |
+|        |
+|        |
+cabbage:growing:
+|        |
+|  @  @  |
+|  !@G@G |
+| @!G@!@ |
+| !@@!!G |
+| G!@!@  |
+|  GGG   |
+|        |
+cabbage:grown:
+|        |
+|  @  @  |
+| G!@G!G |
+| G!G@!@ |
+|G!G@!!GG|
+|G@!G!G@G|
+| G@!G@G |
+|  GGGG  |
+cabbage:collectable:
+|  g  g  |
+| g@gg@g |
+|gG!@G!Gg|
+|gG!G@!@g|
+|g!G@!!Gg|
+|G@!G!G@G|
+| G@!G@G |
+| GGGGGG |

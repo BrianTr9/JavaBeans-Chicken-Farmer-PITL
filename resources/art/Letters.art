@@ -1,0 +1,333 @@
+letter:A:
+|        |
+|    W   |
+|   WWW  |
+|  WW WW |
+|  WWWWW |
+|  W   W |
+|        |
+|        |
+letter:B:
+|        |
+|  WWWW  |
+|  W  W  |
+|  WWW   |
+|  W  W  |
+|  WWWW  |
+|        |
+|        |
+letter:C:
+|        |
+|  WWWW  |
+|  W  W  |
+|  W     |
+|  W  W  |
+|  WWWW  |
+|        |
+|        |
+letter:D:
+|        |
+|  WWWw  |
+|  W   W |
+|  W   W |
+|  W   W |
+|  WWWw  |
+|        |
+|        |
+letter:E:
+|        |
+|  WWWW  |
+|  W     |
+|  WWWW  |
+|  W     |
+|  WWWW  |
+|        |
+|        |
+letter:F:
+|        |
+|  WWWW  |
+|  W     |
+|  WWWW  |
+|  W     |
+|  W     |
+|        |
+|        |
+letter:G:
+|        |
+| WWWWW  |
+| W      |
+| W  WW  |
+| W   W  |
+| WWWWW  |
+|        |
+|        |
+letter:H:
+|        |
+| W   W  |
+| W   W  |
+| WWWWW  |
+| W   W  |
+| W   W  |
+|        |
+|        |
+letter:I:
+|        |
+| WWWWW  |
+|   W    |
+|   W    |
+|   W    |
+| WWWWW  |
+|        |
+|        |
+letter:J:
+|        |
+|  WWW   |
+|    W   |
+|    W   |
+| W  W   |
+| WWWW   |
+|        |
+|        |
+letter:K:
+|        |
+| W  W   |
+| W W    |
+| WW     |
+| W W    |
+| W  W   |
+|        |
+|        |
+letter:L:
+|        |
+| W      |
+| W      |
+| W      |
+| W      |
+| WWWW   |
+|        |
+|        |
+letter:M:
+|        |
+| WW WW  |
+|W  W  W |
+|W  W  W |
+|W  W  W |
+|W  W  W |
+|        |
+|        |
+letter:N:
+|        |
+| WW  W  |
+| W W W  |
+| W W W  |
+| W  WW  |
+| W  WW  |
+|        |
+|        |
+letter:O:
+|        |
+|  WW    |
+| W  W   |
+| W  W   |
+| W  W   |
+|  WW    |
+|        |
+|        |
+letter:P:
+|        |
+| WWWW   |
+| W  W   |
+| WWWW   |
+| W      |
+| W      |
+|        |
+|        |
+letter:Q:
+|        |
+|  WW    |
+| W  W   |
+| W  W   |
+| W  W   |
+|  WWW   |
+|     W  |
+|        |
+letter:R:
+|        |
+| WWWW   |
+| W  W   |
+| WWWW   |
+| W   W  |
+| W   W  |
+|        |
+|        |
+letter:S:
+|        |
+| WWWW   |
+| W      |
+| WWWW   |
+|    W   |
+| WWWW   |
+|        |
+|        |
+letter:T:
+|        |
+| WWWWW  |
+|   W    |
+|   W    |
+|   W    |
+|   W    |
+|        |
+|        |
+letter:U:
+|        |
+| W    W |
+| W    W |
+| W    W |
+| W    W |
+|  WWWW  |
+|        |
+|        |
+letter:V:
+|        |
+| W   W  |
+| W   W  |
+| W   W  |
+|  W W   |
+|   W    |
+|        |
+|        |
+letter:W:
+|        |
+|W     W |
+|W     W |
+|W  W  W |
+|W  W  W |
+| WW WW  |
+|        |
+|        |
+letter:X:
+|        |
+| W   W  |
+|  W W   |
+|   W    |
+|  W W   |
+| W   W  |
+|        |
+|        |
+letter:Y:
+|        |
+| W   W  |
+| W   W  |
+|  W W   |
+|   W    |
+|   W    |
+|        |
+|        |
+letter:Z:
+|        |
+| WWWWW  |
+|     W  |
+|   Ww   |
+| Ww     |
+| WWWWW  |
+|        |
+|        |
+letter:space:
+|        |
+|        |
+|        |
+|        |
+|        |
+|        |
+|        |
+|        |
+letter:0:
+|        |
+| WWWWW  |
+| WW  W  |
+| W W W  |
+| W  WW  |
+| WWWWW  |
+|        |
+|        |
+letter:1:
+|        |
+|  WW    |
+| W W    |
+|   W    |
+|   W    |
+| wWWW   |
+|        |
+|        |
+letter:2:
+|        |
+|  WWW   |
+| W   W  |
+|   W    |
+| WW     |
+| WWWWW  |
+|        |
+|        |
+letter:3:
+|        |
+|  WWWW  |
+| W   W  |
+|   WW   |
+| W   W  |
+|  WWW   |
+|        |
+|        |
+letter:4:
+|        |
+|  WW W  |
+| W   W  |
+| WWWWW  |
+|     W  |
+|     W  |
+|        |
+|        |
+letter:5:
+|        |
+| WWWWW  |
+| W      |
+| WWWW   |
+|     W  |
+| WWWW   |
+|        |
+|        |
+letter:6:
+|        |
+|  WWW   |
+| W      |
+| WWWW   |
+| W   W  |
+| WWWW   |
+|        |
+|        |
+letter:7:
+|        |
+|  WWWW  |
+| W   W  |
+|     W  |
+|    W   |
+|   W    |
+|        |
+|        |
+letter:8:
+|        |
+|  WWW   |
+| W   W  |
+| WWWWW  |
+| W   W  |
+|  WWW   |
+|        |
+|        |
+letter:9:
+|        |
+|  WWW   |
+| W   W  |
+|  WWWW  |
+|     W  |
+|  WWW   |
+|        |
+|        |

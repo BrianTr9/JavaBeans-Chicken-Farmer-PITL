@@ -1,0 +1,28 @@
+tower:full:
+|        |
+|  wWWw  |
+|   WW   |
+|   WW   |
+|   WW   |
+|   WW   |
+|  WWWW  |
+|        |
+tower:damaged:
+|        |
+|  wW    |
+|   W    |
+|   Ww   |
+|   WW   |
+|   WW   |
+|  WWWW  |
+|        |
+tower:heavilydamaged:
+|        |
+|        |
+|        |
+|   w    |
+|   Ww   |
+|   Ww   |
+|  WWWW  |
+|        |
+

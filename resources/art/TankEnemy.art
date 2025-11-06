@@ -1,0 +1,27 @@
+tankEnemy:full:
+|RRRRRRRR|
+|R      R|
+|Rr    rR|
+|R r  r R|
+|R      R|
+|R rrrr R|
+|R      R|
+|RRRRRRRR|
+tankEnemy:damaged:
+|        |
+|        |
+|        |
+|        |
+|        |
+|        |
+|        |
+|        |
+tankEnemy:heavilydamaged:
+|        |
+|        |
+|        |
+|        |
+|        |
+|        |
+|        |
+|        |

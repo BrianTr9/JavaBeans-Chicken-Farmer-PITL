@@ -1,0 +1,36 @@
+seasons:spring:
+|   ..   |
+| . .. . |
+| ..OO.. |
+|..OEEO..|
+|..OEEO..|
+| ..OO.. |
+| . .. . |
+|   ..   |
+seasons:summer:
+|bbbbbbbb|
+|bbYYYYbb|
+|bYyyyyYb|
+|bYyyyyYb|
+|bYyyyyYb|
+|bYyyyyYb|
+|bbYYYYbb|
+|bbbbbbbb|
+seasons:winter:
+|        |
+|  c  c  |
+| cc  cc |
+|   cc   |
+|   cc   |
+| cc  cc |
+|  c  c  |
+|        |
+seasons:autumn:
+|   O    |
+|  OOO   |
+| OOOO O |
+| OoooO  |
+|OOoEoO  |
+| OyEoO  |
+|  yEy   |
+|   E    |

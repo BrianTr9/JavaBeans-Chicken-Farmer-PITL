@@ -1,0 +1,19 @@
+simpleEnemy:full:
+|        |
+| K    K |
+|KrKKKKrK|
+| KrKKrK |
+|  KKKK  |
+| KrrrrK |
+|  KKKK  |
+|        |
+simpleEnemy:damaged:
+|        |
+| KKKKKK |
+| rKKKKr |
+| KrKKrK |
+| KKKKKK |
+| KrrrrK |
+|  KrrK  |
+|   KK   |
+

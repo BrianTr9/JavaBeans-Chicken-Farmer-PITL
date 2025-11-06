@@ -1,0 +1,153 @@
+chickenFarmer:right:
+|    YYY |
+|  YYYYYY|
+| W WWWW |
+| W.Wkwk |
+| .WwwYW |
+| ....rW |
+|  *.#.* |
+|   Y Y  |
+chickenFarmer:right1:
+|    YYY |
+|  YYYYYY|
+| W WWWW |
+| W.Wkwk |
+| .WwwYW |
+| ....rW |
+|  *Y#.* |
+|     Y  |
+chickenFarmer:right2:
+|    YYY |
+|  YYYYYY|
+| W WWWW |
+| W.Wkwk |
+| .WwwYW |
+| ....rW |
+|  *.#Y* |
+|   Y    |
+chickenFarmer:left:
+|  YYY   |
+|YYYYYY  |
+| WWWW W |
+| kWkW.W |
+| WYWWW. |
+| .r.... |
+| *.#.*  |
+|  Y Y   |
+chickenFarmer:left1:
+|  YYY   |
+|YYYYYY  |
+| WWWW W |
+| kWkW.W |
+| WYWWW. |
+| .r.... |
+| *Y#.*  |
+|    Y   |
+chickenFarmer:left2:
+|  YYY   |
+|YYYYYY  |
+| WWWW W |
+| kWkW.W |
+| WYWWW. |
+| .r.... |
+| *.#Y*  |
+|  Y     |
+chickenFarmer:up:
+|  YYY   |
+|YYYYYYY |
+| Ww.wW  |
+| W...W  |
+|  W.W   |
+| Ww.wW  |
+| *.#.*  |
+|  Y Y   |
+chickenFarmer:up1:
+|  YYY   |
+|YYYYYYY |
+| Ww.wW  |
+| W...W  |
+|  W.W   |
+| Ww.wW  |
+| *.#Y*  |
+|  Y     |
+chickenFarmer:up2:
+|  YYY   |
+|YYYYYYY |
+| Ww.wW  |
+| W...W  |
+|  W.W   |
+| Ww.wW  |
+| *Y#.*  |
+|    Y   |
+chickenFarmer:down:
+|  YYY   |
+|YYYYYYY |
+| Wk.kW  |
+| W.Y.W  |
+|  WrW   |
+| Ww.wW  |
+| *.#.*  |
+|  Y Y   |
+chickenFarmer:down1:
+|  YYY   |
+|YYYYYYY |
+| Wk.kW  |
+| W.Y.W  |
+|  WrW   |
+| Ww.wW  |
+| *.#Y*  |
+|  Y     |
+chickenFarmer:down2:
+|  YYY   |
+|YYYYYYY |
+| Wk.kW  |
+| W.Y.W  |
+|  WrW   |
+| Ww.wW  |
+| *Y#.*  |
+|    Y   |
+chickenFarmer:attack:
+|  NNN   |
+|YyyyyyY |
+|cvcvcvc |
+|cVvYvVc |
+| cvrvc  |
+|cVcccVc |
+|cVv#vVc |
+| cVcVc  |
+chickenFarmer:jackhammer1:
+|  YYY   |
+|YYYYYYY |
+| Wk.kW  |
+| W.Y.W  |
+|WRkrkRW |
+| wwkww  |
+|  .k.   |
+|  YkY   |
+chickenFarmer:jackhammer2:
+|  YYY   |
+|YYYYYYY |
+| Wk.kW  |
+| W.Y.W  |
+| w.R.w  |
+|wRkrkRw |
+|  .k.   |
+|  YkY   |
+chickenFarmer:plant1:
+|  YYY   |
+|YYYYYYY |
+| Wk.kW  |
+| W.Y.W  |
+|  WrW   |
+| Ww.*#  |
+| *..##  |
+|  Y ##  |
+chickenFarmer:plant2:
+|  YYY   |
+|YYYYYYY |
+| Wk.kW  |
+| W.Y.W  |
+|  WrW   |
+| Ww.*#  |
+| *..v#  |
+|  Yvbv  |

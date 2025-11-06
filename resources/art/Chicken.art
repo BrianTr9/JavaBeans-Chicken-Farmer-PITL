@@ -1,0 +1,36 @@
+chicken:right:
+|        |
+|    rr  |
+| W WWWW |
+| W.Wkwk |
+| .WwwYW |
+| ....rW |
+|  *.#.* |
+|   Y Y  |
+chicken:left:
+|        |
+|  rr    |
+| WWWW W |
+| kWkW.W |
+| WYWWW. |
+| .r.... |
+| *.#.*  |
+|  Y Y   |
+chicken:up:
+|   r    |
+|  WwW   |
+| Ww.wW  |
+| W...W  |
+|  W.W   |
+| Ww.wW  |
+| *.#.*  |
+|  Y Y   |
+chicken:down:
+|   r    |
+|  WwW   |
+| Wk.kW  |
+| W.Y.W  |
+|  WrW   |
+| Ww.wW  |
+| *.#.*  |
+|  Y Y   |

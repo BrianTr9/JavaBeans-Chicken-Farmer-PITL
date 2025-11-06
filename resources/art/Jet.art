@@ -1,0 +1,37 @@
+jet:up:
+|   c    |
+|  ccc   |
+| c c c  |
+|   c    |
+|   r    |
+|   r    |
+|   p    |
+|        |
+jet:left:
+|        |
+|  c     |
+| c      |
+|cccrrp  |
+| c      |
+|  c     |
+|        |
+|        |
+jet:right:
+|        |
+|    c   |
+|     c  |
+| prrccc |
+|     c  |
+|    c   |
+|        |
+|        |
+jet:down:
+|        |
+|   p    |
+|   r    |
+|   r    |
+|   r    |
+| c c c  |
+|  ccc   |
+|   c    |
+
