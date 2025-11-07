@@ -73,7 +73,7 @@ This demonstrates **genuine problem-solving skills**, **deep understanding** of 
 
 | Category | Score            | Details |
 |----------|------------------|---------|
-| **Functionality** | ~95%             | All game mechanics working flawlessly. Passed nearly all unit tests. Minor deduction due to one edge case logic error in automated tests (non-critical, doesn't affect gameplay). |
+| **Functionality** | ~95%             | All game mechanics working flawlessly. Passed nearly all unit tests. Minor deduction due to one edge case logic error in automated tests (non-critical, doesn't affect gameplay) which has been fixed. |
 | **Code Style** | 100%             | Full compliance with UQ CSSE2002 style guide. Zero Checkstyle violations. Comprehensive JavaDoc on all public classes and methods. |
 | **Software Design** | Excellent        | Clean architecture, 5+ design patterns correctly implemented, proper separation of concerns, extensible for future features. |
 | **Gameplay** | Fully Functional | All game features work smoothly without bugs affecting user experience. The logic error only affected academic testing, not actual gameplay. |
@@ -391,4 +391,3 @@ Java • OOP • Design Patterns • Game Development
 Made with ❤️ for learning and demonstration
 
 </div>
-
