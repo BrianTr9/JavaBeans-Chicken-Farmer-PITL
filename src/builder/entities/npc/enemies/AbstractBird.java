@@ -134,6 +134,24 @@ abstract class AbstractBird extends Enemy implements Expirable {
         return this.returnedHome;
     }
 
+    /**
+     * Ages the bird by one tick and removes it once its lifespan runs out. Callers must stop
+     * updating the bird for this tick when this returns true, so an expired bird cannot steal.
+     *
+     * @return true if the bird expired on this tick
+     */
+    protected boolean expire() {
+        if (this.lifespan == null) {
+            return false;
+        }
+        this.lifespan.tick();
+        if (this.lifespan.isFinished()) {
+            this.markForRemoval();
+            return true;
+        }
+        return false;
+    }
+
     /** Removes this bird from the world because it has reached its spawn. */
     protected void removeAtSpawn() {
         this.returnedHome = true;

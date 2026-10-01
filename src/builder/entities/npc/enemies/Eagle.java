@@ -64,22 +64,15 @@ public class Eagle extends AbstractBird {
         // Birds move twice per tick: once before and once after re-steering.
         this.baseTickMove(engine, game);
 
-        tickLifespanAndMaybeDespawn();
+        if (this.expire()) {
+            return;
+        }
         tryStealFromPlayerIfAttacking(engine, game);
         tryDespawnAtSpawnIfReturning(engine);
 
         this.move();
 
         updateHeadingAndSprite();
-    }
-
-    private void tickLifespanAndMaybeDespawn() {
-        if (this.getLifespan() != null) {
-            this.getLifespan().tick();
-            if (this.getLifespan().isFinished()) {
-                this.markForRemoval();
-            }
-        }
     }
 
     private void tryStealFromPlayerIfAttacking(EngineState engine, GameState game) {

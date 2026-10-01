@@ -61,13 +61,14 @@ public class PlayerManager implements Tickable, RenderableGroup {
      * preference order is 'w', 's', 'a', and 'd'. That is, if both 's' and 'd' are pressed, the
      * player should move south ('s').
      *
-     * <p>If any tile at the position the player would move to (according to {@link
-     * World#tilesAtPosition(int, int, Dimensions)}) cannot be walked through (according to
-     * {@link Tile#canWalkThrough()}) then the player must not move there.
+     * <p>The player stands on the tile under their feet ({@link Player#footY}), not under the
+     * sprite's centre. A move is refused if any corner of the player's foot box (half a tile
+     * wide, the bottom quarter of the sprite) would be on a tile that cannot be walked through
+     * (according to {@link Tile#canWalkThrough()}). Positions outside the world count as empty.
      *
-     * <p>Any tile at the (potentially new) position of the player should be interacted
-     * with via {@link Tile#interact(EngineState, GameState)}. If the player is left-clicking
-     * (according to {@link MouseState#isLeftPressed()}), those tiles should be used via {@link
+     * <p>Every tile under the player's feet, after moving, is interacted with via {@link
+     * Tile#interact(EngineState, GameState)}. If the player is left-clicking (according to
+     * {@link MouseState#isLeftPressed()}), those tiles are also used via {@link
      * Tile#use(EngineState, GameState)}.
      */
     @Override
@@ -110,20 +111,22 @@ public class PlayerManager implements Tickable, RenderableGroup {
         }
     }
 
-
     /**
      * Moves the player one pixel in the given direction unless their feet would touch a tile
-     * that cannot be walked through. The feet are a box half a tile wide, centred on the
-     * player's x coordinate, covering the bottom quarter of the sprite; all four corners must
-     * land on walkable tiles, so the legs never overlap water while the head may.
+     * that cannot be walked through. The feet are the middle half of the sprite's columns and
+     * its bottom quarter of rows. The sprite covers x - tileSize/2 to x + tileSize/2 - 1, so
+     * the box spans x - tileSize/4 to x + tileSize/4 - 1. All four corners must land on walkable
+     * tiles, so the legs never overlap water while the head may.
      */
     private void tryMove(Direction direction, World world, Dimensions dimensions) {
         Position next = new Position(player.getX(), player.getY()).shift(direction, 1);
-        int halfWidth = dimensions.tileSize() / 4;
+        int quarter = dimensions.tileSize() / 4;
         int bottom = Player.footY(next.getY(), dimensions);
-        int top = bottom - dimensions.tileSize() / 4 + 1;
+        int top = bottom - quarter + 1;
+        int left = next.getX() - quarter;
+        int right = next.getX() + quarter - 1;
 
-        for (int x : new int[] {next.getX() - halfWidth, next.getX() + halfWidth}) {
+        for (int x : new int[] {left, right}) {
             for (int y : new int[] {top, bottom}) {
                 if (!isWalkable(tilesAt(world, x, y, dimensions))) {
                     return;

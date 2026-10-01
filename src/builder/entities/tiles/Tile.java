@@ -127,9 +127,10 @@ public abstract class Tile extends Entity
     }
 
     /**
-     * Handle player interaction with the tile. When a tile is interacted with, any of its
-     * interactable stacked entities (i.e. {@link Interactable} instances in {@link
-     * #getStackedEntities()}) must also be interacted with.
+     * Handle player interaction with the tile. When a tile is interacted with, its interactable
+     * stacked entities (i.e. {@link Interactable} instances in {@link #getStackedEntities()})
+     * are also interacted with, except NPCs built on the tile: {@link
+     * builder.entities.npc.NpcManager} interacts with those once per frame.
      *
      * @param state The state of the engine, including the mouse, keyboard information and
      *     dimension. Useful for processing keyboard presses or mouse movement. Note that for

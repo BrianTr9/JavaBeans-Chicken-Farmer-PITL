@@ -179,4 +179,40 @@ public class RemovedEntityTest {
             markForRemoval();
         }
     }
+
+    // --- Expiry ----------------------------------------------------------------------------
+
+    @Test
+    public void aMagpieExpiringNextToThePlayerStealsNothing() {
+        builder.entities.npc.enemies.Magpie magpie =
+                new builder.entities.npc.enemies.Magpie(GameFixture.FIRST_TILE + 5,
+                        GameFixture.FIRST_TILE, fixture.player);
+        magpie.setLifespan(new engine.timing.FixedTimer(1));
+        magpie.tick(engine, fixture.game);
+        assertTrue(magpie.isMarkedForRemoval());
+        assertEquals(10, fixture.inventory.getCoins());
+        assertEquals(0, magpie.getCoins());
+    }
+
+    @Test
+    public void anEagleExpiringNextToThePlayerStealsNothing() {
+        builder.entities.npc.enemies.Eagle eagle =
+                new builder.entities.npc.enemies.Eagle(GameFixture.FIRST_TILE + 5,
+                        GameFixture.FIRST_TILE, fixture.player);
+        eagle.setLifespan(new engine.timing.FixedTimer(1));
+        eagle.tick(engine, fixture.game);
+        assertTrue(eagle.isMarkedForRemoval());
+        assertEquals(10, fixture.inventory.getFood());
+        assertEquals(0, eagle.getFood());
+    }
+
+    @Test
+    public void aPigeonExpiringOnACabbageStealsNothing() {
+        Dirt patch = cabbagePatch(400, 400, false);
+        Pigeon pigeon = new Pigeon(405, 400, patch);
+        pigeon.setLifespan(new engine.timing.FixedTimer(1));
+        pigeon.tick(engine, fixture.game);
+        assertTrue(pigeon.isMarkedForRemoval());
+        assertTrue(Cabbage.growsOn(patch));
+    }
 }

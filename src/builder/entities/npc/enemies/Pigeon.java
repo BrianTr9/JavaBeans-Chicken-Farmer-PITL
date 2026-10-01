@@ -85,11 +85,8 @@ public class Pigeon extends AbstractBird {
             this.steerTowards(this.getTrackedTarget());
         }
 
-        if (this.getLifespan() != null) {
-            this.getLifespan().tick();
-            if (this.getLifespan().isFinished()) {
-                this.markForRemoval();
-            }
+        if (this.expire()) {
+            return;
         }
 
         final Tile closest = findClosestCabbage(game);
