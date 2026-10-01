@@ -9,8 +9,6 @@ import engine.art.sprites.SpriteGroup;
 import engine.game.HasPosition;
 import engine.timing.FixedTimer;
 
-import java.util.ArrayList;
-
 /**
  * A highly trained Guard Bee used as a short-lived projectile that hunts birds.
  */
@@ -76,15 +74,14 @@ public class GuardBee extends Npc implements Expirable {
         super.tick(state);
         this.move();
 
-        // Determine closest enemy each tick
+        // Birds caught earlier this frame (by another bee) are still listed until cleanup.
         Enemy nearest = null;
         int nearestDist = Integer.MAX_VALUE;
-        ArrayList<Enemy> enemies = new ArrayList<>(game.getEnemies().getBirds());
-        for (Enemy enemy : enemies) {
-            int d = this.distanceFrom(enemy);
-            if (d < nearestDist) {
+        for (Enemy enemy : game.getEnemies().getBirds()) {
+            final int distance = this.distanceFrom(enemy);
+            if (!enemy.isMarkedForRemoval() && distance < nearestDist) {
                 nearest = enemy;
-                nearestDist = d;
+                nearestDist = distance;
             }
         }
 
@@ -95,12 +92,10 @@ public class GuardBee extends Npc implements Expirable {
             this.steerTowards(this.spawnX, this.spawnY);
         }
 
-        // Collision with any enemy: remove both
-        for (Enemy enemy : enemies) {
-            if (this.distanceFrom(enemy) < state.getDimensions().tileSize()) {
-                enemy.markForRemoval();
-                this.markForRemoval();
-            }
+        // A bee is used up by the first bird it reaches, which is always the nearest one.
+        if (nearest != null && nearestDist < state.getDimensions().tileSize()) {
+            nearest.markForRemoval();
+            this.markForRemoval();
         }
 
         this.updateArtBasedOnDirection();
