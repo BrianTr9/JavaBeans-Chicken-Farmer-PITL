@@ -32,6 +32,18 @@ public class Enemy extends Npc {
     }
 
     /**
+     * Returns how many times {@link EnemyManager} ticks this enemy each frame.
+     *
+     * <p>Faster enemies take several simulation steps per frame rather than moving further
+     * per step, which keeps their steering and arrival checks precise.
+     *
+     * @return the number of ticks per frame, at least 1
+     */
+    public int ticksPerFrame() {
+        return 1;
+    }
+
+    /**
      * Interact with the game state (no-op by default).
      *
      * @param state The engine state for this tick.

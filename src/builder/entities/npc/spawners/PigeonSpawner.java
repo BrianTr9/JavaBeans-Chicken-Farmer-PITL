@@ -1,6 +1,7 @@
 package builder.entities.npc.spawners;
 
 import builder.GameState;
+import builder.entities.npc.enemies.Pigeon;
 import builder.entities.resources.Cabbage;
 import builder.entities.tiles.Tile;
 
@@ -17,8 +18,6 @@ import java.util.List;
  * it from the world, then return to spawn and remove themselves.
  */
 public class PigeonSpawner extends AbstractBirdSpawner {
-
-    private static final int DEFAULT_DURATION = 100;
 
     /**
      * Construct a pigeon spawner with custom spawn interval.
@@ -40,9 +39,8 @@ public class PigeonSpawner extends AbstractBirdSpawner {
         if (!tilesWithCabbages.isEmpty()) {
             Tile closestCabbageTile = findClosestTile(tilesWithCabbages);
 
-            game.getEnemies().setSpawnX(this.getX());
-            game.getEnemies().setSpawnY(this.getY());
-            game.getEnemies().getBirds().add(game.getEnemies().mkP(closestCabbageTile));
+            game.getEnemies().addBird(
+                    new Pigeon(this.getX(), this.getY(), closestCabbageTile));
         }
     }
 

@@ -1,6 +1,7 @@
 package builder.entities.npc.spawners;
 
 import builder.GameState;
+import builder.entities.npc.enemies.Eagle;
 
 import engine.EngineState;
 
@@ -11,8 +12,6 @@ import engine.EngineState;
  * reaching them, then return to spawn and remove themselves from the world.
  */
 public class EagleSpawner extends AbstractBirdSpawner {
-
-    private static final int DEFAULT_DURATION = 1000;
 
     /**
      * Construct an eagle spawner with custom spawn interval.
@@ -27,8 +26,6 @@ public class EagleSpawner extends AbstractBirdSpawner {
 
     @Override
     protected void spawnBird(EngineState state, GameState game) {
-        game.getEnemies().setSpawnX(this.getX());
-        game.getEnemies().setSpawnY(this.getY());
-        game.getEnemies().getBirds().add(game.getEnemies().mkE(game.getPlayer()));
+        game.getEnemies().addBird(new Eagle(this.getX(), this.getY(), game.getPlayer()));
     }
 }

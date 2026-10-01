@@ -42,7 +42,7 @@ public class ScarecrowTest {
         engineState = new MockEngineState(dimensions);
         Inventory inventory = new MockInventory();
         player = new MockPlayer(400, 400);
-        enemyManager = new EnemyManager(dimensions);
+        enemyManager = new EnemyManager();
         gameState = new MockGameState(player, inventory, enemyManager);
     }
 
@@ -78,7 +78,7 @@ public class ScarecrowTest {
         // Place magpie within 4 tiles (4 * 80 = 320 pixels)
         Magpie magpie = new Magpie(200, 200, player); // Distance ~141 pixels
         magpie.setAttacking(true);
-        enemyManager.getBirds().add(magpie);
+        enemyManager.addBird(magpie);
 
         assertTrue(magpie.getAttacking());
 
@@ -97,7 +97,7 @@ public class ScarecrowTest {
         // Place pigeon within 4 tiles
         Pigeon pigeon = new Pigeon(250, 250); // Distance ~212 pixels
         pigeon.setAttacking(true);
-        enemyManager.getBirds().add(pigeon);
+        enemyManager.addBird(pigeon);
 
         assertTrue(pigeon.getAttacking());
 
@@ -121,9 +121,9 @@ public class ScarecrowTest {
         magpie2.setAttacking(true);
         magpie3.setAttacking(true);
 
-        enemyManager.getBirds().add(magpie1);
-        enemyManager.getBirds().add(magpie2);
-        enemyManager.getBirds().add(magpie3);
+        enemyManager.addBird(magpie1);
+        enemyManager.addBird(magpie2);
+        enemyManager.addBird(magpie3);
 
         scarecrow.interact(engineState, gameState);
 
@@ -145,8 +145,8 @@ public class ScarecrowTest {
         pigeon1.setAttacking(true);
         pigeon2.setAttacking(true);
 
-        enemyManager.getBirds().add(pigeon1);
-        enemyManager.getBirds().add(pigeon2);
+        enemyManager.addBird(pigeon1);
+        enemyManager.addBird(pigeon2);
 
         scarecrow.interact(engineState, gameState);
 
@@ -167,8 +167,8 @@ public class ScarecrowTest {
         magpie.setAttacking(true);
         pigeon.setAttacking(true);
 
-        enemyManager.getBirds().add(magpie);
-        enemyManager.getBirds().add(pigeon);
+        enemyManager.addBird(magpie);
+        enemyManager.addBird(pigeon);
 
         scarecrow.interact(engineState, gameState);
 
@@ -186,7 +186,7 @@ public class ScarecrowTest {
         // Place magpie outside 4 tiles (>320 pixels)
         Magpie magpie = new Magpie(500, 500, player); // Distance ~565 pixels
         magpie.setAttacking(true);
-        enemyManager.getBirds().add(magpie);
+        enemyManager.addBird(magpie);
 
         scarecrow.interact(engineState, gameState);
 
@@ -203,7 +203,7 @@ public class ScarecrowTest {
         // Place pigeon outside 4 tiles
         Pigeon pigeon = new Pigeon(600, 600); // Distance ~707 pixels
         pigeon.setAttacking(true);
-        enemyManager.getBirds().add(pigeon);
+        enemyManager.addBird(pigeon);
 
         scarecrow.interact(engineState, gameState);
 
@@ -219,7 +219,7 @@ public class ScarecrowTest {
 
         // Place eagle within 4 tiles
         Eagle eagle = new Eagle(150, 150, player);
-        enemyManager.getBirds().add(eagle);
+        enemyManager.addBird(eagle);
 
         scarecrow.interact(engineState, gameState);
 
@@ -240,7 +240,7 @@ public class ScarecrowTest {
         // sqrt(240^2 + 210^2) ≈ 319 pixels (just under 4 tiles)
         Magpie magpie = new Magpie(340, 310, player);
         magpie.setAttacking(true);
-        enemyManager.getBirds().add(magpie);
+        enemyManager.addBird(magpie);
 
         scarecrow.interact(engineState, gameState);
 
@@ -303,11 +303,11 @@ public class ScarecrowTest {
         magpie2.setAttacking(true);
         pigeon2.setAttacking(true);
 
-        enemyManager.getBirds().add(magpie1);
-        enemyManager.getBirds().add(pigeon1);
-        enemyManager.getBirds().add(magpie2);
-        enemyManager.getBirds().add(pigeon2);
-        enemyManager.getBirds().add(eagle);
+        enemyManager.addBird(magpie1);
+        enemyManager.addBird(pigeon1);
+        enemyManager.addBird(magpie2);
+        enemyManager.addBird(pigeon2);
+        enemyManager.addBird(eagle);
 
         scarecrow.interact(engineState, gameState);
 
@@ -329,7 +329,7 @@ public class ScarecrowTest {
 
         Magpie magpie = new Magpie(150, 150, player);
         magpie.setAttacking(false); // Already fleeing
-        enemyManager.getBirds().add(magpie);
+        enemyManager.addBird(magpie);
 
         scarecrow.interact(engineState, gameState);
 
@@ -357,7 +357,7 @@ public class ScarecrowTest {
 
         Magpie magpie = new Magpie(200, 100, player);
         magpie.setAttacking(true);
-        enemyManager.getBirds().add(magpie);
+        enemyManager.addBird(magpie);
 
         scarecrow1.interact(engineState, gameState);
 

@@ -38,7 +38,7 @@ public class PigeonSpawnerTest {
     private EngineState engineState;
     private GameState gameState;
     private MockWorld world;
-    private MockEnemyManager enemyManager;
+    private EnemyManager enemyManager;
 
     @Before
     public void setUp() {
@@ -47,7 +47,7 @@ public class PigeonSpawnerTest {
         Inventory inventory = new MockInventory();
         Player player = new MockPlayer(400, 400);
         world = new MockWorld();
-        enemyManager = new MockEnemyManager();
+        enemyManager = new EnemyManager();
         gameState = new MockGameState(player, inventory, world, enemyManager);
     }
 
@@ -186,22 +186,6 @@ public class PigeonSpawnerTest {
         spawner.tick(engineState, gameState);
 
         assertEquals("Should not spawn when only non-cabbage entities exist", 0, enemyManager.getBirds().size());
-    }
-
-    @Test
-    public void testSetsSpawnCoordinatesInEnemyManager() {
-        PigeonSpawner spawner = new PigeonSpawner(150, 250, 1);
-
-        // Add cabbage
-        MockCabbage cabbage = new MockCabbage(300, 300);
-        MockTile tile = new MockTile(300, 300);
-        tile.addEntity(cabbage);
-        world.addTile(tile);
-
-        spawner.tick(engineState, gameState);
-
-        assertEquals("Should set spawn X in enemy manager", 150, enemyManager.getSpawnX());
-        assertEquals("Should set spawn Y in enemy manager", 250, enemyManager.getSpawnY());
     }
 
     @Test
@@ -511,44 +495,6 @@ public class PigeonSpawnerTest {
     private static class MockCabbage extends Cabbage {
         public MockCabbage(int x, int y) {
             super(x, y);
-        }
-    }
-
-    private static class MockEnemyManager extends EnemyManager {
-        private final List<builder.entities.npc.enemies.Enemy> birds = new ArrayList<>();
-        private int spawnX;
-        private int spawnY;
-
-        public MockEnemyManager() {
-            super(new TileGrid(10, 800));
-        }
-
-        @Override
-        public List<builder.entities.npc.enemies.Enemy> getBirds() {
-            return birds;
-        }
-
-        @Override
-        public void setSpawnX(int x) {
-            this.spawnX = x;
-        }
-
-        @Override
-        public void setSpawnY(int y) {
-            this.spawnY = y;
-        }
-
-        public int getSpawnX() {
-            return spawnX;
-        }
-
-        public int getSpawnY() {
-            return spawnY;
-        }
-
-        @Override
-        public Pigeon mkP(HasPosition target) {
-            return new Pigeon(spawnX, spawnY, target);
         }
     }
 }

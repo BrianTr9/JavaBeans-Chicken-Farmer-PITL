@@ -58,6 +58,17 @@ public class Pigeon extends AbstractBird {
         this.setAttacking(true);
     }
 
+    /**
+     * Pigeons take two simulation steps per frame. The game's system tests are calibrated
+     * to this pace.
+     *
+     * @return 2
+     */
+    @Override
+    public int ticksPerFrame() {
+        return 2;
+    }
+
     @Override
     public void tick(EngineState engine, GameState game) {
         // Original behavior: call super.tick(engine, game) then call move() later as well

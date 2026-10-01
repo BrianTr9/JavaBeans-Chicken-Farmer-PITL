@@ -103,7 +103,7 @@ public class JavaBeanFarm implements Game {
         final PlayerDetails playerDetails = OverlayBuilder.getPlayerDetailsFromFile(detailsContent);
         this.playerManager = new PlayerManager(playerDetails.getX(), playerDetails.getY());
         this.npcs = new NpcManager();
-        this.enemies = new EnemyManager(dimensions);
+        this.enemies = new EnemyManager();
 
         // Wire enemy spawners from details
         addSpawners(
@@ -184,7 +184,6 @@ public class JavaBeanFarm implements Game {
         }
 
         this.npcs.interact(state, game);
-        this.enemies.interact(state, game);
 
         this.npcs.cleanup();
         this.enemies.cleanup();
@@ -237,7 +236,7 @@ public class JavaBeanFarm implements Game {
             List<SpawnerDetails> points,
             Function<SpawnerDetails, Spawner> factory) {
         for (SpawnerDetails sd : points) {
-            this.enemies.add(factory.apply(sd));
+            this.enemies.addSpawner(factory.apply(sd));
         }
     }
 

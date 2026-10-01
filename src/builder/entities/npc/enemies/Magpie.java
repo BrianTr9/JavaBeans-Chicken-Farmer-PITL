@@ -52,6 +52,17 @@ public class Magpie extends AbstractBird {
         this.setDirection((int) Math.toDegrees(Math.atan2(deltaY, deltaX)));
     }
 
+    /**
+     * Magpies take two simulation steps per frame. The game's system tests are calibrated
+     * to this pace.
+     *
+     * @return 2
+     */
+    @Override
+    public int ticksPerFrame() {
+        return 2;
+    }
+
     @Override
     public void tick(EngineState engine, GameState game) {
         // Preserve original behavior: one base move, then call move() again later

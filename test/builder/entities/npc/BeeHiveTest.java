@@ -33,7 +33,7 @@ public class BeeHiveTest {
     private GameState gameState;
     private MockPlayer player;
     private MockNpcManager npcManager;
-    private MockEnemyManager enemyManager;
+    private EnemyManager enemyManager;
 
     @Before
     public void setUp() {
@@ -41,7 +41,7 @@ public class BeeHiveTest {
         engineState = new MockEngineState(dimensions);
         player = new MockPlayer(400, 400);
         npcManager = new MockNpcManager();
-        enemyManager = new MockEnemyManager();
+        enemyManager = new EnemyManager();
         gameState = new MockGameState(player, npcManager, enemyManager);
     }
 
@@ -557,23 +557,6 @@ public class BeeHiveTest {
 
         public ArrayList<Npc> getNpcs() {
             return npcs;
-        }
-    }
-
-    private static class MockEnemyManager extends EnemyManager {
-        private final ArrayList<Enemy> birds = new ArrayList<>();
-
-        public MockEnemyManager() {
-            super(new TileGrid(10, 800));
-        }
-
-        @Override
-        public java.util.List<Enemy> getBirds() {
-            return birds;
-        }
-
-        public void addBird(Enemy bird) {
-            birds.add(bird);
         }
     }
 

@@ -33,7 +33,7 @@ public class MagpieSpawnerTest {
     private EngineState engineState;
     private GameState gameState;
     private MockWorld world;
-    private MockEnemyManager enemyManager;
+    private EnemyManager enemyManager;
     private MockPlayer player;
 
     @Before
@@ -43,7 +43,7 @@ public class MagpieSpawnerTest {
         Inventory inventory = new MockInventory();
         player = new MockPlayer(400, 400);
         world = new MockWorld();
-        enemyManager = new MockEnemyManager();
+        enemyManager = new EnemyManager();
         gameState = new MockGameState(player, inventory, world, enemyManager);
     }
 
@@ -112,16 +112,6 @@ public class MagpieSpawnerTest {
         spawner.tick(engineState, gameState);
         spawner.tick(engineState, gameState);
         assertEquals("Should spawn second magpie", 2, enemyManager.getBirds().size());
-    }
-
-    @Test
-    public void testSetsSpawnCoordinatesInEnemyManager() {
-        MagpieSpawner spawner = new MagpieSpawner(150, 250, 1);
-
-        spawner.tick(engineState, gameState);
-
-        assertEquals("Should set spawn X in enemy manager", 150, enemyManager.getSpawnX());
-        assertEquals("Should set spawn Y in enemy manager", 250, enemyManager.getSpawnY());
     }
 
     @Test
@@ -396,44 +386,6 @@ public class MagpieSpawnerTest {
 
         @Override
         public void place(Tile tile) {
-        }
-    }
-
-    private static class MockEnemyManager extends EnemyManager {
-        private final List<builder.entities.npc.enemies.Enemy> birds = new ArrayList<>();
-        private int spawnX;
-        private int spawnY;
-
-        public MockEnemyManager() {
-            super(new TileGrid(10, 800));
-        }
-
-        @Override
-        public List<builder.entities.npc.enemies.Enemy> getBirds() {
-            return birds;
-        }
-
-        @Override
-        public void setSpawnX(int x) {
-            this.spawnX = x;
-        }
-
-        @Override
-        public void setSpawnY(int y) {
-            this.spawnY = y;
-        }
-
-        public int getSpawnX() {
-            return spawnX;
-        }
-
-        public int getSpawnY() {
-            return spawnY;
-        }
-
-        @Override
-        public Magpie mkM(Player player) {
-            return new Magpie(spawnX, spawnY, player);
         }
     }
 }

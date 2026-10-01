@@ -35,16 +35,16 @@ public class EnemyManagerTest {
 
     @Test
     public void testInitialStateHasNoSpawnersOrBirds() {
-        EnemyManager mgr = new EnemyManager(dims);
+        EnemyManager mgr = new EnemyManager();
         assertTrue(mgr.getSpawners().isEmpty());
         assertTrue(mgr.getBirds().isEmpty());
     }
 
     @Test
     public void testAddSpawnerAndTickCallsSpawner() {
-        EnemyManager mgr = new EnemyManager(dims);
+        EnemyManager mgr = new EnemyManager();
         CountingSpawner spawner = new CountingSpawner();
-        mgr.add(spawner);
+        mgr.addSpawner(spawner);
         assertEquals(0, spawner.ticks);
         mgr.tick(engine, game);
         assertEquals(1, spawner.ticks);
@@ -52,7 +52,7 @@ public class EnemyManagerTest {
 
     @Test
     public void testAddBirdAndCleanupRemovesMarkedBirds() {
-        EnemyManager mgr = new EnemyManager(dims);
+        EnemyManager mgr = new EnemyManager();
         Enemy a = new Enemy(0,0);
         Enemy b = new Enemy(0,0);
         Enemy c = new Enemy(0,0);
@@ -68,49 +68,40 @@ public class EnemyManagerTest {
     }
 
     @Test
-    public void testMkMAddsMagpieAtSpawnAndToBirds() {
-        EnemyManager mgr = new EnemyManager(dims);
-        mgr.setSpawnX(123);
-        mgr.setSpawnY(456);
-        Player p = new MockPlayer(300, 300);
-        Magpie m = mgr.mkM(p);
-        assertNotNull(m);
-        assertEquals(123, m.getX());
-        assertEquals(456, m.getY());
-        assertTrue(mgr.getBirds().contains(m));
-        assertEquals(1, mgr.getMagpies().size());
-        assertSame(m, mgr.getMagpies().get(0));
+    public void testAddBirdStoresEachBirdOnce() {
+        EnemyManager mgr = new EnemyManager();
+        Magpie magpie = new Magpie(0, 0, new MockPos(1, 1));
+        mgr.addBird(magpie);
+        assertEquals(1, mgr.getBirds().size());
+        assertSame(magpie, mgr.getBirds().get(0));
     }
 
     @Test
-    public void testMkPAddsPigeonAtSpawnAndToBirds() {
-        EnemyManager mgr = new EnemyManager(dims);
-        mgr.setSpawnX(10);
-        mgr.setSpawnY(20);
-        HasPosition target = new MockPos(500, 500);
-        Pigeon p = mgr.mkP(target);
-        assertNotNull(p);
-        assertEquals(10, p.getX());
-        assertEquals(20, p.getY());
-        assertTrue(mgr.getBirds().contains(p));
+    public void testSpawnerSpawnAddsExactlyOneBird() {
+        // Regression: spawners used to add magpies and pigeons twice, so each was ticked
+        // (and moved) twice per frame.
+        EnemyManager mgr = new EnemyManager();
+        mgr.addSpawner(new builder.entities.npc.spawners.MagpieSpawner(5, 5, 1));
+        GameState withManager = new MockGameState(mgr);
+        mgr.tick(engine, withManager);
+        assertEquals(1, mgr.getBirds().size());
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testGetBirdsIsReadOnly() {
+        EnemyManager mgr = new EnemyManager();
+        mgr.getBirds().add(new Enemy(0, 0));
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testGetSpawnersIsReadOnly() {
+        EnemyManager mgr = new EnemyManager();
+        mgr.getSpawners().add(new CountingSpawner());
     }
 
     @Test
-    public void testMkEDoesNotAutoAddToBirds() {
-        EnemyManager mgr = new EnemyManager(dims);
-        mgr.setSpawnX(7);
-        mgr.setSpawnY(9);
-        Player player = new MockPlayer(0,0);
-        Eagle e = mgr.mkE(player);
-        assertNotNull(e);
-        assertEquals(7, e.getX());
-        assertEquals(9, e.getY());
-        assertFalse("Eagle should not be auto-added to birds", mgr.getBirds().contains(e));
-    }
-
-    @Test
-    public void testTickDispatchesToMagpieEaglePigeonButNotGenericEnemy() {
-        EnemyManager mgr = new EnemyManager(dims);
+    public void testTickDispatchesToEveryEnemy() {
+        EnemyManager mgr = new EnemyManager();
         // Create spies that flip a flag on tick
         SpyMagpie magpie = new SpyMagpie(0, 0, new MockPos(1,1));
         SpyPigeon pigeon = new SpyPigeon(0, 0, new MockPos(2,2));
@@ -127,12 +118,12 @@ public class EnemyManagerTest {
         assertTrue("Magpie should have been ticked", magpie.called);
         assertTrue("Pigeon should have been ticked", pigeon.called);
         assertTrue("Eagle should have been ticked", eagle.called);
-        assertFalse("Generic Enemy should NOT be ticked by EnemyManager", generic.called);
+        assertTrue("Generic Enemy should have been ticked", generic.called);
     }
 
     @Test
     public void testRenderReturnsCopyOfBirds() {
-        EnemyManager mgr = new EnemyManager(dims);
+        EnemyManager mgr = new EnemyManager();
         Enemy a = new Enemy(0,0);
         Enemy b = new Enemy(0,0);
         mgr.addBird(a);
@@ -142,20 +133,6 @@ public class EnemyManagerTest {
         // Mutating returned list shouldn't affect manager state
         renderables.clear();
         assertEquals(2, mgr.getBirds().size());
-    }
-
-    @Test
-    public void testGetMagpiesFiltersOnlyMagpies() {
-        EnemyManager mgr = new EnemyManager(dims);
-        Magpie m = new Magpie(0,0, new MockPos(1,1));
-        Pigeon p = new Pigeon(0,0, new MockPos(2,2));
-        Eagle e = new Eagle(0,0, new MockPlayer(3,3));
-        mgr.addBird(m);
-        mgr.addBird(p);
-        mgr.addBird(e);
-        ArrayList<Magpie> magpies = mgr.getMagpies();
-        assertEquals(1, magpies.size());
-        assertSame(m, magpies.get(0));
     }
 
     // ---- test helpers ----
@@ -170,9 +147,12 @@ public class EnemyManagerTest {
     }
 
     private static class MockGameState implements GameState {
+        private final EnemyManager enemies;
+        public MockGameState() { this(null); }
+        public MockGameState(EnemyManager enemies) { this.enemies = enemies; }
         @Override public World getWorld() { return null; }
         @Override public builder.entities.npc.NpcManager getNpcs() { return null; }
-        @Override public EnemyManager getEnemies() { return null; }
+        @Override public EnemyManager getEnemies() { return enemies; }
         @Override public Player getPlayer() { return new MockPlayer(0,0); }
         @Override public Inventory getInventory() { return new Inventory() {
             private int food = 0, coins = 0;

@@ -43,7 +43,7 @@ public class GuardBeeTest {
         engineState = new MockEngineState(dimensions);
         Inventory inventory = new MockInventory();
         player = new MockPlayer(400, 400);
-        enemyManager = new EnemyManager(dimensions);
+        enemyManager = new EnemyManager();
         gameState = new MockGameState(player, inventory, enemyManager);
     }
 
@@ -142,7 +142,7 @@ public class GuardBeeTest {
     @Test
     public void testRemovesEnemyOnContact() {
         Magpie magpie = new Magpie(110, 110, player);
-        enemyManager.getBirds().add(magpie);
+        enemyManager.addBird(magpie);
 
         GuardBee bee = new GuardBee(100, 100, magpie);
 
@@ -161,7 +161,7 @@ public class GuardBeeTest {
     @Test
     public void testRemovesSelfOnContactWithEnemy() {
         Pigeon pigeon = new Pigeon(110, 110);
-        enemyManager.getBirds().add(pigeon);
+        enemyManager.addBird(pigeon);
 
         GuardBee bee = new GuardBee(100, 100, pigeon);
 
@@ -177,8 +177,8 @@ public class GuardBeeTest {
     public void testTracksMultipleEnemies() {
         Magpie magpie1 = new Magpie(200, 200, player);
         Magpie magpie2 = new Magpie(300, 300, player);
-        enemyManager.getBirds().add(magpie1);
-        enemyManager.getBirds().add(magpie2);
+        enemyManager.addBird(magpie1);
+        enemyManager.addBird(magpie2);
 
         GuardBee bee = new GuardBee(100, 100, magpie1);
 
@@ -219,7 +219,7 @@ public class GuardBeeTest {
     @Test
     public void testLocksOntoEnemyWithin300Pixels() {
         Magpie magpie = new Magpie(250, 250, player);
-        enemyManager.getBirds().add(magpie);
+        enemyManager.addBird(magpie);
 
         MockPosition farTarget = new MockPosition(500, 500);
         GuardBee bee = new GuardBee(100, 100, farTarget);
@@ -307,7 +307,7 @@ public class GuardBeeTest {
     @Test
     public void testDoesNotRemoveEnemyFarAway() {
         Magpie magpie = new Magpie(500, 500, player);
-        enemyManager.getBirds().add(magpie);
+        enemyManager.addBird(magpie);
 
         GuardBee bee = new GuardBee(100, 100, magpie);
 
@@ -336,7 +336,7 @@ public class GuardBeeTest {
     @Test
     public void testWorksWithEagleEnemies() {
         Eagle eagle = new Eagle(110, 110, player);
-        enemyManager.getBirds().add(eagle);
+        enemyManager.addBird(eagle);
 
         GuardBee bee = new GuardBee(100, 100, eagle);
 
@@ -366,7 +366,7 @@ public class GuardBeeTest {
     public void testDirectionTowardsNearestEnemyDiagonal() {
         // Place an enemy diagonally at (200,200); expect 45 degrees after tick
         Magpie magpie = new Magpie(200, 200, player);
-        enemyManager.getBirds().add(magpie);
+        enemyManager.addBird(magpie);
 
         GuardBee bee = new GuardBee(100, 100, new MockPosition(0, 0)); // tracked target irrelevant
         bee.tick(engineState, gameState);

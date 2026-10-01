@@ -1,6 +1,7 @@
 package builder.entities.npc.spawners;
 
 import builder.GameState;
+import builder.entities.npc.enemies.Magpie;
 
 import engine.EngineState;
 
@@ -11,8 +12,6 @@ import engine.EngineState;
  * reaching them, then return to spawn and remove themselves from the world.
  */
 public class MagpieSpawner extends AbstractBirdSpawner {
-
-    private static final int DEFAULT_DURATION = 360;
 
     /**
      * Construct a magpie spawner with custom spawn interval.
@@ -27,8 +26,6 @@ public class MagpieSpawner extends AbstractBirdSpawner {
 
     @Override
     protected void spawnBird(EngineState state, GameState game) {
-        game.getEnemies().setSpawnX(this.getX());
-        game.getEnemies().setSpawnY(this.getY());
-        game.getEnemies().getBirds().add(game.getEnemies().mkM(game.getPlayer()));
+        game.getEnemies().addBird(new Magpie(this.getX(), this.getY(), game.getPlayer()));
     }
 }
