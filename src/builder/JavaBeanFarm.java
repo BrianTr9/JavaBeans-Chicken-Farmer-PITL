@@ -177,14 +177,16 @@ public class JavaBeanFarm implements Game {
 
         this.world.tick(state, game);
 
-        for (Overlay overlay : overlays) {
-            overlay.tick(state, game);
-        }
-
         this.npcs.interact(state, game);
 
         this.npcs.cleanup();
         this.enemies.cleanup(game);
+
+        // Last, so the HUD shows this frame's final coins and food, including hive costs and
+        // refunds from birds removed during cleanup.
+        for (Overlay overlay : overlays) {
+            overlay.tick(state, game);
+        }
     }
 
     /**

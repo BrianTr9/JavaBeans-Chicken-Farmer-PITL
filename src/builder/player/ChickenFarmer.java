@@ -30,6 +30,9 @@ public class ChickenFarmer extends Entity implements Player {
 
     private static final SpriteGroup art = SpriteGallery.chickenFarmer;
     private Animation useAnimation = null;
+
+    /** Sprite shown when standing still: facing the direction of the last move. */
+    private Sprite idleSprite = art.getSprite("down");
     private final Animation walkLeft =
             new Animation(
                     AnimationDuration.SLOW,
@@ -104,18 +107,22 @@ public class ChickenFarmer extends Entity implements Player {
             case NORTH -> {
                 setY(getY() - amount);
                 this.setSprite(this.walkUp);
+                this.idleSprite = art.getSprite("up");
             }
             case SOUTH -> {
                 setY(getY() + amount);
                 this.setSprite(this.walkDown);
+                this.idleSprite = art.getSprite("down");
             }
             case EAST -> {
                 setX(getX() + amount);
                 this.setSprite(this.walkRight);
+                this.idleSprite = art.getSprite("right");
             }
             case WEST -> {
                 setX(getX() - amount);
                 this.setSprite(this.walkLeft);
+                this.idleSprite = art.getSprite("left");
             }
             default -> {
                 this.setSprite(art.getSprite("down"));
@@ -124,13 +131,13 @@ public class ChickenFarmer extends Entity implements Player {
     }
 
     /**
-     * Progress the state of the player. The player is progressed by first setting the displayed
-     * sprite to 'down' (to undo any moving animations). Then any animations stored by the player
-     * should be progressed (by calling {@link Animation#tick(EngineState)}).
+     * Progress the state of the player. The displayed sprite is first reset to the idle sprite
+     * for the direction the player last moved in (undoing any walking or use animation), then
+     * every stored animation is progressed so they stay in step.
      */
     @Override
     public void tick(EngineState state) {
-        this.setSprite(art.getSprite("down"));
+        this.setSprite(this.idleSprite);
 
         // progress animations forward
         this.walkLeft.tick(state);
