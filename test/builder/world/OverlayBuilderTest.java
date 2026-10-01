@@ -81,5 +81,54 @@ public class OverlayBuilderTest {
         assertEquals(7, cs.get(0).getX());
         assertEquals(10, cs.get(1).getY());
     }
+
+    @Test
+    public void testEntriesMayUsePipePrefixAnyKeyOrderAndBlankLines() throws Exception {
+        String content = ":magpiespawner:\n|duration:9 Y:8 x:7\n\nend;\n";
+        List<SpawnerDetails> magpies = OverlayBuilder.getMagpieSpawnDetailsFromString(content);
+        assertEquals(1, magpies.size());
+        assertEquals(7, magpies.get(0).getX());
+        assertEquals(8, magpies.get(0).getY());
+        assertEquals(9, magpies.get(0).getDuration());
+    }
+
+    @Test
+    public void testMissingKeyIsReportedAsIoException() {
+        String content = ":eaglespawner:\nx:1 y:2\nend;\n";
+        try {
+            OverlayBuilder.getEagleSpawnDetailsFromString(content);
+            fail("Expected IOException for a spawner without a duration");
+        } catch (IOException e) {
+            assertTrue(e.getMessage().contains("eaglespawner"));
+            assertTrue(e.getMessage().contains("duration"));
+        }
+    }
+
+    @Test
+    public void testNonIntegerValueIsReportedAsIoException() {
+        String content = ":cabbages:\nx:one y:2\nend;\n";
+        try {
+            OverlayBuilder.getCabbageSpawnDetailsFromString(content);
+            fail("Expected IOException for a non-integer value");
+        } catch (IOException e) {
+            assertTrue(e.getMessage().contains("not an integer"));
+        }
+    }
+
+    @Test
+    public void testPlayerSectionMustHaveExactlyOneEntry() {
+        String content = ":chickenfarmer:\nx:1 y:2 coins:3 food:4\nx:5 y:6 coins:7 food:8\nend;\n";
+        try {
+            OverlayBuilder.getPlayerDetailsFromFile(content);
+            fail("Expected IOException for two player entries");
+        } catch (IOException e) {
+            assertTrue(e.getMessage().contains("exactly one"));
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testExtractRejectsDuplicateKeys() {
+        OverlayBuilder.extractSpawnDetailsFromLine("x:1 x:2 duration:3");
+    }
 }
 
