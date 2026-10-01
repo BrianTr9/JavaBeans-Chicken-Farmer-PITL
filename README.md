@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/BrianTr9/JavaBeans-Chicken-Farmer-PITL/actions/workflows/ci.yml/badge.svg)](https://github.com/BrianTr9/JavaBeans-Chicken-Farmer-PITL/actions/workflows/ci.yml)
 [![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat-square&logo=openjdk)](https://openjdk.org/projects/jdk/21/)
-[![Tests](https://img.shields.io/badge/tests-432_passing-brightgreen?style=flat-square)](#-testing)
+[![Tests](https://img.shields.io/badge/tests-454_passing-brightgreen?style=flat-square)](#-testing)
 [![Gradle](https://img.shields.io/badge/build-Gradle-02303A?style=flat-square&logo=gradle)](build.gradle)
 
 A tile-based 2D farming game in Java 21. You farm crops and mine ore while thieving birds raid
@@ -19,11 +19,11 @@ the farm. Bee hives and scarecrows defend it.
   the tile world and the HUD. Entities are only marked for removal during updates and are
   cleaned up between phases, so no collection changes while it is being iterated.
 - **Enemy behaviour**: three bird types with steering, theft, fleeing and lifespans, plus
-  timed spawners. Guard bees chase the nearest target. Stolen goods are refunded exactly once,
-  through a removal hook.
-- **Data-driven levels**: a tile map plus a key/value level file. The parser validates input and
-  reports the section and line of any error.
-- **432 automated tests**: unit tests for the game logic, plus whole-game simulation tests
+  timed spawners. Guard bees chase the nearest live bird. Magpies and eagles caught before they
+  get home return what they stole, exactly once, through a removal hook.
+- **Data-driven levels**: a tile map plus a key/value level file. The parser rejects malformed
+  or out-of-range entries with an error naming the section and the offending entry.
+- **454 automated tests**: unit tests for the game logic, plus whole-game simulation tests
   that replay scripted input and analyse every rendered frame.
 - **Tooling**: Gradle wrapper, Checkstyle enforced at zero warnings, Javadoc with
   design-by-contract tags, and GitHub Actions CI.
@@ -63,7 +63,8 @@ Walking over a ripe cabbage harvests it (+2 food, +3 coins).
 | Eagle | Player | Up to 3 food | Bees |
 | Pigeon | Nearest cabbage | The cabbage | Bees, scarecrows |
 
-Birds fly home after a theft. A bird removed before it gets home gives back what it stole.
+Birds fly home after a theft. A magpie or eagle removed before it gets home gives back what it
+stole; a stolen cabbage is gone for good.
 
 - **Bee hive**: when a bird comes within 350 px, the hive launches a guard bee. The bee homes in
   on the nearest bird and removes it on contact, or returns to the hive when there are none.
@@ -123,19 +124,31 @@ Problems found and fixed while hardening the codebase, and the design choices be
 - **Encapsulation.** Managers expose read-only views of their collections. Spawners create their
   own bird at their own position, replacing a mutable "next spawn position" on the manager.
 - **Validated input.** Level-file entries are parsed as `key:value` pairs in any order. Missing
-  or duplicate keys, non-integer values and a wrong player count produce a load error naming the
-  section and line.
+  or duplicate keys, non-integer or out-of-range values (negative positions or resources, a
+  spawn interval below 1), unclosed sections and a wrong player count all produce a load error
+  naming the section and, where there is one, the offending entry. Levels load with either LF
+  or CRLF line endings.
+- **Removed is not gone yet.** Entities are only *marked* for removal during a frame and are
+  cleaned up later, so every system must skip marked ones. Several did not: bees chased and
+  "caught" birds another bee had already caught (and one bee could remove a whole flock), hives
+  fired at dead birds, pigeons stole cabbages the player had just harvested, a ripe cabbage
+  could be harvested twice, and an expired bird still took its second step of the frame.
+- **Lifecycle leaks.** The world never dropped replaced tiles, so every hoed grass tile stayed
+  behind, still ticked and drawn under the new dirt. Hives and scarecrows were updated and drawn
+  twice per frame, through their tile and through the NPC manager. Level files opened by path
+  were never closed.
 - **Rendering correctness.** Sprites are drawn centred on their position. The inventory bar's
   layout treated positions as left edges and was off by half a tile.
 - **Feet-based collision.** The player stands on the tile under their feet, not under the
   sprite's centre. Collisions use a foot box covering the bottom quarter of the sprite, so legs
   never overlap water while the head can overlap the tile behind, as in other top-down games.
+  The hive's "player standing on it" reload boost uses the same feet tile.
 
 ## 🧪 Testing
 
 | Suite | Location | Classes | Tests |
 |-------|----------|:---:|:---:|
-| Unit tests | `test/builder` | 22 | 352 |
+| Unit tests | `test/builder` | 24 | 374 |
 | Simulation tests | `test/scenarios` | 11 | 80 |
 
 - **Unit tests** cover the game logic: inventory, tiles and tools, crops and ore, player
@@ -174,7 +187,8 @@ end;
 ```
 
 The `eaglespawner` and `pigeonspawner` sections use the same format as `magpiespawner`. Every
-section must be present, but it may be empty.
+section must be present, but it may be empty. Coordinates, coins and food must not be negative,
+and `duration` (ticks between spawns) must be at least 1.
 
 ## 🧰 Tech stack
 
