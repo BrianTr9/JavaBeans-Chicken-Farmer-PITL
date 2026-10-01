@@ -95,10 +95,6 @@ public class Pigeon extends AbstractBird {
             }
         }
 
-        if (!this.getAttacking()) {
-            handleFleeing(engine); // duplicate original behavior
-        }
-
         final Tile closest = findClosestCabbage(game);
         if (closest != null) {
             this.setTrackedTarget(closest);

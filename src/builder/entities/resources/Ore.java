@@ -9,8 +9,6 @@ import builder.ui.SpriteGallery;
 import engine.EngineState;
 import engine.art.sprites.SpriteGroup;
 import engine.game.Entity;
-import engine.timing.RepeatingTimer;
-import engine.timing.TickTimer;
 
 /**
  * An entity that is stacked on an {@link builder.entities.tiles.OreVein} and yields coins when
@@ -24,9 +22,6 @@ public class Ore extends Entity implements Usable {
     private static final SpriteGroup art = SpriteGallery.rock;
     private static final int COIN_VALUE = 10;
     private int coins = COIN_VALUE;
-
-    private final TickTimer timer = new RepeatingTimer(5);
-    private static final boolean USE_TIMER = false;
 
     /**
      * Construct a new ore entity at the given x, y position.
@@ -54,7 +49,6 @@ public class Ore extends Entity implements Usable {
      */
     @Override
     public void tick(EngineState state) {
-        timer.tick();
         double remainingRatio = (double) coins / COIN_VALUE;
         if (remainingRatio > 0.9) {
             this.setSprite(art.getSprite("default"));
@@ -77,14 +71,8 @@ public class Ore extends Entity implements Usable {
      */
     @Override
     public void use(EngineState state, GameState game) {
-        boolean nthFrame;
-        if (USE_TIMER) {
-            nthFrame = timer.isFinished();
-        } else {
-            nthFrame = state.currentTick() % 5 == 0;
-        }
-
-        if (nthFrame && game.getInventory().getHolding() instanceof Jackhammer) {
+        final boolean miningFrame = state.currentTick() % 5 == 0;
+        if (miningFrame && game.getInventory().getHolding() instanceof Jackhammer) {
             int collection = Math.min(this.coins, game.getPlayer().getDamage());
             if (collection > 0) {
                 this.coins -= collection;
