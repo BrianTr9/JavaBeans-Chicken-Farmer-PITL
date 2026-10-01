@@ -64,11 +64,8 @@ public class Magpie extends AbstractBird {
         // Birds move twice per tick: once before and once after re-steering.
         this.baseTickMove(engine, game);
 
-        if (this.getLifespan() != null) {
-            this.getLifespan().tick();
-            if (this.getLifespan().isFinished()) {
-                this.markForRemoval();
-            }
+        if (this.expire()) {
+            return;
         }
 
         if (this.getAttacking()) {

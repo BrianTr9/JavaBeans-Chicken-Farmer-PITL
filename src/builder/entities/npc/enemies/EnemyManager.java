@@ -101,7 +101,7 @@ public class EnemyManager implements Tickable, RenderableGroup {
      * Ticks every spawner, then every bird (including any spawned during this tick).
      *
      * <p>Each bird is ticked {@link Enemy#ticksPerFrame()} times in a row, stopping early once
-     * it has been removed (so an expired bird cannot, for example, steal on its second step).
+     * it has been removed. Birds themselves stop mid-tick when they expire.
      *
      * @param state the current engine state
      * @param game the current game state

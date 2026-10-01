@@ -148,8 +148,8 @@ public class PlayerTest {
     }
 
     // The player stands on the tile under their feet: the sprite's bottom pixel row
-    // (y + 39 with 80px tiles). For collisions the feet are a box 20px either side of x,
-    // covering the sprite's bottom quarter (y + 20 to y + 39).
+    // (y + 39 with 80px tiles). For collisions the feet are the box x - 20 .. x + 19 by
+    // y + 20 .. y + 39: the middle half of the sprite's columns and its bottom quarter.
 
     private void walkTo(int x, int y) {
         ((ChickenFarmer) player).setX(x);
@@ -193,9 +193,11 @@ public class PlayerTest {
         assertEquals(100, player.getX());
 
         fixture.world.place(new Water(CENTRE + 80, CENTRE)); // column 2
-        walkTo(139, CENTRE); // right end of the feet at x 159
+        walkTo(139, CENTRE);
         manager.tick(input(false, 'd'), fixture.game);
-        assertEquals(139, player.getX());
+        assertEquals("feet span x 120..159 at x 140, still on the grass", 140, player.getX());
+        manager.tick(input(false, 'd'), fixture.game);
+        assertEquals("one more step would put the right foot in the water", 140, player.getX());
     }
 
     @Test

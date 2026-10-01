@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/BrianTr9/JavaBeans-Chicken-Farmer-PITL/actions/workflows/ci.yml/badge.svg)](https://github.com/BrianTr9/JavaBeans-Chicken-Farmer-PITL/actions/workflows/ci.yml)
 [![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat-square&logo=openjdk)](https://openjdk.org/projects/jdk/21/)
-[![Tests](https://img.shields.io/badge/tests-454_passing-brightgreen?style=flat-square)](#-testing)
+[![Tests](https://img.shields.io/badge/tests-457_passing-brightgreen?style=flat-square)](#-testing)
 [![Gradle](https://img.shields.io/badge/build-Gradle-02303A?style=flat-square&logo=gradle)](build.gradle)
 
 A tile-based 2D farming game in Java 21. You farm crops and mine ore while thieving birds raid
@@ -23,7 +23,7 @@ the farm. Bee hives and scarecrows defend it.
   get home return what they stole, exactly once, through a removal hook.
 - **Data-driven levels**: a tile map plus a key/value level file. The parser rejects malformed
   or out-of-range entries with an error naming the section and the offending entry.
-- **454 automated tests**: unit tests for the game logic, plus whole-game simulation tests
+- **457 automated tests**: unit tests for the game logic, plus whole-game simulation tests
   that replay scripted input and analyse every rendered frame.
 - **Tooling**: Gradle wrapper, Checkstyle enforced at zero warnings, Javadoc with
   design-by-contract tags, and GitHub Actions CI.
@@ -132,7 +132,7 @@ Problems found and fixed while hardening the codebase, and the design choices be
   cleaned up later, so every system must skip marked ones. Several did not: bees chased and
   "caught" birds another bee had already caught (and one bee could remove a whole flock), hives
   fired at dead birds, pigeons stole cabbages the player had just harvested, a ripe cabbage
-  could be harvested twice, and an expired bird still took its second step of the frame.
+  could be harvested twice, and a bird that expired could still steal in the same tick.
 - **Lifecycle leaks.** The world never dropped replaced tiles, so every hoed grass tile stayed
   behind, still ticked and drawn under the new dirt. Hives and scarecrows were updated and drawn
   twice per frame, through their tile and through the NPC manager. Level files opened by path
@@ -148,7 +148,7 @@ Problems found and fixed while hardening the codebase, and the design choices be
 
 | Suite | Location | Classes | Tests |
 |-------|----------|:---:|:---:|
-| Unit tests | `test/builder` | 24 | 374 |
+| Unit tests | `test/builder` | 24 | 377 |
 | Simulation tests | `test/scenarios` | 11 | 80 |
 
 - **Unit tests** cover the game logic: inventory, tiles and tools, crops and ore, player
