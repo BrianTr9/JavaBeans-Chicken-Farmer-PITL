@@ -240,7 +240,7 @@ public class GuardBeeTest {
 
         bee.tick(engineState, gameState);
 
-        assertNotNull(bee.getSprite());
+        assertSame(builder.ui.SpriteGallery.bee.getSprite("down"), bee.getSprite());
     }
 
     /**
@@ -253,7 +253,7 @@ public class GuardBeeTest {
 
         bee.tick(engineState, gameState);
 
-        assertNotNull(bee.getSprite());
+        assertSame(builder.ui.SpriteGallery.bee.getSprite("up"), bee.getSprite());
     }
 
     /**
@@ -266,7 +266,7 @@ public class GuardBeeTest {
 
         bee.tick(engineState, gameState);
 
-        assertNotNull(bee.getSprite());
+        assertSame(builder.ui.SpriteGallery.bee.getSprite("right"), bee.getSprite());
     }
 
     /**
@@ -279,7 +279,7 @@ public class GuardBeeTest {
 
         bee.tick(engineState, gameState);
 
-        assertNotNull(bee.getSprite());
+        assertSame(builder.ui.SpriteGallery.bee.getSprite("left"), bee.getSprite());
     }
 
     /**
@@ -404,13 +404,21 @@ public class GuardBeeTest {
     @Test
     public void testUpdateArtSetsRightSprite() {
         GuardBee bee = new GuardBee(100, 100, new MockPosition(300, 100));
-        // Force direction into the nominal 'right' bucket (e.g., 0 deg)
         bee.setDirection(0);
-        // Prior sprite is default from constructor
-        Object before = bee.getSprite();
         bee.updateArtBasedOnDirection();
-        // At minimum, sprite should change away from default if setSprite is invoked
-        assertNotSame(before, bee.getSprite());
+        assertSame(builder.ui.SpriteGallery.bee.getSprite("right"), bee.getSprite());
+    }
+
+    @Test
+    public void testUpdateArtHandlesNegativeDirections() {
+        // atan2 yields angles in (-180, 180], so "up" arrives as -90 degrees.
+        GuardBee bee = new GuardBee(100, 100, new MockPosition(100, 0));
+        bee.setDirection(-90);
+        bee.updateArtBasedOnDirection();
+        assertSame(builder.ui.SpriteGallery.bee.getSprite("up"), bee.getSprite());
+        bee.setDirection(-10);
+        bee.updateArtBasedOnDirection();
+        assertSame(builder.ui.SpriteGallery.bee.getSprite("right"), bee.getSprite());
     }
 
     @Test

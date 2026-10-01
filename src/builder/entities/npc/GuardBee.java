@@ -57,20 +57,23 @@ public class GuardBee extends Npc implements Expirable {
 
     /**
      * Update the sprite used to render the bee based on its current movement direction.
+     *
+     * <p>Directions are in degrees with 0 pointing right and 90 pointing down (screen
+     * coordinates), and may be negative or exceed 360.
      */
     public void updateArtBasedOnDirection() {
-        boolean goingUp = (this.getDirection() >= 230 && this.getDirection() < 310);
-        boolean goingDown = (this.getDirection() >= 40 && this.getDirection() < 140);
-        boolean goingRight = (this.getDirection() >= 310 && this.getDirection() < 40);
-        if (goingDown) {
-            this.setSprite(ART.getSprite("down"));
-        } else if (goingUp) {
-            this.setSprite(ART.getSprite("up"));
-        } else if (goingRight) {
-            this.setSprite(ART.getSprite("right"));
+        final int heading = Math.floorMod(this.getDirection(), 360);
+        final String spriteName;
+        if (heading >= 40 && heading < 140) {
+            spriteName = "down";
+        } else if (heading >= 140 && heading < 230) {
+            spriteName = "left";
+        } else if (heading >= 230 && heading < 310) {
+            spriteName = "up";
         } else {
-            this.setSprite(ART.getSprite("left"));
+            spriteName = "right";
         }
+        this.setSprite(ART.getSprite(spriteName));
     }
 
     @Override
