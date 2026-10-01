@@ -42,17 +42,17 @@ public class InventoryOverlay implements Overlay {
         inventorySquares = new InventorySquare[slots];
         inventorySlots = new InventorySlot[slots];
 
-        int midScreen = dimensions.windowSize() / 2;
-        int inventoryWidth = slots * dimensions.tileSize();
-        // draw tiles from mid-screen minus half the inventory with
-        // so center of the inventory is at mid-screen
-        int x = midScreen - (inventoryWidth / 2);
-        int y = dimensions.windowSize() - dimensions.tileSize();
+        // Sprites are drawn centred on their position, so offset each slot by half a tile to
+        // centre the whole bar horizontally. It sits one tile above the bottom edge.
+        final int tileSize = dimensions.tileSize();
+        final int inventoryWidth = slots * tileSize;
+        int x = (dimensions.windowSize() - inventoryWidth) / 2 + tileSize / 2;
+        final int y = dimensions.windowSize() - tileSize;
 
         for (int i = 0; i < slots; i++) {
             inventorySquares[i] = new InventorySquare(x, y);
             inventorySlots[i] = new InventorySlot(x, y);
-            x += dimensions.tileSize();
+            x += tileSize;
         }
     }
 

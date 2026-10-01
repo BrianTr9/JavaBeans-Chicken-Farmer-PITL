@@ -86,6 +86,24 @@ public class PlayerTest {
     }
 
     @Test
+    public void standingStillFacesTheLastDirectionMoved() {
+        ChickenFarmer farmer = new ChickenFarmer(100, 100);
+        farmer.tick(GameFixture.engine(0));
+        assertSame(builder.ui.SpriteGallery.chickenFarmer.getSprite("down"), farmer.getSprite());
+
+        String[] facing = {"up", "down", "right", "left"};
+        Direction[] directions = {
+            Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST
+        };
+        for (int i = 0; i < directions.length; i++) {
+            farmer.move(directions[i], 1);
+            farmer.tick(GameFixture.engine(i + 1)); // next frame, no movement
+            assertSame(builder.ui.SpriteGallery.chickenFarmer.getSprite(facing[i]),
+                    farmer.getSprite());
+        }
+    }
+
+    @Test
     public void usingAnItemWithAnAnimationShowsIt() {
         ChickenFarmer farmer = new ChickenFarmer(100, 100);
         Bucket bucket = new Bucket();
