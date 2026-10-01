@@ -56,6 +56,7 @@ public class Brutus extends Entity {
      */
     public Brutus(int x, int y) {
         super(x, y);
+        assert x >= 0 && y >= 0;
     }
 
     @Override

@@ -39,6 +39,7 @@ public class InventoryOverlay implements Overlay {
      * @param slots The number of slots to display for the inventory.
      */
     public InventoryOverlay(Dimensions dimensions, int slots) {
+        assert slots <= 9;
         this.slots = slots;
         inventorySquares = new InventorySquare[slots];
         inventorySlots = new InventorySlot[slots];

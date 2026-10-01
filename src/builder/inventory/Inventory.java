@@ -19,7 +19,7 @@ public interface Inventory {
      * will not go below zero.
      *
      * @param amount The amount of food to add or remove from the inventory.
-     * @ensures getFood() = max(0, \old(getFood()) - amount)
+     * @ensures getFood() = max(0, \old(getFood()) + amount)
      */
     void addFood(int amount);
 

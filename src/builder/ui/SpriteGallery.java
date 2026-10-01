@@ -49,6 +49,29 @@ public class SpriteGallery {
     /** Cabbage resource sprites. */
     public static final SpriteGroup cabbage = load("Cabbage", "cabbage");
 
+    // Npcs
+    /** Eagle sprites. */
+    public static final SpriteGroup eagle = load("Eagle", "eagle");
+
+    /** Pigeon sprites. */
+    public static final SpriteGroup pigeon = load("Pigeon", "pigeon");
+
+    /** Magpie sprites. */
+    public static final SpriteGroup magpie = load("Magpie", "magpie");
+
+    /** Hive sprites. */
+    public static final SpriteGroup hive = load("Hive", "hive");
+
+    /** Bee sprites. */
+    public static final SpriteGroup bee = load("Bee", "bee");
+
+    /** Scarecrow sprites. */
+    public static final SpriteGroup scarecrow = load("Scarecrow", "scarecrow");
+
+    public static final SpriteGroup letters = load("Letters", "letter");
+
+    // Enemies
+
     private SpriteGallery() {}
 
     /**

@@ -1,0 +1,27 @@
+pigeon:default:
+|        |
+|        |
+|   n    |
+|NNkNkNN |
+|  nKn   |
+|   k    |
+|  n n   |
+|        |
+pigeon:up:
+|        |
+|        |
+|   n    |
+|NNkNkNN |
+|  nKn   |
+|   k    |
+|  n n   |
+|        |
+pigeon:down:
+|        |
+|  n n   |
+|   k    |
+|  nKn   |
+|NNkNkNN |
+|   n    |
+|        |
+|        |

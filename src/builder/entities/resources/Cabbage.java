@@ -3,66 +3,99 @@ package builder.entities.resources;
 import builder.GameState;
 import builder.entities.Interactable;
 import builder.ui.SpriteGallery;
+
 import engine.EngineState;
+import engine.art.sprites.SpriteGroup;
 import engine.game.Entity;
+import engine.timing.RepeatingTimer;
+import engine.timing.TickTimer;
+import engine.timing.TimerDuration;
 
 /**
- * An entity planted (stacked on) {@link builder.entities.tiles.Dirt}
- * that grows and can be
- * collected by the player once grown. A cabbage is initially
- * rendered as 'default' within
- * {@link SpriteGallery#cabbage}.
+ * An entity planted (stacked on) {@link builder.entities.tiles.Dirt} that grows and can be
+ * collected by the player once grown. A cabbage is initially rendered as 'default' within {@link
+ * SpriteGallery#cabbage}.
+ *
+ * <p>This class represents the in-game cabbage resource and manages its growth and harvesting
+ * behaviour.
  */
 public class Cabbage extends Entity implements Interactable {
+
+    /** Timer used to advance cabbage growth stages. */
+    private final TickTimer timer = new RepeatingTimer(TimerDuration.SHORT);
+
+    /** Sprite group used to render cabbage states. */
+    private static final SpriteGroup ART = SpriteGallery.cabbage;
+
+    /** Growth state: 0..4 representing progression from 'default' to 'collectable'. */
+    private int growthState = 0;
+
+    /** The cost of planting a cabbage, 2 coins. */
     public static final int COST = 2;
-    private int count;
-    private String[] spriteState;
 
     /**
      * Construct a new cabbage entity at the given x, y position.
-     * Initially the cabbage is rendered
-     * as 'default' within {@link SpriteGallery#cabbage}.
+     *
+     * <p>Initially the cabbage is rendered as 'default' within {@link SpriteGallery#cabbage}.
+     *
+     * <p>x and y must be non-negative and within the window bounds.
+     *
      * @param x The x-axis (horizontal) coordinate.
      * @param y The y-axis (vertical) coordinate.
-     * @requires x >= 0, x is less than the window width,
-     * y >= 0, y is less than the window height
      */
     public Cabbage(int x, int y) {
         super(x, y);
-        this.setSprite(SpriteGallery.cabbage.getSprite("default"));
-        this.count = 0;
-        this.spriteState = new String[]{"default", "budding", "growing", "grown", "collectable"};
+        this.setSprite(ART.getSprite("default"));
     }
 
     /**
-     * Progress the state of the cabbage, updating how it is
-     * rendered as required. The cabbage
-     * progresses through the following sprites in
-     * {@link SpriteGallery#cabbage}: 'default',
-     * 'budding', 'growing', 'grown', and finally 'collectable'.
-     * The cabbage transitions into its
-     * next state every 100 ticks.
-     * @param state The state of the engine, including timing and input.
+     * Progress the state of the cabbage, updating how it is rendered as required.
+     *
+     * <p>The cabbage progresses through the following sprites in {@link SpriteGallery#cabbage}:
+     * 'default', 'budding', 'growing', 'grown', and finally 'collectable'. The cabbage transitions
+     * into its next state periodically.
+     *
+     * <p>Use {@link RepeatingTimer} and {@link TimerDuration#SHORT} to track timed transitions.
      */
+    @Override
     public void tick(EngineState state) {
-        if (state.currentTick() % 100 == 0 && this.count < 4) {
-            count++;
-            this.setSprite(SpriteGallery.cabbage.getSprite(spriteState[count]));
+        this.timer.tick();
+        if (this.timer.isFinished()) {
+            if (this.growthState < 4) {
+                this.growthState++;
+            }
+            this.updateArt();
         }
     }
 
+    /** Updates the displayed art of this entity based on the current growth state. */
+    private void updateArt() {
+        String spriteName =
+            switch (this.growthState) {
+                case 0 -> "default";
+                case 1 -> "budding";
+                case 2 -> "growing";
+                case 3 -> "grown";
+                default -> "collectable";
+            };
+
+        this.setSprite(ART.getSprite(spriteName));
+    }
+
     /**
-     * Handle collecting a fully grown cabbage. When the player
-     * interacts with a fully grown
-     * ("collectable") cabbage the cost of the cabbage
-     * ({@link #COST}) is added to the player's
-     * food, 3 coins are added to the player's inventory,
-     * and the cabbage is removed from the game.
-     * @param state The state of the engine (input/dimensions context).
-     * @param game The game state that can be queried or updated as needed.
+     * Handle collecting a fully grown cabbage. When the player interacts with a fully grown cabbage
+     * the cost of the cabbage is added to the player's food, 3 coins are added to the player's
+     * inventory, and the cabbage is removed from the game.
+     *
+     * @param state The state of the engine, including the mouse, keyboard information and
+     *     dimension. Useful for processing keyboard presses or mouse movement. Note that for
+     *     left-click behaviour, {@link builder.entities.Usable} should be used instead.
+     * @param game The state of the game, including the player and world. Can be used to query or
+     *     update the game state.
      */
+    @Override
     public void interact(EngineState state, GameState game) {
-        if (count == 4) {
+        if (this.growthState >= 4) {
             game.getInventory().addFood(COST);
             game.getInventory().addCoins(3);
             this.markForRemoval();

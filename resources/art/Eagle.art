@@ -1,0 +1,27 @@
+eagle:default:
+|   OO   |
+|  nOOn  |
+|   tt   |
+|N  tt  N|
+|kNtNNtNk|
+|  knnk  |
+|  nNNn  |
+|   Yy   |
+eagle:up:
+|   Yy   |
+|  nNNn  |
+|  knnk  |
+|kNtNNtNk|
+|N  tt  N|
+|   tt   |
+|  nOOn  |
+|   OO   |
+eagle:down:
+|   OO   |
+|  nOOn  |
+|   tt   |
+|N  tt  N|
+|kNtNNtNk|
+|  knnk  |
+|  nNNn  |
+|   Yy   |

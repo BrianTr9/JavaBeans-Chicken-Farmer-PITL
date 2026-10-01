@@ -1,0 +1,27 @@
+ibis:default:
+|   kk   |
+|  kKKKKK|
+|   ..   |
+|   ..   |
+| kKwww  |
+|  wwww  |
+|  KKK   |
+|   KK   |
+ibis:up:
+|   ll   |
+|  lll   |
+|  wwww  |
+|bBnwwnBb|
+|B  nn  B|
+|   nn   |
+|  oBBb  |
+|   bb   |
+ibis:down:
+|   bb   |
+|  oBBb  |
+|   nn   |
+|B  nn  B|
+|bBnwwnBb|
+|  wwww  |
+|  lll   |
+|   ll   |
