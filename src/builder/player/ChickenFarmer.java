@@ -20,14 +20,9 @@ import java.util.Optional;
  *
  * <p>Note: All references to sprites are sprites within {@link SpriteGallery#chickenFarmer}.
  *
- * @hint Use the provided {@link builder.entities.Brutus} class as a rough guide.
- * @hint The player must maintain three animations (see {@link Animation}): the left walking
- *     animation ('left', 'left1', 'left2' on {@link AnimationDuration#SLOW}), the right walking
- *     animation ('right', 'right1', 'right2' on {@link AnimationDuration#SLOW}), and the use
- *     animation (in stage 3) set by the {@link #use(Item)} method. The player instance should store
- *     each animation as a member variable and progress it during the tick method. When the player
- *     needs to run the animation, it should call {@link #setSprite(Sprite)} and pass the stored
- *     animation.
+ * <p>The player keeps a three-frame walking animation for each direction (for example 'up',
+ * 'up1', 'up2' on {@link AnimationDuration#SLOW}) plus the use animation set by
+ * {@link #use(Item)}. All animations are progressed every tick so they stay in step.
  */
 public class ChickenFarmer extends Entity implements Player {
 
@@ -46,6 +41,16 @@ public class ChickenFarmer extends Entity implements Player {
                     AnimationDuration.SLOW,
                     new Sprite[] {
                         art.getSprite("right"), art.getSprite("right1"), art.getSprite("right2")
+                    });
+    private final Animation walkUp =
+            new Animation(
+                    AnimationDuration.SLOW,
+                    new Sprite[] {art.getSprite("up"), art.getSprite("up1"), art.getSprite("up2")});
+    private final Animation walkDown =
+            new Animation(
+                    AnimationDuration.SLOW,
+                    new Sprite[] {
+                        art.getSprite("down"), art.getSprite("down1"), art.getSprite("down2")
                     });
 
     /**
@@ -86,10 +91,7 @@ public class ChickenFarmer extends Entity implements Player {
      *     <caption>&nbsp;</caption>
      * </table>
      *
-     * The player's sprite should also be updated based on the move. If the player moves north, the
-     * sprite should be set to 'up'. If the player moves south, the sprite should be set to 'down'.
-     * If the player moves either east or west, the sprite should be set to the appropriate
-     * animation step of that direction, see the hint in the class comment.
+     * The player's sprite is set to the walking animation for the direction moved.
      *
      * <p>Note: Moving to a negative position is unspecified and won't be tested.
      *
@@ -101,11 +103,11 @@ public class ChickenFarmer extends Entity implements Player {
         switch (direction) {
             case NORTH -> {
                 setY(getY() - amount);
-                this.setSprite(art.getSprite("up"));
+                this.setSprite(this.walkUp);
             }
             case SOUTH -> {
                 setY(getY() + amount);
-                this.setSprite(art.getSprite("down"));
+                this.setSprite(this.walkDown);
             }
             case EAST -> {
                 setX(getX() + amount);
@@ -133,6 +135,8 @@ public class ChickenFarmer extends Entity implements Player {
         // progress animations forward
         this.walkLeft.tick(state);
         this.walkRight.tick(state);
+        this.walkUp.tick(state);
+        this.walkDown.tick(state);
         if (useAnimation != null) {
             useAnimation.tick(state);
         }
