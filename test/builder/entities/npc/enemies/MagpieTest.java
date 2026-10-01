@@ -236,8 +236,15 @@ public class MagpieTest {
         assertEquals(10, inventory.getCoins());
 
         magpie.tick(engineState, gameState);
+        assertTrue("lifespan should have expired", magpie.isMarkedForRemoval());
+        assertFalse(magpie.hasReturnedHome());
 
-        // Should return the 3 coins since removed before reaching spawn
+        // The manager notifies the bird on removal; it was not home, so the coins go back.
+        magpie.onRemoved(gameState);
+        assertEquals(13, inventory.getCoins());
+
+        // Notifying twice must not refund twice.
+        magpie.onRemoved(gameState);
         assertEquals(13, inventory.getCoins());
     }
 

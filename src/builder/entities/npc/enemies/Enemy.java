@@ -44,6 +44,16 @@ public class Enemy extends Npc {
     }
 
     /**
+     * Called exactly once by {@link EnemyManager} when this enemy is removed from the world,
+     * whatever the cause (returning home, expiring or being caught by a bee). No-op by default.
+     *
+     * @param game the current game state
+     */
+    public void onRemoved(GameState game) {
+        // intentionally empty
+    }
+
+    /**
      * Interact with the game state (no-op by default).
      *
      * @param state The engine state for this tick.

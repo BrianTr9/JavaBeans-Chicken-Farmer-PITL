@@ -61,7 +61,7 @@ public class EnemyManagerTest {
         mgr.addBird(c);
         a.markForRemoval();
         c.markForRemoval();
-        mgr.cleanup();
+        mgr.cleanup(game);
         List<Enemy> birds = mgr.getBirds();
         assertEquals(1, birds.size());
         assertSame(b, birds.get(0));

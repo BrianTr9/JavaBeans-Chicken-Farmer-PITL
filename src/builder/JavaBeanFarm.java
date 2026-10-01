@@ -186,7 +186,7 @@ public class JavaBeanFarm implements Game {
         this.npcs.interact(state, game);
 
         this.npcs.cleanup();
-        this.enemies.cleanup();
+        this.enemies.cleanup(game);
     }
 
     /**

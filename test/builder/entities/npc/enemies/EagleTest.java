@@ -241,21 +241,22 @@ public class EagleTest {
         inventory.addFood(10);
         MockPlayer closePlayer = new MockPlayer(110, 110);
         gameState = new MockGameState(closePlayer, inventory);
-        Eagle eagle = new Eagle(300, 300, closePlayer);
+        Eagle eagle = new Eagle(300, 300, closePlayer); // spawn far from the player
+        eagle.setX(105);
+        eagle.setY(105);
 
-        eagle.tick(engineState, gameState); // Steal food
-        // Move eagle far from spawn and mark for removal
+        eagle.tick(engineState, gameState); // within a tile of the player: steals food
+        assertEquals("eagle should have stolen 3 food", 7, inventory.getFood());
+        assertEquals(3, eagle.getFood());
+
+        // Removed far from spawn (e.g. caught by a bee) before getting home.
         eagle.setX(500);
         eagle.setY(500);
-
-        // Mark eagle for removal while far from spawn
-        // On the next tick, if eagle is marked for removal and far from spawn, it returns food
         eagle.markForRemoval();
+        eagle.onRemoved(gameState);
 
-        // Food should be returned (7 + 3 = 10)
+        assertEquals("stolen food should be returned", 10, inventory.getFood());
 
-        // Food should be returned
-        assertEquals(10, inventory.getFood());
     }
 
     /**

@@ -8,7 +8,6 @@ import engine.EngineState;
 import engine.art.sprites.SpriteGroup;
 import engine.game.HasPosition;
 import engine.timing.FixedTimer;
-import engine.timing.RepeatingTimer;
 
 /**
  * A magpie enemy that flies towards the player and steals coins.
@@ -27,7 +26,6 @@ public class Magpie extends AbstractBird {
     private static final SpriteGroup ART = SpriteGallery.magpie;
 
     /** Timer used to update directional heading periodically. */
-    private final RepeatingTimer directionalUpdateTimer = new RepeatingTimer(30);
 
     /** Number of coins currently stolen by this magpie. */
     private int coins = 0;
@@ -84,7 +82,6 @@ public class Magpie extends AbstractBird {
         }
 
         this.move();
-        this.directionalUpdateTimer.tick();
 
         Player player = game.getPlayer();
 
@@ -97,20 +94,21 @@ public class Magpie extends AbstractBird {
             this.setSpeed(2); // book it
         }
 
-        if (!this.getAttacking()) {
-            if (this.distanceFrom(this.getSpawnX(), this.getSpawnY())
-                    < engine.getDimensions().tileSize()) {
-                this.markForRemoval();
-            }
+        if (!this.getAttacking() && this.isNear(engine, this.getSpawnX(), this.getSpawnY())) {
+            this.removeAtSpawn();
         }
+    }
 
-        // Refund stolen coin if removed before reaching spawn:
-        // - If removed while attacking (e.g., lifespan), refund.
-        // - Or if removed and still not within a tile of spawn, refund.
-        if (this.isMarkedForRemoval() && this.coins > 0
-                && this.distanceFrom(this.getSpawnX(), this.getSpawnY())
-                        > engine.getDimensions().tileSize()) {
+    /**
+     * Gives stolen coins back to the player unless the magpie made it home with them.
+     *
+     * @param game the current game state
+     */
+    @Override
+    public void onRemoved(GameState game) {
+        if (!this.hasReturnedHome() && this.coins > 0) {
             game.getInventory().addCoins(this.coins);
+            this.coins = 0;
         }
     }
 

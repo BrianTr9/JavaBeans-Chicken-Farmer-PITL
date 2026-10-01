@@ -72,7 +72,6 @@ public class Eagle extends AbstractBird {
         this.move();
 
         updateHeadingAndSprite();
-        refundFoodIfRemovedAwayFromSpawn(engine, game);
     }
 
     private void tickLifespanAndMaybeDespawn() {
@@ -99,7 +98,7 @@ public class Eagle extends AbstractBird {
 
     private void tryDespawnAtSpawnIfReturning(EngineState engine) {
         if (!this.getAttacking() && this.isNear(engine, this.getSpawnX(), this.getSpawnY())) {
-            this.markForRemoval();
+            this.removeAtSpawn();
         }
     }
 
@@ -115,11 +114,16 @@ public class Eagle extends AbstractBird {
         }
     }
 
-    private void refundFoodIfRemovedAwayFromSpawn(EngineState engine, GameState game) {
-        if (this.isMarkedForRemoval()
-                && this.distanceFrom(this.getSpawnX(), this.getSpawnY())
-                        > engine.getDimensions().tileSize()) {
+    /**
+     * Gives stolen food back to the player unless the eagle made it home with it.
+     *
+     * @param game the current game state
+     */
+    @Override
+    public void onRemoved(GameState game) {
+        if (!this.hasReturnedHome() && this.food > 0) {
             game.getInventory().addFood(this.food);
+            this.food = 0;
         }
     }
 

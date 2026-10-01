@@ -30,6 +30,9 @@ abstract class AbstractBird extends Enemy implements Expirable {
     /** Optional lifespan timer; if set the bird will expire when finished. */
     private FixedTimer lifespan;
 
+    /** True once the bird has flown back to its spawn and removed itself. */
+    private boolean returnedHome = false;
+
     /**
      * Construct a new AbstractBird located at the given coordinates.
      *
@@ -119,6 +122,22 @@ abstract class AbstractBird extends Enemy implements Expirable {
      */
     public int getSpawnY() {
         return this.spawnY;
+    }
+
+    /**
+     * Returns whether this bird got back to its spawn before being removed. Loot carried
+     * home is kept; loot of a bird removed anywhere else goes back to the player.
+     *
+     * @return true if the bird removed itself at its spawn
+     */
+    public boolean hasReturnedHome() {
+        return this.returnedHome;
+    }
+
+    /** Removes this bird from the world because it has reached its spawn. */
+    protected void removeAtSpawn() {
+        this.returnedHome = true;
+        this.markForRemoval();
     }
 
     // --- Protected helper methods -----------------------------------------------

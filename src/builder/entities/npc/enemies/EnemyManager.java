@@ -10,6 +10,7 @@ import engine.renderer.Renderable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -79,9 +80,21 @@ public class EnemyManager implements Tickable, RenderableGroup {
         this.birds.add(enemy);
     }
 
-    /** Removes any birds that have been marked for removal. */
-    public void cleanup() {
-        this.birds.removeIf(Enemy::isMarkedForRemoval);
+    /**
+     * Removes any birds that have been marked for removal, calling
+     * {@link Enemy#onRemoved(GameState)} on each one.
+     *
+     * @param game the current game state
+     */
+    public void cleanup(GameState game) {
+        final Iterator<Enemy> iterator = this.birds.iterator();
+        while (iterator.hasNext()) {
+            final Enemy bird = iterator.next();
+            if (bird.isMarkedForRemoval()) {
+                iterator.remove();
+                bird.onRemoved(game);
+            }
+        }
     }
 
     /**
@@ -94,7 +107,7 @@ public class EnemyManager implements Tickable, RenderableGroup {
      */
     @Override
     public void tick(EngineState state, GameState game) {
-        this.cleanup();
+        this.cleanup(game);
         for (Spawner spawner : this.spawners) {
             spawner.tick(state, game);
         }
