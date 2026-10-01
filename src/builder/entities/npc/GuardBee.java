@@ -21,27 +21,21 @@ public class GuardBee extends Npc implements Expirable {
     private static final int SPEED = 2;
     private static final SpriteGroup ART = SpriteGallery.bee;
     private FixedTimer lifespan = new FixedTimer(300);
-    private final HasPosition trackedTarget;
 
     /**
-     * Construct a GuardBee spawned at the given coordinates that initially tracks the
-     * supplied target.
+     * Construct a GuardBee spawned at the given coordinates, initially aimed at the supplied
+     * target. Each tick it re-targets the nearest bird, or heads home when there is none.
      *
      * @param x horizontal spawning position
      * @param y vertical spawning position
-     * @param trackedTarget target with a position we want this to track (initial aim)
+     * @param trackedTarget the position the bee initially flies towards
      */
     public GuardBee(int x, int y, HasPosition trackedTarget) {
         super(x, y);
         this.setSprite(ART.getSprite("default"));
-        this.trackedTarget = trackedTarget;
-
         this.spawnX = x;
         this.spawnY = y;
-
-        double deltaX = trackedTarget.getX() - this.getX();
-        double deltaY = trackedTarget.getY() - this.getY();
-        this.setDirection((int) Math.toDegrees(Math.atan2(deltaY, deltaX)));
+        this.steerTowards(trackedTarget);
         this.setSpeed(GuardBee.SPEED);
     }
 
@@ -95,20 +89,10 @@ public class GuardBee extends Npc implements Expirable {
         }
 
         if (nearest != null) {
-            // Steer towards closest bird
-            double dx = nearest.getX() - this.getX();
-            double dy = nearest.getY() - this.getY();
-            this.setDirection((int) Math.toDegrees(Math.atan2(dy, dx)));
-        } else if (this.trackedTarget != null) {
-            // No birds in world: continue towards the last known target (as per existing tests)
-            double dx = this.trackedTarget.getX() - this.getX();
-            double dy = this.trackedTarget.getY() - this.getY();
-            this.setDirection((int) Math.toDegrees(Math.atan2(dy, dx)));
+            this.steerTowards(nearest);
         } else {
-            // Fallback: steer back to spawn if no target
-            double dx = this.spawnX - this.getX();
-            double dy = this.spawnY - this.getY();
-            this.setDirection((int) Math.toDegrees(Math.atan2(dy, dx)));
+            // No birds left in the world: return to the hive.
+            this.steerTowards(this.spawnX, this.spawnY);
         }
 
         // Collision with any enemy: remove both

@@ -2,6 +2,7 @@ package builder.entities.npc;
 
 import builder.GameState;
 import builder.entities.npc.enemies.Eagle;
+import builder.entities.npc.enemies.Enemy;
 import builder.entities.npc.enemies.EnemyManager;
 import builder.entities.npc.enemies.Magpie;
 import builder.entities.npc.enemies.Pigeon;
@@ -45,6 +46,14 @@ public class GuardBeeTest {
         player = new MockPlayer(400, 400);
         enemyManager = new EnemyManager();
         gameState = new MockGameState(player, inventory, enemyManager);
+    }
+
+    /** Adds a stationary bird at the given position and returns it. */
+    private Enemy birdAt(int x, int y) {
+        Enemy bird = new Enemy(x, y);
+        bird.setSpeed(0);
+        enemyManager.addBird(bird);
+        return bird;
     }
 
     /**
@@ -127,7 +136,7 @@ public class GuardBeeTest {
      */
     @Test
     public void testDirectionTowardsTarget() {
-        MockPosition target = new MockPosition(200, 100);
+        Enemy target = birdAt(200, 100);
         GuardBee bee = new GuardBee(100, 100, target);
 
         bee.tick(engineState, gameState);
@@ -235,7 +244,7 @@ public class GuardBeeTest {
      */
     @Test
     public void testSpriteDownWhenMovingDown() {
-        MockPosition targetBelow = new MockPosition(100, 300);
+        Enemy targetBelow = birdAt(100, 300);
         GuardBee bee = new GuardBee(100, 100, targetBelow);
 
         bee.tick(engineState, gameState);
@@ -248,7 +257,7 @@ public class GuardBeeTest {
      */
     @Test
     public void testSpriteUpWhenMovingUp() {
-        MockPosition targetAbove = new MockPosition(100, 50);
+        Enemy targetAbove = birdAt(100, 50);
         GuardBee bee = new GuardBee(100, 300, targetAbove);
 
         bee.tick(engineState, gameState);
@@ -261,7 +270,7 @@ public class GuardBeeTest {
      */
     @Test
     public void testSpriteRightWhenMovingRight() {
-        MockPosition targetRight = new MockPosition(300, 100);
+        Enemy targetRight = birdAt(300, 100);
         GuardBee bee = new GuardBee(100, 100, targetRight);
 
         bee.tick(engineState, gameState);
@@ -274,7 +283,7 @@ public class GuardBeeTest {
      */
     @Test
     public void testSpriteLeftWhenMovingLeft() {
-        MockPosition targetLeft = new MockPosition(50, 100);
+        Enemy targetLeft = birdAt(50, 100);
         GuardBee bee = new GuardBee(300, 100, targetLeft);
 
         bee.tick(engineState, gameState);
@@ -287,7 +296,7 @@ public class GuardBeeTest {
      */
     @Test
     public void testMultipleTicksMovement() {
-        MockPosition target = new MockPosition(500, 500);
+        Enemy target = birdAt(500, 500);
         GuardBee bee = new GuardBee(100, 100, target);
 
         int initialDistance = bee.distanceFrom(500, 500);
@@ -374,13 +383,14 @@ public class GuardBeeTest {
     }
 
     @Test
-    public void testDirectionTowardsTrackedTargetWhenNoEnemiesDiagonal() {
-        // No enemies; direction should follow trackedTarget. Target is diagonally up-left: (-135 deg)
-        GuardBee bee = new GuardBee(100, 100, new MockPosition(50, 50));
-        // Ensure no enemies
+    public void testReturnsToSpawnWhenNoEnemies() {
+        // Spec: with no birds in the world the bee flies back to its spawn (the hive).
+        GuardBee bee = new GuardBee(100, 100, new MockPosition(500, 500));
+        bee.setX(300);
+        bee.setY(300);
         assertTrue(enemyManager.getBirds().isEmpty());
         bee.tick(engineState, gameState);
-        assertEquals("Direction should update towards tracked target when no enemies (-135 deg)", -135, bee.getDirection());
+        assertEquals("Bee should head back towards its spawn (-135 deg)", -135, bee.getDirection());
     }
 
     @Test
@@ -433,7 +443,7 @@ public class GuardBeeTest {
     @Test
     public void testSpriteUpdatesToDownAfterTick() {
         // Target below ensures a downward heading; after tick, sprite should be 'down'
-        GuardBee bee = new GuardBee(100, 100, new MockPosition(100, 300));
+        GuardBee bee = new GuardBee(100, 100, birdAt(100, 300));
         bee.tick(engineState, gameState);
         assertSame(builder.ui.SpriteGallery.bee.getSprite("down"), bee.getSprite());
     }
