@@ -176,6 +176,12 @@ public class TileBehaviourTest {
         assertTrue(grass.isMarkedForRemoval());
         List<Tile> placed = fixture.world.tilesAtPosition(X, Y, GameFixture.DIMENSIONS);
         assertTrue(placed.stream().anyMatch(tile -> tile instanceof Dirt));
+
+        // Once the world ticks, only the new dirt remains at that position.
+        fixture.world.tick(GameFixture.engine(1), fixture.game);
+        List<Tile> after = fixture.world.tilesAtPosition(X, Y, GameFixture.DIMENSIONS);
+        assertEquals(1, after.size());
+        assertTrue(after.get(0) instanceof Dirt);
     }
 
     @Test

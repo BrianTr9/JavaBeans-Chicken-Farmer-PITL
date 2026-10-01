@@ -82,8 +82,9 @@ public class BeanWorld implements RenderableGroup, Tickable, World {
     }
 
     /**
-     * Progress the state of the world. The world is progressed by calling the {@link
-     * Tile#tick(EngineState)} method on every world tile.
+     * Progress the state of the world. Tiles marked for removal (for example grass that has
+     * been hoed into dirt) are dropped first, so they are no longer ticked, rendered or found
+     * by position queries; then {@link Tile#tick(EngineState)} is called on every tile.
      *
      * @param state The state of the engine, including the mouse, keyboard information and
      *     dimension. Useful for processing keyboard presses or mouse movement.
@@ -92,6 +93,7 @@ public class BeanWorld implements RenderableGroup, Tickable, World {
      */
     @Override
     public void tick(EngineState state, GameState game) {
+        this.tiles.removeIf(Tile::isMarkedForRemoval);
         for (Tile tile : this.tiles) {
             tile.tick(state);
         }

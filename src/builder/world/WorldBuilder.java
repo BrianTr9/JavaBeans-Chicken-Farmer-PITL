@@ -54,7 +54,8 @@ public class WorldBuilder {
     public static List<Tile> fromString(Dimensions dimensions, String text)
             throws WorldLoadException {
         int numberOfTiles = dimensions.windowSize() / dimensions.tileSize();
-        String[] lines = text.split("\n");
+        // Accept both LF and CRLF line endings (maps edited on Windows).
+        String[] lines = text.split("\r?\n");
         final boolean lineDesync = lines.length != numberOfTiles;
         if (lineDesync) {
             throw new WorldLoadException(
