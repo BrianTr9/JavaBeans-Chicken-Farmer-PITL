@@ -6,8 +6,6 @@ import java.util.List;
 
 /**
  * A collection of multiple renderables. Each of the renderables should be displayed by the game.
- *
- * @provided
  */
 public interface RenderableGroup {
 

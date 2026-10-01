@@ -1,0 +1,46 @@
+bee:default:
+|        |
+|        |
+|   yy   |
+|   KK   |
+|   yy   |
+|   KK   |
+|        |
+|        |
+bee:up:
+|        |
+|        |
+|   yy   |
+|   KK   |
+|   yy   |
+|   KK   |
+|        |
+|        |
+bee:down:
+|        |
+|        |
+|   yy   |
+|   KK   |
+|   yy   |
+|   KK   |
+|        |
+|        |
+bee:right:
+|        |
+|        |
+|        |
+|   KyKy |
+|   KyKy |
+|        |
+|        |
+|        |
+
+bee:left:
+|        |
+|        |
+|        |
+| yKyK   |
+| yKyK   |
+|        |
+|        |
+|        |

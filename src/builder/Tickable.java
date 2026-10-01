@@ -4,8 +4,6 @@ import engine.EngineState;
 
 /**
  * A game component that performs some progression during each game tick.
- *
- * @provided
  */
 public interface Tickable {
 

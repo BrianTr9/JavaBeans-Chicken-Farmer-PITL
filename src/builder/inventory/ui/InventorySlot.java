@@ -10,8 +10,6 @@ import engine.ui.FixedDisplay;
 /**
  * A slot within the player's inventory used to render the item's inventory sprite ({@link
  * Item#inventorySprite()}).
- *
- * @provided
  */
 public class InventorySlot extends FixedDisplay {
     private static final SpriteGroup inventoryArt = SpriteGallery.inventory;

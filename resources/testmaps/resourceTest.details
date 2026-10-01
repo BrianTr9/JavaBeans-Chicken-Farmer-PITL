@@ -1,0 +1,17 @@
+:chickenFarmer:
+|x:340 y:380 coins:1 food:3
+end;
+
+:cabbages:
+|x:300 y:440
+|x:300 y:370
+end;
+
+:magpiespawner:
+end;
+
+:eaglespawner:
+end;
+
+:pigeonspawner:
+end;

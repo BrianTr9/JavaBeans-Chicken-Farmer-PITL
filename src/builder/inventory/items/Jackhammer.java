@@ -13,8 +13,6 @@ import java.util.Optional;
  * A jackhammer item may be used when the player is above an ore to extract its contents. A
  * jackhammer uses the 'jackhammer' inventory sprite within {@link SpriteGallery#tools} and the
  * 'jackhammer1' and 'jackhammer2' animation within {@link SpriteGallery#chickenFarmer}.
- *
- * @provided
  */
 public class Jackhammer implements Item {
     private static final SpriteGroup toolArt = SpriteGallery.tools;

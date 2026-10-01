@@ -20,8 +20,6 @@ import java.util.List;
  *
  * <p>When the player presses a number key, the active slot of the inventory will be updated the
  * number 1 corresponds to the item slot 0 and so on.
- *
- * @provided
  */
 public class InventoryOverlay implements Overlay {
     // invariant: slots <= 9
@@ -39,6 +37,7 @@ public class InventoryOverlay implements Overlay {
      * @param slots The number of slots to display for the inventory.
      */
     public InventoryOverlay(Dimensions dimensions, int slots) {
+        assert slots <= 9;
         this.slots = slots;
         inventorySquares = new InventorySquare[slots];
         inventorySlots = new InventorySlot[slots];

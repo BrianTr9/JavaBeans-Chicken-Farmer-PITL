@@ -1,17 +1,31 @@
 # IDE
 .idea/
 *.iml
+.vscode/
+
+# Build output
 out/
+bin/
+bin_test/
+build/
+dist/
+template/
+.gradle/
 *.class
 
 # OS
 .DS_Store
 Thumbs.db
+__MACOSX/
 
-# Build
+# Archives / binaries
 *.jar
 *.zip
 *.exe
 
-# Optional: Exclude only problematic files, keep engine.jar
-!lib/engine.jar
+# Keep the provided libraries
+!lib/*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# Local copy of the Assignment 2 repository (history is merged into this repo)
+Assignment2/

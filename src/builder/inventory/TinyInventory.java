@@ -3,11 +3,10 @@ package builder.inventory;
 import builder.inventory.items.Item;
 
 /**
- * An inventory implementation that stores some small number of items.
+ * An inventory implementation that stores a small, fixed number of items.
  *
- * @invariant getCapacity() &le; 10
- * @test
- * @provided
+ * <p>This implementation is used where a compact inventory is sufficient (typically for tests
+ * and seeding). Capacity must be no greater than 10.
  */
 public class TinyInventory implements Inventory {
     // note: there's no reason that this class needs to store less than 10 elements,
@@ -18,17 +17,32 @@ public class TinyInventory implements Inventory {
     private int active = 0;
 
     /**
-     * Construct a new tiny inventory instance.
+     * Construct a new tiny inventory instance with the given capacity.
      *
-     * @requires size &le; 10
-     * @param size The maximum capacity of the inventory.
+     * @param size The maximum capacity of the inventory; at most 10.
      */
     public TinyInventory(int size) {
+        assert size <= 10;
         contents = new Item[size];
+    }
+
+    /**
+     * Construct a new tiny inventory instance with initial resources.
+     *
+     * @param size The maximum capacity of the inventory; at most 10.
+     * @param coins The initial coin amount.
+     * @param food The initial food amount.
+     */
+    public TinyInventory(int size, int coins, int food) {
+        assert size <= 10;
+        contents = new Item[size];
+        this.coins = coins;
+        this.food = food;
     }
 
     @Override
     public int getCapacity() {
+        assert contents.length >= 0;
         return contents.length;
     }
 
@@ -48,6 +62,8 @@ public class TinyInventory implements Inventory {
 
     @Override
     public int getActiveSlot() {
+        assert active >= 0;
+        assert active < getCapacity();
         return active;
     }
 
@@ -67,21 +83,27 @@ public class TinyInventory implements Inventory {
 
     @Override
     public void addCoins(int amount) {
+        int oldCoins = coins;
         coins = Math.max(0, coins + amount);
+        assert coins == Math.max(0, oldCoins + amount);
     }
 
     @Override
     public void addFood(int amount) {
+        int oldFood = food;
         food = Math.max(0, food + amount);
+        assert food == Math.max(0, oldFood + amount);
     }
 
     @Override
     public int getCoins() {
+        assert coins >= 0;
         return coins;
     }
 
     @Override
     public int getFood() {
+        assert food >= 0;
         return food;
     }
 }

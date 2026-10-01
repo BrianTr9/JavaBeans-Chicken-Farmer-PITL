@@ -1,0 +1,69 @@
+plugins {
+    id 'application'
+    id 'checkstyle'
+}
+
+repositories {
+    // Only used to fetch the Checkstyle tool itself; game libraries come from lib/.
+    mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+sourceSets {
+    main {
+        java { srcDirs = ['src'] }
+        resources { srcDirs = [] }
+    }
+    test {
+        java { srcDirs = ['test'] }
+        resources { srcDirs = [] }
+    }
+}
+
+dependencies {
+    // Game engine provided by the CSSE2002 course staff.
+    implementation files('lib/engine.jar')
+    testImplementation files('lib/junit-4.13.1.jar', 'lib/hamcrest-core-1.3.jar')
+}
+
+application {
+    mainClass = 'Main'
+}
+
+// Sprites and maps are loaded from paths relative to the project root.
+tasks.named('run') {
+    workingDir = projectDir
+}
+
+tasks.named('test') {
+    workingDir = projectDir
+    testLogging {
+        events = ['failed']
+        exceptionFormat = 'full'
+    }
+}
+
+// CSSE2002 style guide, applied to the game sources. Any warning fails the build.
+checkstyle {
+    toolVersion = '10.26.1'
+    configFile = file('config/checkstyle/checkstyle.xml')
+    maxWarnings = 0
+}
+
+tasks.named('checkstyleTest') {
+    enabled = false
+}
+
+// Design-by-contract tags used in the Javadoc (CSSE2002 convention).
+tasks.named('javadoc') {
+    options.tags = [
+        'requires:a:Requires:',
+        'ensures:a:Ensures:',
+        'invariant:a:Invariant:'
+    ]
+}

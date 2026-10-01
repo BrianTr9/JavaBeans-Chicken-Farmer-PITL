@@ -8,8 +8,6 @@ import java.util.Optional;
 /**
  * An item is stored in the player's inventory and may be used by the player. For example, a hoe may
  * be stored in the player's inventory and held then used.
- *
- * @provided
  */
 public interface Item {
     /**
