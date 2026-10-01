@@ -89,8 +89,10 @@ public class Eagle extends AbstractBird {
         if (this.getAttacking() && this.isNear(engine, px, py)) {
             this.setAttacking(false);
             if (this.food == 0) { // steal at most once
-                game.getInventory().addFood(-STEAL_FOOD);
-                this.food = STEAL_FOOD;
+                // Only carry what the player actually had, so a refund never creates food.
+                final int stolen = Math.min(STEAL_FOOD, game.getInventory().getFood());
+                game.getInventory().addFood(-stolen);
+                this.food = stolen;
             }
             this.setSpeed(FLEE_SPEED);
         }

@@ -155,12 +155,19 @@ public class EagleTest {
         inventory.addFood(2);
         MockPlayer closePlayer = new MockPlayer(110, 110);
         gameState = new MockGameState(closePlayer, inventory);
-        Eagle eagle = new Eagle(100, 100, closePlayer);
+        Eagle eagle = new Eagle(300, 300, closePlayer); // spawn far from the player
+        eagle.setX(105);
+        eagle.setY(105);
 
         eagle.tick(engineState, gameState);
 
-        // Should still attempt to steal 3, resulting in 0 (or negative handled by inventory)
-        assertTrue(inventory.getFood() <= 0);
+        // Takes everything the player has, but only carries what it actually took.
+        assertEquals(0, inventory.getFood());
+        assertEquals(2, eagle.getFood());
+
+        // A refund can therefore never give back more than was lost.
+        eagle.onRemoved(gameState);
+        assertEquals(2, inventory.getFood());
     }
 
     /**
