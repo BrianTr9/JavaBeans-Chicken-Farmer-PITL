@@ -1,6 +1,6 @@
 # 🐔 JavaBeans - Chicken Farmer Game
 
-[![CI](https://github.com/BrianTr9/JavaBeans-Chicken-Farmer/actions/workflows/ci.yml/badge.svg)](https://github.com/BrianTr9/JavaBeans-Chicken-Farmer/actions/workflows/ci.yml)
+[![CI](https://github.com/BrianTr9/JavaBeans-Chicken-Farmer-PITL/actions/workflows/ci.yml/badge.svg)](https://github.com/BrianTr9/JavaBeans-Chicken-Farmer-PITL/actions/workflows/ci.yml)
 [![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat-square&logo=java)](https://www.oracle.com/java/)
 [![License](https://img.shields.io/badge/License-Educational-blue?style=flat-square)](#-license)
 
