@@ -1,3 +1,7 @@
+> **Note:** this is the report submitted with Assignment 2 and describes the code at that time.
+> Some APIs it mentions (for example `EnemyManager.mkM/mkP/mkE` and the spawn-coordinate
+> setters) were replaced during consolidation; see the main [README](../README.md#-project-history).
+
 # JavaBeanFarm — Refactoring Report (Assignment README)
 
 This document explains the refactorings I applied to the JavaBeanFarm codebase, why I chose them, and how they improve readability and design quality. The course staff can use this as a guide when assessing the Readability and Design rubrics.

@@ -7,6 +7,11 @@
 A 2D farming game in Java, inspired by Stardew Valley. You play a chicken farmer who mines ore,
 grows cabbages and defends the farm from thieving birds with bee hives and scarecrows.
 
+<p align="center">
+  <img src="docs/screenshot.png" alt="Gameplay: a row of bee hives releasing guard bees while birds
+  approach the cabbage fields" width="480">
+</p>
+
 The project combines both CSSE2002 (Programming in the Large) assignments from the University
 of Queensland, Semester 2 2025, into a single codebase:
 
@@ -19,7 +24,8 @@ of Queensland, Semester 2 2025, into a single codebase:
 
 ## 🎮 Quick start
 
-Requires **Java 21**. Gradle is downloaded by the wrapper.
+Requires a JDK (17 to 24) to start Gradle. The wrapper downloads Gradle, and the build uses
+Java 21, which is downloaded automatically if it is not installed.
 
 ```bash
 ./gradlew run      # play the game
@@ -97,8 +103,9 @@ Design techniques used in the code:
   `spawnBird`.
 - **Composite rendering**: tiles render themselves plus whatever is stacked on them;
   `RenderableGroup` lets managers render collections.
-- **Polymorphism over type checks**: tools and tiles decide behaviour in `use`/`interact`.
-  Birds declare their own pace (`ticksPerFrame`) and clean-up (`onRemoved`).
+- **Polymorphism**: each tile decides what a tool does to it (`use`) and what happens when the
+  player walks over it (`interact`). Birds declare their own pace (`ticksPerFrame`) and their
+  clean-up when removed (`onRemoved`).
 - **Encapsulation**: managers expose read-only views of their collections.
 
 ## 🗺️ Level files
@@ -148,7 +155,7 @@ on every push and pull request.
 |-------|---------------|
 | **Assignment 1** (Stages 1–3) | Player movement, tile world and map loading, collisions, mining, tilling, planting, harvesting, inventory and overlays |
 | **Assignment 2** | Provided with a buggy, poorly structured extension. Fixed the bugs found by the system tests, refactored birds, spawners, towers and level loading (see [`docs/assignment2-refactoring-report.md`](docs/assignment2-refactoring-report.md)), and wrote unit tests |
-| **Consolidation** | Merged both git histories and fixed the issues below. Added tests for the Assignment 1 classes (the missing Stage 4), a Gradle build, Checkstyle and CI |
+| **Consolidation** | Merged both git histories and fixed the issues below. Added tests for the Assignment 1 classes (the missing Stage 4), a Gradle build, Checkstyle and CI, and removed the assignment scaffolding |
 
 Bugs fixed during consolidation:
 
@@ -158,8 +165,8 @@ Bugs fixed during consolidation:
 - Birds caught by a bee never returned stolen goods, because they were cleaned up before their
   refund code ran. Refunds now happen in `Enemy.onRemoved`, exactly once.
 - An eagle could "return" food the player never had.
-- Guard bees chose the wrong sprite for most headings, and kept chasing a dead target instead of
-  flying home.
+- Guard bees showed the wrong sprite when flying up or right, and kept chasing a dead target
+  instead of flying home.
 - Malformed `.details` files crashed with index or number errors. They now produce clear
   load errors.
 
