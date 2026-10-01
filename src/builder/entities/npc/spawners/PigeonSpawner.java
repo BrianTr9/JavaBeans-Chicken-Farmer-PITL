@@ -6,7 +6,6 @@ import builder.entities.resources.Cabbage;
 import builder.entities.tiles.Tile;
 
 import engine.EngineState;
-import engine.game.Entity;
 
 import java.util.List;
 
@@ -33,7 +32,7 @@ public class PigeonSpawner extends AbstractBirdSpawner {
     @Override
     protected void spawnBird(EngineState state, GameState game) {
         // Find all tiles with cabbages
-        List<Tile> tilesWithCabbages = game.getWorld().tileSelector(this::hasCabbage);
+        List<Tile> tilesWithCabbages = game.getWorld().tileSelector(Cabbage::growsOn);
 
         // Only spawn if there are cabbages to steal (per specification)
         if (!tilesWithCabbages.isEmpty()) {
@@ -49,21 +48,6 @@ public class PigeonSpawner extends AbstractBirdSpawner {
      *
      * @param tile The tile to check.
      * @return true if the tile has at least one cabbage, false otherwise.
-     */
-    private boolean hasCabbage(Tile tile) {
-        for (Entity entity : tile.getStackedEntities()) {
-            if (entity instanceof Cabbage) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Find the closest tile to this spawner from a list of tiles.
-     *
-     * @param tiles The list of tiles to search (must not be empty).
-     * @return The closest tile to this spawner.
      */
     private Tile findClosestTile(List<Tile> tiles) {
         final java.util.Iterator<Tile> it = tiles.iterator();

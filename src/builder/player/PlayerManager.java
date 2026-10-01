@@ -103,21 +103,13 @@ public class PlayerManager implements Tickable, RenderableGroup {
         }
 
         List<Tile> underPlayer =
-                tilesAt(world, player.getX(), footY(player.getY(), dimensions), dimensions);
+                tilesAt(world, player.getX(), Player.footY(player.getY(), dimensions), dimensions);
         interact(state, game, underPlayer);
         if (state.getMouse().isLeftPressed()) {
             use(state, game, underPlayer);
         }
     }
 
-    /**
-     * Returns the y coordinate of the player's feet: the bottom pixel row of the sprite, which
-     * is drawn centred on the player's position. The player stands on the tile under their
-     * feet, so the upper body can overlap the tile above (for example, water at the shore).
-     */
-    private static int footY(int y, Dimensions dimensions) {
-        return y + dimensions.tileSize() / 2 - 1;
-    }
 
     /**
      * Moves the player one pixel in the given direction unless their feet would touch a tile
@@ -128,7 +120,7 @@ public class PlayerManager implements Tickable, RenderableGroup {
     private void tryMove(Direction direction, World world, Dimensions dimensions) {
         Position next = new Position(player.getX(), player.getY()).shift(direction, 1);
         int halfWidth = dimensions.tileSize() / 4;
-        int bottom = footY(next.getY(), dimensions);
+        int bottom = Player.footY(next.getY(), dimensions);
         int top = bottom - dimensions.tileSize() / 4 + 1;
 
         for (int x : new int[] {next.getX() - halfWidth, next.getX() + halfWidth}) {

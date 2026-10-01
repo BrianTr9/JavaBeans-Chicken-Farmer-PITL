@@ -123,6 +123,26 @@ public class TileTest {
         }
     }
 
+    /** An NPC built on a tile, counting what the tile does to it. */
+    private static class BuiltNpc extends builder.entities.npc.Npc {
+        private int ticks = 0;
+        private int interactions = 0;
+
+        BuiltNpc() {
+            super(0, 0);
+        }
+
+        @Override
+        public void tick(EngineState state) {
+            ticks++;
+        }
+
+        @Override
+        public void interact(EngineState state, GameState game) {
+            interactions++;
+        }
+    }
+
     /** An entity with no interactions. */
     private static class Plain extends Entity {
         Plain() {
@@ -131,5 +151,21 @@ public class TileTest {
 
         @Override
         public void tick(EngineState state) {}
+    }
+
+    @Test
+    public void npcsBuiltOnATileAreLeftToTheNpcManager() {
+        // Regression: hives and scarecrows were ticked, drawn and interacted with twice per
+        // frame, once through their tile and once through NpcManager.
+        BuiltNpc npc = new BuiltNpc();
+        tile.placeOn(npc);
+
+        tile.tick(GameFixture.engine(0));
+        tile.interact(GameFixture.engine(0), fixture.game);
+
+        assertEquals(0, npc.ticks);
+        assertEquals(0, npc.interactions);
+        assertEquals(List.of(tile), tile.render());
+        assertEquals("the tile still counts as occupied", 1, tile.getStackedEntities().size());
     }
 }

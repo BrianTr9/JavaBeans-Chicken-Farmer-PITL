@@ -4,6 +4,8 @@ import builder.GameState;
 import builder.entities.Interactable;
 import builder.ui.SpriteGallery;
 
+import builder.entities.tiles.Tile;
+
 import engine.EngineState;
 import engine.art.sprites.SpriteGroup;
 import engine.game.Entity;
@@ -32,6 +34,12 @@ public class Cabbage extends Entity implements Interactable {
 
     /** The cost of planting a cabbage, 2 coins. */
     public static final int COST = 2;
+
+    /** Food gained by harvesting a fully grown cabbage. */
+    public static final int FOOD_YIELD = 2;
+
+    /** Coins gained by harvesting a fully grown cabbage. */
+    public static final int COIN_YIELD = 3;
 
     /**
      * Construct a new cabbage entity at the given x, y position.
@@ -83,9 +91,36 @@ public class Cabbage extends Entity implements Interactable {
     }
 
     /**
+     * Returns whether the tile holds a cabbage that has not been harvested or stolen yet.
+     * A taken cabbage stays stacked on its tile, marked for removal, until the tile next ticks,
+     * so it must not be offered to the player or to pigeons again in the meantime.
+     *
+     * @param tile the tile to inspect
+     * @return true if a live cabbage is stacked on the tile
+     */
+    public static boolean growsOn(Tile tile) {
+        return liveCabbageOn(tile) != null;
+    }
+
+    /**
+     * Returns the live cabbage stacked on the tile, if any.
+     *
+     * @param tile the tile to inspect
+     * @return the cabbage, or null if there is no cabbage that can still be taken
+     */
+    public static Cabbage liveCabbageOn(Tile tile) {
+        for (Entity entity : tile.getStackedEntities()) {
+            if (entity instanceof Cabbage cabbage && !cabbage.isMarkedForRemoval()) {
+                return cabbage;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Handle collecting a fully grown cabbage. When the player interacts with a fully grown cabbage
-     * the cost of the cabbage is added to the player's food, 3 coins are added to the player's
-     * inventory, and the cabbage is removed from the game.
+     * that has not already been taken, {@link #FOOD_YIELD} food and {@link #COIN_YIELD} coins are
+     * added to the player's inventory and the cabbage is removed from the game.
      *
      * @param state The state of the engine, including the mouse, keyboard information and
      *     dimension. Useful for processing keyboard presses or mouse movement. Note that for
@@ -95,9 +130,9 @@ public class Cabbage extends Entity implements Interactable {
      */
     @Override
     public void interact(EngineState state, GameState game) {
-        if (this.growthState >= 4) {
-            game.getInventory().addFood(COST);
-            game.getInventory().addCoins(3);
+        if (this.growthState >= 4 && !this.isMarkedForRemoval()) {
+            game.getInventory().addFood(FOOD_YIELD);
+            game.getInventory().addCoins(COIN_YIELD);
             this.markForRemoval();
         }
     }

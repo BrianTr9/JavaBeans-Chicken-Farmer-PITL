@@ -1,9 +1,11 @@
 package builder;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
@@ -73,9 +75,14 @@ public class JavaBeanFarm implements Game {
     /** Overlays rendered on top of the game (resource/inventory UI). */
     private final List<Overlay> overlays = new ArrayList<>();
 
+    /**
+     * Reads every line from the reader, joining them with a newline whatever the platform or
+     * the source's line endings, so the map and details parsers see one consistent format.
+     * The reader is not closed; it belongs to the caller.
+     */
     private String readAllReader(Reader reader) throws IOException {
         BufferedReader br = new BufferedReader(reader);
-        StringJoiner sb = new StringJoiner(System.lineSeparator());
+        StringJoiner sb = new StringJoiner("\n");
         String line;
         while ((line = br.readLine()) != null) {
             sb.add(line);
@@ -145,7 +152,10 @@ public class JavaBeanFarm implements Game {
             String mapFile,
             String detailsFile)
             throws IOException, WorldLoadException {
-        this(dimensions, new FileReader(mapFile), new FileReader(detailsFile));
+        // Files.readString opens and closes each file, so no file handle is leaked.
+        this(dimensions,
+                new StringReader(Files.readString(Path.of(mapFile))),
+                new StringReader(Files.readString(Path.of(detailsFile))));
     }
 
     /**

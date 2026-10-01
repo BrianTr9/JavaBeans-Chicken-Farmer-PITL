@@ -100,7 +100,8 @@ public class EnemyManager implements Tickable, RenderableGroup {
     /**
      * Ticks every spawner, then every bird (including any spawned during this tick).
      *
-     * <p>Each bird is ticked {@link Enemy#ticksPerFrame()} times in a row.
+     * <p>Each bird is ticked {@link Enemy#ticksPerFrame()} times in a row, stopping early once
+     * it has been removed (so an expired bird cannot, for example, steal on its second step).
      *
      * @param state the current engine state
      * @param game the current game state
@@ -112,7 +113,8 @@ public class EnemyManager implements Tickable, RenderableGroup {
             spawner.tick(state, game);
         }
         for (Enemy bird : new ArrayList<>(this.birds)) {
-            for (int step = 0; step < bird.ticksPerFrame(); step++) {
+            for (int step = 0; step < bird.ticksPerFrame()
+                    && !bird.isMarkedForRemoval(); step++) {
                 bird.tick(state, game);
             }
         }

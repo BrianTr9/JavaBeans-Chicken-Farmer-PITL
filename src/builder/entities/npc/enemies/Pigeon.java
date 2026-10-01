@@ -7,11 +7,8 @@ import builder.ui.SpriteGallery;
 
 import engine.EngineState;
 import engine.art.sprites.SpriteGroup;
-import engine.game.Entity;
 import engine.game.HasPosition;
 import engine.timing.FixedTimer;
-
-import java.util.List;
 
 /**
  * A pigeon enemy that flies towards cabbages and steals them.
@@ -107,9 +104,8 @@ public class Pigeon extends AbstractBird {
 
     private void handleFleeing(EngineState engine) {
         this.steerTowards(this.getSpawnX(), this.getSpawnY());
-        if (this.distanceFrom(this.getSpawnX(), this.getSpawnY())
-                < engine.getDimensions().tileSize()) {
-            this.markForRemoval();
+        if (this.isNear(engine, this.getSpawnX(), this.getSpawnY())) {
+            this.removeAtSpawn();
         }
         this.updateVerticalSpriteTowardsSpawn(ART, this.getSpawnY());
     }
@@ -127,28 +123,13 @@ public class Pigeon extends AbstractBird {
     }
 
     private Tile findClosestCabbage(GameState game) {
-        List<Tile> tiles =
-                game.getWorld()
-                        .tileSelector(
-                                tile -> {
-                                    for (Entity entity : tile.getStackedEntities()) {
-                                        if (entity instanceof Cabbage) {
-                                            return true;
-                                        }
-                                    }
-                                    return false;
-                                });
-        if (tiles.isEmpty()) {
-            return null;
-        }
-
-        int distance = this.distanceFrom(tiles.getFirst());
-        Tile closest = tiles.getFirst();
-        for (Tile tile : tiles) {
-            final int d = this.distanceFrom(tile);
-            if (d < distance) {
+        Tile closest = null;
+        int closestDistance = Integer.MAX_VALUE;
+        for (Tile tile : game.getWorld().tileSelector(Cabbage::growsOn)) {
+            final int distance = this.distanceFrom(tile);
+            if (distance < closestDistance) {
                 closest = tile;
-                distance = d;
+                closestDistance = distance;
             }
         }
         return closest;
@@ -157,12 +138,10 @@ public class Pigeon extends AbstractBird {
     private void tryStealFromClosest(EngineState engine, Tile closest) {
         if (this.getAttacking()
                 && this.distanceFrom(this.getTrackedTarget()) < engine.getDimensions().tileSize()) {
-            for (Entity entity : closest.getStackedEntities()) {
-                if (entity instanceof Cabbage cabbage) {
-                    cabbage.markForRemoval();
-                    this.setAttacking(false); // start fleeing
-                    break;
-                }
+            final Cabbage cabbage = Cabbage.liveCabbageOn(closest);
+            if (cabbage != null) {
+                cabbage.markForRemoval();
+                this.setAttacking(false); // start fleeing
             }
         }
     }

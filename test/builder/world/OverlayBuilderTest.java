@@ -130,5 +130,42 @@ public class OverlayBuilderTest {
     public void testExtractRejectsDuplicateKeys() {
         OverlayBuilder.extractSpawnDetailsFromLine("x:1 x:2 duration:3");
     }
-}
 
+    @Test
+    public void testOutOfRangeValuesAreRejected() {
+        String[] invalid = {
+            ":chickenfarmer:\nx:1 y:2 coins:-5 food:4\nend;\n",
+            ":chickenfarmer:\nx:-1 y:2 coins:5 food:4\nend;\n",
+        };
+        for (String content : invalid) {
+            try {
+                OverlayBuilder.getPlayerDetailsFromFile(content);
+                fail("Expected IOException for " + content);
+            } catch (IOException e) {
+                assertTrue(e.getMessage().contains("must be at least 0"));
+            }
+        }
+    }
+
+    @Test
+    public void testSpawnerDurationMustBePositive() {
+        // A zero interval would leave the spawner's timer unable to ever fire.
+        String content = ":pigeonspawner:\nx:1 y:2 duration:0\nend;\n";
+        try {
+            OverlayBuilder.getPigeonSpawnDetailsFromString(content);
+            fail("Expected IOException for a zero duration");
+        } catch (IOException e) {
+            assertTrue(e.getMessage().contains("'duration' must be at least 1"));
+        }
+    }
+
+    @Test
+    public void testUnclosedSectionIsReportedAsSuch() {
+        try {
+            OverlayBuilder.getSection("cabbages", ":cabbages:\nx:1 y:2\n");
+            fail("Expected IOException for a section without end;");
+        } catch (IOException e) {
+            assertTrue(e.getMessage().contains("missing its closing"));
+        }
+    }
+}

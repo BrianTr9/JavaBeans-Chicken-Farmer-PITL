@@ -41,6 +41,25 @@ public class BeanWorldTest {
     }
 
     @Test
+    public void testTickDropsTilesMarkedForRemoval() {
+        // Regression: replaced tiles (grass hoed into dirt) used to stay in the world forever,
+        // still ticked, rendered and returned by position queries.
+        BeanWorld world = WorldBuilder.empty();
+        TestTile replaced = new TestTile(40, 40);
+        TestTile replacement = new TestTile(40, 40);
+        world.place(replaced);
+        world.place(replacement);
+        replaced.markForRemoval();
+
+        world.tick(engine, game);
+
+        assertEquals(List.of(replacement), world.allTiles());
+        assertEquals(List.of(replacement), world.tilesAtPosition(40, 40, dims));
+        assertEquals(0, replaced.getTickCount());
+        assertFalse(world.render().contains(replaced));
+    }
+
+    @Test
     public void testPlaceAndAllTilesReturnsCopy() {
         BeanWorld world = WorldBuilder.empty();
         Tile t1 = new TestTile(160, 240); // col=2,row=3

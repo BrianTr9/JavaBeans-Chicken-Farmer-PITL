@@ -53,9 +53,9 @@ public class BeeHive extends Npc {
         }
     }
 
+    /** The player stands on the hive when their feet are on the hive's tile. */
     private boolean isPlayerOnHive(EngineState state, GameState game) {
-        return this.distanceFrom(game.getPlayer().getX(), game.getPlayer().getY())
-                < state.getDimensions().tileSize();
+        return game.getPlayer().isStandingOn(this, state.getDimensions());
     }
 
     @Override
@@ -73,19 +73,25 @@ public class BeeHive extends Npc {
     }
 
     /**
-     * Check the provided targets for a bird within detection range and spawn a GuardBee if
-     * the hive is loaded.
+     * If the hive is loaded, creates a guard bee aimed at the nearest bird within detection
+     * range. Birds already removed this frame are ignored.
      *
      * @param targets the list of enemy birds to consider
      * @return a new GuardBee to spawn, or null if none should be spawned
      */
     public Npc checkAndSpawnBee(ArrayList<Enemy> targets) {
+        if (!this.loaded) {
+            return null;
+        }
+        Enemy nearest = null;
+        int nearestDistance = DETECTION_DISTANCE;
         for (Enemy enemy : targets) {
-            if (this.distanceFrom(enemy) < DETECTION_DISTANCE && this.loaded) {
-                // can only spawn one bee in a frame
-                return new GuardBee(this.getX(), this.getY(), enemy);
+            final int distance = this.distanceFrom(enemy);
+            if (!enemy.isMarkedForRemoval() && distance < nearestDistance) {
+                nearest = enemy;
+                nearestDistance = distance;
             }
         }
-        return null;
+        return nearest == null ? null : new GuardBee(this.getX(), this.getY(), nearest);
     }
 }

@@ -6,7 +6,6 @@ import engine.game.Game;
 import engine.renderer.Dimensions;
 import engine.renderer.TileGrid;
 
-import java.io.FileReader;
 import java.io.IOException;
 
 /**
@@ -27,9 +26,7 @@ public class Main {
         Dimensions dimensions = new TileGrid(TILES_PER_ROW, SIZE);
         Game game =
                 new JavaBeanFarm(
-                        dimensions,
-                        new FileReader("resources/uqLogo.map"),
-                        new FileReader("resources/uqLogo.details"));
+                        dimensions, "resources/uqLogo.map", "resources/uqLogo.details");
         Engine engine = new Engine(game, dimensions);
 
         // Optionally uncomment this line to turn on debug mode

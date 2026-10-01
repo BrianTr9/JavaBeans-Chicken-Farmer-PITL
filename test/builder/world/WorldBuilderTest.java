@@ -26,6 +26,13 @@ public class WorldBuilderTest {
     public TemporaryFolder tmp = new TemporaryFolder();
 
     @Test
+    public void testFromStringAcceptsWindowsLineEndings() throws Exception {
+        Dimensions d = dims(2, 80);
+        List<Tile> tiles = WorldBuilder.fromString(d, "gg\r\nwd\r\n");
+        assertEquals(4, tiles.size());
+    }
+
+    @Test
     public void testFromStringHappyPathBuildsTiles() throws Exception {
         Dimensions d = dims(2, 80); // 2x2 grid
         String text = "gg\nwd\n"; // row0: g g, row1: w d
