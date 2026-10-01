@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/BrianTr9/JavaBeans-Chicken-Farmer-PITL/actions/workflows/ci.yml/badge.svg)](https://github.com/BrianTr9/JavaBeans-Chicken-Farmer-PITL/actions/workflows/ci.yml)
 [![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat-square&logo=openjdk)](https://openjdk.org/projects/jdk/21/)
-[![Tests](https://img.shields.io/badge/tests-425_passing-brightgreen?style=flat-square)](#-testing)
+[![Tests](https://img.shields.io/badge/tests-432_passing-brightgreen?style=flat-square)](#-testing)
 [![Gradle](https://img.shields.io/badge/build-Gradle-02303A?style=flat-square&logo=gradle)](build.gradle)
 
 A tile-based 2D farming game in Java 21. You farm crops and mine ore while thieving birds raid
@@ -23,7 +23,7 @@ the farm. Bee hives and scarecrows defend it.
   through a removal hook.
 - **Data-driven levels**: a tile map plus a key/value level file. The parser validates input and
   reports the section and line of any error.
-- **425 automated tests**: unit tests for the game logic, plus whole-game simulation tests
+- **432 automated tests**: unit tests for the game logic, plus whole-game simulation tests
   that replay scripted input and analyse every rendered frame.
 - **Tooling**: Gradle wrapper, Checkstyle enforced at zero warnings, Javadoc with
   design-by-contract tags, and GitHub Actions CI.
@@ -127,12 +127,15 @@ Problems found and fixed while hardening the codebase, and the design choices be
   section and line.
 - **Rendering correctness.** Sprites are drawn centred on their position. The inventory bar's
   layout treated positions as left edges and was off by half a tile.
+- **Feet-based collision.** The player stands on the tile under their feet, not under the
+  sprite's centre. Collisions use a foot box covering the bottom quarter of the sprite, so legs
+  never overlap water while the head can overlap the tile behind, as in other top-down games.
 
 ## 🧪 Testing
 
 | Suite | Location | Classes | Tests |
 |-------|----------|:---:|:---:|
-| Unit tests | `test/builder` | 22 | 345 |
+| Unit tests | `test/builder` | 22 | 352 |
 | Simulation tests | `test/scenarios` | 11 | 80 |
 
 - **Unit tests** cover the game logic: inventory, tiles and tools, crops and ore, player
@@ -193,7 +196,8 @@ consolidation added the fixes above, the missing tests, the build tooling and CI
 
 **Credits.** The game engine (`lib/engine.jar`), the simulation tests in `test/scenarios`, the
 sprite art, the original specifications ([`docs/`](docs/)) and the Checkstyle configuration were
-provided by the CSSE2002 course staff.
+provided by the CSSE2002 course staff. One simulation's spawn point was moved so the player's
+feet start on the same ore tile under feet-based collision.
 
 **AI usage.** Assignment 1 was written without generative AI. Assignment 2 used ChatGPT and
 Claude for Javadoc and an initial test baseline ([declaration](docs/ai-declaration.txt)). The

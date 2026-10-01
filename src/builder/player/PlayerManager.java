@@ -87,6 +87,7 @@ public class PlayerManager implements Tickable, RenderableGroup {
 
     private void useControls(EngineState state, GameState game) {
         World world = game.getWorld();
+        Dimensions dimensions = state.getDimensions();
         Direction direction = null;
         if (state.getKeys().isDown('w')) {
             direction = Direction.NORTH;
@@ -98,31 +99,63 @@ public class PlayerManager implements Tickable, RenderableGroup {
             direction = Direction.EAST;
         }
         if (direction != null) {
-            tryMove(direction, world, state.getDimensions());
+            tryMove(direction, world, dimensions);
         }
 
         List<Tile> underPlayer =
-                world.tilesAtPosition(player.getX(), player.getY(), state.getDimensions());
+                tilesAt(world, player.getX(), footY(player.getY(), dimensions), dimensions);
         interact(state, game, underPlayer);
         if (state.getMouse().isLeftPressed()) {
             use(state, game, underPlayer);
         }
     }
 
-    private void tryMove(Direction direction, World world, Dimensions dimensions) {
-        Position nextPosition = new Position(player.getX(), player.getY()).shift(direction, 1);
+    /**
+     * Returns the y coordinate of the player's feet: the bottom pixel row of the sprite, which
+     * is drawn centred on the player's position. The player stands on the tile under their
+     * feet, so the upper body can overlap the tile above (for example, water at the shore).
+     */
+    private static int footY(int y, Dimensions dimensions) {
+        return y + dimensions.tileSize() / 2 - 1;
+    }
 
-        List<Tile> underPlayer =
-                world.tilesAtPosition(nextPosition.getX(), nextPosition.getY(), dimensions);
-        boolean blocked = false;
-        for (Tile tile : underPlayer) {
-            if (!tile.canWalkThrough()) {
-                blocked = true;
+    /**
+     * Moves the player one pixel in the given direction unless their feet would touch a tile
+     * that cannot be walked through. The feet are a box half a tile wide, centred on the
+     * player's x coordinate, covering the bottom quarter of the sprite; all four corners must
+     * land on walkable tiles, so the legs never overlap water while the head may.
+     */
+    private void tryMove(Direction direction, World world, Dimensions dimensions) {
+        Position next = new Position(player.getX(), player.getY()).shift(direction, 1);
+        int halfWidth = dimensions.tileSize() / 4;
+        int bottom = footY(next.getY(), dimensions);
+        int top = bottom - dimensions.tileSize() / 4 + 1;
+
+        for (int x : new int[] {next.getX() - halfWidth, next.getX() + halfWidth}) {
+            for (int y : new int[] {top, bottom}) {
+                if (!isWalkable(tilesAt(world, x, y, dimensions))) {
+                    return;
+                }
             }
         }
-        if (!blocked) {
-            player.move(direction, 1);
+        player.move(direction, 1);
+    }
+
+    /** Returns the tiles at a pixel, or none if the pixel lies outside the world. */
+    private static List<Tile> tilesAt(World world, int x, int y, Dimensions dimensions) {
+        if (x < 0 || y < 0 || x >= dimensions.windowSize() || y >= dimensions.windowSize()) {
+            return List.of();
         }
+        return world.tilesAtPosition(x, y, dimensions);
+    }
+
+    private static boolean isWalkable(List<Tile> tiles) {
+        for (Tile tile : tiles) {
+            if (!tile.canWalkThrough()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void interact(EngineState state, GameState game, List<Tile> underPlayer) {

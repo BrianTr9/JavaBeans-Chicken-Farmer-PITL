@@ -36,7 +36,10 @@ import java.util.List;
 public class ResourceSimulationTest {
 
     private final int playerX = 340;
-    private final int playerY = 380;
+    // The player stands on the tile under their feet (the sprite's bottom row, y + 39 here).
+    // Feet start 60px into the ore tile, as the sprite centre did when the player was anchored
+    // at its centre, so the mining sequence is unchanged.
+    private final int playerY = 341;
     private static final int SIZE = 800;
     private static final int TILES_PER_ROW = 10;
     private static final int TICKS = 530;
