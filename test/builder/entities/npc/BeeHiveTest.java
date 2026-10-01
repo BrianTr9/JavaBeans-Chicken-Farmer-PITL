@@ -162,21 +162,33 @@ public class BeeHiveTest {
         assertFalse("Should not get boost when player not on hive", canSpawnBee(hive, bird));
     }
 
-    @Test
-    public void testPlayerExactlyOnTileBoundaryGetsBoost() {
-        // Detects mutation: < vs <= in distance check
-        BeeHive hive = new BeeHive(100, 100);
-        player.setX(179); // Distance = 79 < 80
-        player.setY(100);
-
+    /** Reloads for 80 ticks with the player at (x, y) and reports whether the hive is loaded. */
+    private boolean reloadedIn80TicksWithPlayerAt(int x, int y) {
+        BeeHive hive = new BeeHive(100, 100); // tile (1, 1): pixels 80..159
+        player.setX(x);
+        player.setY(y);
         MockEnemy bird = new MockEnemy(200, 200);
         spawnBeeAndStartReload(hive, bird);
-
-        // Should get boost (3x speed)
         for (int i = 0; i < 80; i++) {
             hive.tick(engineState, gameState);
         }
-        assertTrue("Should get boost when just inside tile boundary", canSpawnBee(hive, bird));
+        return canSpawnBee(hive, bird);
+    }
+
+    @Test
+    public void testBoostRequiresFeetOnTheHiveTile() {
+        // The player stands on the tile under their feet (y + 39 with 80px tiles).
+        assertTrue("last column of the hive tile", reloadedIn80TicksWithPlayerAt(159, 100));
+        assertFalse("first column of the next tile, though within 80px of the hive",
+                reloadedIn80TicksWithPlayerAt(160, 100));
+    }
+
+    @Test
+    public void testBoostFollowsTheFeetNotTheSpriteCentre() {
+        assertTrue("centre on the tile above, feet on the hive tile",
+                reloadedIn80TicksWithPlayerAt(100, 60));
+        assertFalse("centre on the hive tile, feet on the tile below",
+                reloadedIn80TicksWithPlayerAt(100, 130));
     }
 
     // === Detection Range Tests (Mutation Detection) ===

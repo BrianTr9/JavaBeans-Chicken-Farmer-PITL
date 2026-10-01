@@ -30,11 +30,17 @@ public class TinyInventory implements Inventory {
      * Construct a new tiny inventory instance with initial resources.
      *
      * @param size The maximum capacity of the inventory; at most 10.
-     * @param coins The initial coin amount.
-     * @param food The initial food amount.
+     * @param coins The initial coin amount; not negative.
+     * @param food The initial food amount; not negative.
+     * @throws IllegalArgumentException if coins or food is negative
      */
     public TinyInventory(int size, int coins, int food) {
         assert size <= 10;
+        if (coins < 0 || food < 0) {
+            throw new IllegalArgumentException(
+                    "Starting coins and food must not be negative: coins=" + coins
+                            + ", food=" + food);
+        }
         contents = new Item[size];
         this.coins = coins;
         this.food = food;

@@ -71,6 +71,9 @@ public class OverlayBuilder {
      */
     public static SpawnerDetails extractSpawnDetailsFromLine(String line) {
         final Map<String, Integer> values = parseEntry(line, SPAWNER_KEYS);
+        requireAtLeast(values, "x", 0, line);
+        requireAtLeast(values, "y", 0, line);
+        requireAtLeast(values, "duration", 1, line);
         return new Spawner(values.get("x"), values.get("y"), values.get("duration"));
     }
 
@@ -83,6 +86,9 @@ public class OverlayBuilder {
      */
     public static PlayerDetails extractPlayerDetailsFromLine(String line) {
         final Map<String, Integer> values = parseEntry(line, PLAYER_KEYS);
+        for (String key : PLAYER_KEYS) {
+            requireAtLeast(values, key, 0, line);
+        }
         return new Player(
                 values.get("x"), values.get("y"), values.get("coins"), values.get("food"));
     }
@@ -160,6 +166,8 @@ public class OverlayBuilder {
         for (String entry : getSection(label, detailsContent)) {
             try {
                 final Map<String, Integer> values = parseEntry(entry, CABBAGE_KEYS);
+                requireAtLeast(values, "x", 0, entry);
+                requireAtLeast(values, "y", 0, entry);
                 result.add(new Cabbage(values.get("x"), values.get("y")));
             } catch (IllegalArgumentException e) {
                 throw malformed(label, e);
@@ -218,6 +226,19 @@ public class OverlayBuilder {
                     + values.keySet() + " in '" + line + "'");
         }
         return values;
+    }
+
+    /**
+     * Checks that a parsed value is at least the given minimum.
+     *
+     * @throws IllegalArgumentException if it is smaller
+     */
+    private static void requireAtLeast(
+            Map<String, Integer> values, String key, int minimum, String line) {
+        if (values.get(key) < minimum) {
+            throw new IllegalArgumentException(
+                    "'" + key + "' must be at least " + minimum + " in '" + line + "'");
+        }
     }
 
     private static IOException malformed(String label, IllegalArgumentException cause) {

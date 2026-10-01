@@ -236,4 +236,19 @@ public class TileBehaviourTest {
         assertFalse(dirt.isTilled());
         assertTrue(fixture.world.allTiles().isEmpty());
     }
+
+    @Test
+    public void plantEnforcesItsOwnPreconditions() {
+        // plant() is also used when seeding a level, outside the bucket's checks.
+        Dirt untilled = new Dirt(X, Y);
+        assertFalse(untilled.plant(fixture.inventory));
+        assertTrue(untilled.getStackedEntities().isEmpty());
+
+        Dirt tilled = new Dirt(X, Y);
+        tilled.till();
+        assertTrue(tilled.plant(fixture.inventory));
+        assertFalse("a second cabbage on the same tile", tilled.plant(fixture.inventory));
+        assertEquals(1, tilled.getStackedEntities().size());
+        assertEquals(10 - Cabbage.COST, fixture.inventory.getCoins());
+    }
 }

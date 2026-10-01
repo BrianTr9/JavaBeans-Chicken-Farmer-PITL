@@ -52,15 +52,22 @@ public class Dirt extends Tile {
     }
 
     /**
-     * Attempt to plant a {@link Cabbage} and adjust the resources accordingly. If the user can not
-     * currently place the {@link Cabbage} one should not be placed.
+     * Attempt to plant a {@link Cabbage} and adjust the resources accordingly. A cabbage is only
+     * planted on tilled dirt with nothing on it, and only if the inventory can pay
+     * {@link Cabbage#COST}.
+     *
+     * @param inventory the inventory that pays for the cabbage
+     * @return true if a cabbage was planted
      */
-    public void plant(Inventory inventory) {
-        if (inventory.getCoins() >= Cabbage.COST) {
-            inventory.addCoins(-Cabbage.COST);
-            Cabbage cabbage = new Cabbage(this.getX(), this.getY());
-            this.placeOn(cabbage);
+    public boolean plant(Inventory inventory) {
+        if (!this.isTilled()
+                || !this.getStackedEntities().isEmpty()
+                || inventory.getCoins() < Cabbage.COST) {
+            return false;
         }
+        inventory.addCoins(-Cabbage.COST);
+        this.placeOn(new Cabbage(this.getX(), this.getY()));
+        return true;
     }
 
     /**
@@ -87,9 +94,7 @@ public class Dirt extends Tile {
         if (inventory.getHolding() instanceof Hoe) {
             this.till();
         }
-        if (inventory.getHolding() instanceof Bucket
-                && this.getStackedEntities().isEmpty()
-                && this.isTilled()) {
+        if (inventory.getHolding() instanceof Bucket) {
             this.plant(inventory);
         }
         if (inventory.getHolding() instanceof Pole

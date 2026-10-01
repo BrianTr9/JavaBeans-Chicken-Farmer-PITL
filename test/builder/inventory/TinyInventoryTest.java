@@ -115,4 +115,14 @@ public class TinyInventoryTest {
         assertEquals(5, inventory.getCoins());
         assertEquals(0, inventory.getFood());
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void negativeStartingCoinsAreRejected() {
+        new TinyInventory(5, -1, 0);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void negativeStartingFoodIsRejected() {
+        new TinyInventory(5, 0, -1);
+    }
 }

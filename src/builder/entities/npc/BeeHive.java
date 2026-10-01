@@ -53,9 +53,9 @@ public class BeeHive extends Npc {
         }
     }
 
+    /** The player stands on the hive when their feet are on the hive's tile. */
     private boolean isPlayerOnHive(EngineState state, GameState game) {
-        return this.distanceFrom(game.getPlayer().getX(), game.getPlayer().getY())
-                < state.getDimensions().tileSize();
+        return game.getPlayer().isStandingOn(this, state.getDimensions());
     }
 
     @Override
