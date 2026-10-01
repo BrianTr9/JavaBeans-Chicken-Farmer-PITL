@@ -147,25 +147,110 @@ public class PlayerTest {
         assertEquals(CENTRE, player.getY());
     }
 
+    // The player stands on the tile under their feet: the sprite's bottom pixel row
+    // (y + 39 with 80px tiles). For collisions the feet are a box 20px either side of x,
+    // covering the sprite's bottom quarter (y + 20 to y + 39).
+
+    private void walkTo(int x, int y) {
+        ((ChickenFarmer) player).setX(x);
+        ((ChickenFarmer) player).setY(y);
+    }
+
     @Test
-    public void waterBlocksMovement() {
-        // Water directly above; the player stands at the top edge of their tile.
+    public void upperBodyMayOverlapWaterAboveTheFeet() {
+        fixture.world.place(new Water(CENTRE, CENTRE - 80)); // row 0
+        fixture.world.place(new Grass(CENTRE, CENTRE));      // row 1
+        walkTo(CENTRE, 80); // sprite spans y 40..119, feet on row 1
+        manager.tick(input(false, 'w'), fixture.game);
+        assertEquals("head over the water is fine while the feet stay on grass",
+                79, player.getY());
+    }
+
+    @Test
+    public void feetCannotStepOntoWaterAbove() {
         fixture.world.place(new Water(CENTRE, CENTRE - 80));
         fixture.world.place(new Grass(CENTRE, CENTRE));
-        ChickenFarmer farmer = (ChickenFarmer) player;
-        farmer.setY(80); // first pixel row of the tile below the water
-
+        walkTo(CENTRE, 60); // top of the feet at y 80, the top row of the grass tile
         manager.tick(input(false, 'w'), fixture.game);
+        assertEquals("the next step would put the feet in the water", 60, player.getY());
+    }
 
-        assertEquals("cannot step onto water", 80, player.getY());
+    @Test
+    public void feetCannotStepOntoWaterBelow() {
+        fixture.world.place(new Grass(CENTRE, CENTRE));
+        fixture.world.place(new Water(CENTRE, CENTRE + 80)); // row 2
+        walkTo(CENTRE, 120); // feet at y 159, the bottom row of the grass tile
+        manager.tick(input(false, 's'), fixture.game);
+        assertEquals(120, player.getY());
+    }
+
+    @Test
+    public void eitherEndOfTheFeetIsBlockedByWaterAtTheSide() {
+        fixture.world.place(new Water(CENTRE - 80, CENTRE)); // column 0
+        fixture.world.place(new Grass(CENTRE, CENTRE));      // column 1
+        walkTo(100, CENTRE); // left end of the feet at x 80, the edge of the water
+        manager.tick(input(false, 'a'), fixture.game);
+        assertEquals(100, player.getX());
+
+        fixture.world.place(new Water(CENTRE + 80, CENTRE)); // column 2
+        walkTo(139, CENTRE); // right end of the feet at x 159
+        manager.tick(input(false, 'd'), fixture.game);
+        assertEquals(139, player.getX());
+    }
+
+    @Test
+    public void walkingAlongTheShoreKeepsBothFeetOnLand() {
+        // Water in column 0 of row 0; the left foot would enter it while walking up.
+        fixture.world.place(new Water(CENTRE - 80, CENTRE - 80));
+        fixture.world.place(new Grass(CENTRE, CENTRE - 80));
+        fixture.world.place(new Grass(CENTRE, CENTRE));
+        walkTo(90, 60); // left foot at x 70 (column 0), feet at the top of row 1
+        manager.tick(input(false, 'w'), fixture.game);
+        assertEquals(60, player.getY());
+    }
+
+    @Test
+    public void legsStayOutOfWaterWhenWalkingUp() {
+        fixture.world.place(new Water(CENTRE, CENTRE - 80));
+        fixture.world.place(new Grass(CENTRE, CENTRE));
+        walkTo(CENTRE, 100);
+        for (int i = 0; i < 100; i++) {
+            manager.tick(input(false, 'w'), fixture.game);
+        }
+        int legsTop = player.getY() + 20;
+        assertEquals("the whole foot box stops on the grass", 80, legsTop);
     }
 
     @Test
     public void walkableTilesDoNotBlock() {
         fixture.world.place(new Grass(CENTRE, CENTRE - 80));
-        ((ChickenFarmer) player).setY(80);
+        fixture.world.place(new Grass(CENTRE, CENTRE));
+        walkTo(CENTRE, 41);
         manager.tick(input(false, 'w'), fixture.game);
-        assertEquals(79, player.getY());
+        assertEquals(40, player.getY());
+    }
+
+    @Test
+    public void movingNearTheWorldEdgeIsSafe() {
+        walkTo(5, 10); // feet extend past the left edge of the world
+        manager.tick(input(false, 'a'), fixture.game);
+        manager.tick(input(false, 'd'), fixture.game);
+        assertEquals(5, player.getX());
+    }
+
+    @Test
+    public void toolsAffectTheTileUnderTheFeet() {
+        Grass bodyTile = new Grass(CENTRE, CENTRE);      // row 1: where the sprite's centre is
+        Dirt feetTile = new Dirt(CENTRE, CENTRE + 80);   // row 2: where the feet are
+        fixture.world.place(bodyTile);
+        fixture.world.place(feetTile);
+        fixture.hold(new Hoe());
+        walkTo(CENTRE, 140); // centre in row 1, feet at y 179 in row 2
+
+        manager.tick(input(true), fixture.game);
+
+        assertTrue(feetTile.isTilled());
+        assertTrue(!bodyTile.isMarkedForRemoval());
     }
 
     @Test
