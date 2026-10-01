@@ -1,5 +1,11 @@
 plugins {
     id 'application'
+    id 'checkstyle'
+}
+
+repositories {
+    // Only used to fetch the Checkstyle tool itself; game libraries come from lib/.
+    mavenCentral()
 }
 
 java {
@@ -40,4 +46,15 @@ tasks.named('test') {
         events = ['failed']
         exceptionFormat = 'full'
     }
+}
+
+// CSSE2002 style guide, applied to the game sources. Any warning fails the build.
+checkstyle {
+    toolVersion = '10.26.1'
+    configFile = file('config/checkstyle/checkstyle.xml')
+    maxWarnings = 0
+}
+
+tasks.named('checkstyleTest') {
+    enabled = false
 }

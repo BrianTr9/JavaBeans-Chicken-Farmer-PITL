@@ -25,8 +25,6 @@ public class Magpie extends AbstractBird {
     /** Magpie sprite group. */
     private static final SpriteGroup ART = SpriteGallery.magpie;
 
-    /** Timer used to update directional heading periodically. */
-
     /** Number of coins currently stolen by this magpie. */
     private int coins = 0;
 
