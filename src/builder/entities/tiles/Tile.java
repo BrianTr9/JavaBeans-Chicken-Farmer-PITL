@@ -3,6 +3,7 @@ package builder.entities.tiles;
 import builder.GameState;
 import builder.entities.Interactable;
 import builder.entities.Usable;
+import builder.entities.npc.Npc;
 import builder.ui.RenderableGroup;
 
 import engine.EngineState;
@@ -80,12 +81,17 @@ public abstract class Tile extends Entity
      * any stacked entities that are marked for removal according to {@link #isMarkedForRemoval()})
      * then progressing each of the stacked entities by calling their {@link
      * Entity#tick(EngineState)} method.
+     *
+     * <p>NPCs built on a tile (hives, scarecrows) are only recorded here so the tile counts as
+     * occupied; {@link builder.entities.npc.NpcManager} updates and draws them.
      */
     @Override
     public void tick(EngineState engine) {
         this.cleanup();
         for (Entity stackedEntity : this.stackedEntities) {
-            stackedEntity.tick(engine);
+            if (!(stackedEntity instanceof Npc)) {
+                stackedEntity.tick(engine);
+            }
         }
     }
 
@@ -134,7 +140,9 @@ public abstract class Tile extends Entity
     @Override
     public void interact(EngineState state, GameState game) {
         for (Entity stackedEntity : this.stackedEntities) {
-            if (stackedEntity instanceof Interactable interactable) {
+            // NPCs interact once per frame through NpcManager, not again when walked over.
+            if (stackedEntity instanceof Interactable interactable
+                    && !(stackedEntity instanceof Npc)) {
                 interactable.interact(state, game);
             }
         }
@@ -171,14 +179,19 @@ public abstract class Tile extends Entity
      * A collection of items to render, including the tile and any entities stacked on it.
      *
      * <p>This tile must be the first renderable in the list so that it is rendered behind each
-     * stacked entity. The remaining list must match the order of {@link #getStackedEntities()}.
+     * stacked entity. The remaining list follows the order of {@link #getStackedEntities()},
+     * leaving out NPCs, which {@link builder.entities.npc.NpcManager} draws.
      *
      * @return The list of renderables required to draw this tile to the screen.
      */
     @Override
     public List<Renderable> render() {
         List<Renderable> result = new ArrayList<>(List.of(this));
-        result.addAll(getStackedEntities());
+        for (Entity stackedEntity : this.stackedEntities) {
+            if (!(stackedEntity instanceof Npc)) {
+                result.add(stackedEntity);
+            }
+        }
         return result;
     }
 }

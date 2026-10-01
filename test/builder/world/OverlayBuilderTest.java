@@ -158,4 +158,14 @@ public class OverlayBuilderTest {
             assertTrue(e.getMessage().contains("'duration' must be at least 1"));
         }
     }
+
+    @Test
+    public void testUnclosedSectionIsReportedAsSuch() {
+        try {
+            OverlayBuilder.getSection("cabbages", ":cabbages:\nx:1 y:2\n");
+            fail("Expected IOException for a section without end;");
+        } catch (IOException e) {
+            assertTrue(e.getMessage().contains("missing its closing"));
+        }
+    }
 }

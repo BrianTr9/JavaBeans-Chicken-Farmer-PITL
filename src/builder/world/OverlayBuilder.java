@@ -40,7 +40,7 @@ public class OverlayBuilder {
      * @param label label we are searching for
      * @param contents file contents we are searching through
      * @return a {@link List} of lines within the searched for section.
-     * @throws IOException if the section is not found
+     * @throws IOException if the section is not found or is not closed
      */
     public static List<String> getSection(String label, String contents) throws IOException {
         final String header = ":" + label.toLowerCase().trim() + ":";
@@ -57,6 +57,10 @@ public class OverlayBuilder {
             if (current.equals(header)) {
                 collectingLines = true;
             }
+        }
+        if (collectingLines) {
+            throw new IOException("Section '" + header + "' is missing its closing '"
+                    + SECTION_END + "' line");
         }
         throw new IOException("Section not Found! Expected a '" + header + "' section ending in '"
                 + SECTION_END + "'");

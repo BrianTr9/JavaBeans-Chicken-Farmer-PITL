@@ -251,4 +251,19 @@ public class TileBehaviourTest {
         assertEquals(1, tilled.getStackedEntities().size());
         assertEquals(10 - Cabbage.COST, fixture.inventory.getCoins());
     }
+
+    @Test
+    public void aHiveIsDrawnOncePerFrame() {
+        Grass grass = new Grass(X, Y);
+        fixture.world.place(grass);
+        fixture.hold(new HiveHammer());
+        use(grass);
+        BeeHive hive = (BeeHive) grass.getStackedEntities().get(0);
+
+        long drawn = java.util.stream.Stream
+                .concat(fixture.world.render().stream(), fixture.npcs.render().stream())
+                .filter(renderable -> renderable == hive)
+                .count();
+        assertEquals(1, drawn);
+    }
 }
