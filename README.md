@@ -148,7 +148,7 @@ Problems found and fixed while hardening the codebase, and the design choices be
 
 | Suite | Location | Classes | Tests |
 |-------|----------|:---:|:---:|
-| Unit tests | `test/builder` | 24 | 20 |
+| Unit tests | `test/builder` | 24 | 377 |
 | Simulation tests | `test/scenarios` | 11 | 80 |
 
 - **Unit tests** cover the game logic: inventory, tiles and tools, crops and ore, player
