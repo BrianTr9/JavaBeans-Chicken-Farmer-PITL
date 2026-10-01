@@ -17,15 +17,11 @@ import java.util.List;
  * <p>Each line of the file, separated by new line characters, corresponds to a row of tiles in the
  * world. Each character represents a tile according to {@link TileFactory#fromSymbol(int, int,
  * char)}.
- *
- * @stage2
  */
 public class WorldBuilder {
 
     /**
      * Construct a new world builder.
-     *
-     * @hint You do not need to implement this.
      */
     public WorldBuilder() {}
 

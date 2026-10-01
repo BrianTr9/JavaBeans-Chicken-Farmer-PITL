@@ -3,14 +3,10 @@ package builder.entities.tiles;
 /**
  * A tile factory uses the {@link #fromSymbol(int, int, char)} method to construct new tile
  * instances from a set encoding.
- *
- * @stage2
  */
 public class TileFactory {
     /**
      * Construct a new tile factory.
-     *
-     * @hint You do not need to implement this constructor.
      */
     public TileFactory() {}
 

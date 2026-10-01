@@ -12,8 +12,6 @@ import engine.EngineState;
  * A grass tile is a basic tile. A grass tile can be walked through. A grass tile is rendered as
  * {@link SpriteGallery#grass}. (Stage 3) A hoe can be used on the grass tile to turn it into a
  * {@link Dirt} tile.
- *
- * @stage2
  */
 public class Grass extends Tile {
 
@@ -35,8 +33,6 @@ public class Grass extends Tile {
      *
      * <p>If the tile is already marked for removal (according to {@link #markForRemoval()}) then it
      * should not be replaced.
-     *
-     * @stage3
      */
     @Override
     public void use(EngineState state, GameState game) {

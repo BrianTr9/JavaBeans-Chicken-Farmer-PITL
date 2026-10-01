@@ -7,8 +7,6 @@ import builder.ui.SpriteGallery;
  * An ore vein tile has a {@link Ore} instance stacked on top. An ore vein is rendered the same as a
  * field but will always have an {@link Ore} above it. An ore vein tile is rendered as {@link
  * SpriteGallery#field}.
- *
- * @stage2
  */
 public class OreVein extends Tile {
     private final Ore ore;
@@ -30,7 +28,6 @@ public class OreVein extends Tile {
     /**
      * Returns the instance of {@link Ore} stacked on this ore vein.
      *
-     * @stage3
      * @return The current instance on top of this tile.
      */
     public Ore getOre() {

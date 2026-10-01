@@ -19,9 +19,6 @@ import java.util.List;
 /**
  * Manages the users interaction with the player through keyboard/mouse interactions. Stores and
  * provides access to the player instance and renders the player via the render method.
- *
- * @hint The player manager should hold an instance of {@link ChickenFarmer}.
- * @stage1
  */
 public class PlayerManager implements Tickable, RenderableGroup {
 
@@ -64,13 +61,14 @@ public class PlayerManager implements Tickable, RenderableGroup {
      * preference order is 'w', 's', 'a', and 'd'. That is, if both 's' and 'd' are pressed, the
      * player should move south ('s').
      *
-     * @stage2part If any tile at the position the player would move to (according to {@link
-     *     World#tilesAtPosition(int, int, Dimensions)}) cannot be walked through (according to
-     *     {@link Tile#canWalkThrough()}) then the player must not move there.
-     * @stage3part Any tile at the (potentially new) position of the player should be interacted
-     *     with via {@link Tile#interact(EngineState, GameState)}. If the player is left-clicking
-     *     (according to {@link MouseState#isLeftPressed()}), those tiles should be used via {@link
-     *     Tile#use(EngineState, GameState)}.
+     * <p>If any tile at the position the player would move to (according to {@link
+     * World#tilesAtPosition(int, int, Dimensions)}) cannot be walked through (according to
+     * {@link Tile#canWalkThrough()}) then the player must not move there.
+     *
+     * <p>Any tile at the (potentially new) position of the player should be interacted
+     * with via {@link Tile#interact(EngineState, GameState)}. If the player is left-clicking
+     * (according to {@link MouseState#isLeftPressed()}), those tiles should be used via {@link
+     * Tile#use(EngineState, GameState)}.
      */
     @Override
     public void tick(EngineState state, GameState game) {

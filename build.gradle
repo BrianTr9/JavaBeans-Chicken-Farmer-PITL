@@ -58,3 +58,12 @@ checkstyle {
 tasks.named('checkstyleTest') {
     enabled = false
 }
+
+// Design-by-contract tags used in the Javadoc (CSSE2002 convention).
+tasks.named('javadoc') {
+    options.tags = [
+        'requires:a:Requires:',
+        'ensures:a:Ensures:',
+        'invariant:a:Invariant:'
+    ]
+}

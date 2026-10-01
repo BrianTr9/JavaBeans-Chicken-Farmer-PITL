@@ -22,15 +22,12 @@ import java.util.List;
  * <ul>
  *   <li>what entities are stacked upon it,
  *   <li>gathering the {@link Renderable}s for itself and its stacked entities, and
- *   <li>(in stage 3) interactions with itself and entities stacked upon it (related: {@link
+ *   <li>interactions with itself and entities stacked upon it (related: {@link
  *       Interactable} and {@link Usable}).
  * </ul>
  *
  * @invariant getX() >= 0, getX() is less than the window height
  * @invariant getY() >= 0, getY() is less than the window width
- * @hint The {@link Interactable} and {@link Usable} interfaces do not need to be implemented until
- *     stage 3.
- * @stage2
  */
 public abstract class Tile extends Entity
         implements Interactable, Usable, RenderableGroup, HasTick {
@@ -73,8 +70,6 @@ public abstract class Tile extends Entity
      *
      * @param artName The name of the art within the sprite group.
      * @throws ArtNotFoundException If the given name doesn't exist within the sprite group.
-     * @hint You don't need to do anything special to throw {@link ArtNotFoundException}, {@link
-     *     SpriteGroup#getSprite(String)} will do it for you.
      */
     public void updateSprite(String artName) throws ArtNotFoundException {
         this.setSprite(art.getSprite(artName));
@@ -85,11 +80,6 @@ public abstract class Tile extends Entity
      * any stacked entities that are marked for removal according to {@link #isMarkedForRemoval()})
      * then progressing each of the stacked entities by calling their {@link
      * Entity#tick(EngineState)} method.
-     *
-     * @hint You may have to modify a list while iterating through it, this will throw a {@link
-     *     java.util.ConcurrentModificationException}. There are a few ways to work around this, see
-     *     <a href="https://edstem.org/au/courses/23940/discussion/2833772">this Ed post</a> for
-     *     options.
      */
     @Override
     public void tick(EngineState engine) {
@@ -140,7 +130,6 @@ public abstract class Tile extends Entity
      *     left-click behaviour, {@link Usable} should be used instead.
      * @param game The state of the game, including the player and world. Can be used to query or
      *     update the game state.
-     * @stage3
      */
     @Override
     public void interact(EngineState state, GameState game) {
@@ -159,7 +148,6 @@ public abstract class Tile extends Entity
      * @param state The state of the engine provides information about which tick this interaction
      *     occurred during.
      * @param game The game state that can be queried or updated as needed.
-     * @stage3
      */
     @Override
     public void use(EngineState state, GameState game) {

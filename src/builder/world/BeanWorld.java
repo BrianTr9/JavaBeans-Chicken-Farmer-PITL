@@ -18,9 +18,6 @@ import java.util.function.Predicate;
  *
  * <p>A world consists of a grid of tiles. The tiles must be updated by the world each tick and
  * appropriately rendered via the render method.
- *
- * @test
- * @stage2
  */
 public class BeanWorld implements RenderableGroup, Tickable, World {
 

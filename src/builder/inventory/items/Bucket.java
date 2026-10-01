@@ -13,8 +13,6 @@ import java.util.Optional;
  * A bucket tool is used to plant new crops on tilled dirt. A bucket uses the 'bucket' inventory
  * sprite within {@link SpriteGallery#tools} and uses 'plant1', 'plant2' from {@link
  * SpriteGallery#chickenFarmer} when used by the player.
- *
- * @provided
  */
 public class Bucket implements Item {
     private static final SpriteGroup toolArt = SpriteGallery.tools;

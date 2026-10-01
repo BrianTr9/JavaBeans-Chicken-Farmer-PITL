@@ -61,7 +61,7 @@ public class Magpie extends AbstractBird {
 
     @Override
     public void tick(EngineState engine, GameState game) {
-        // Preserve original behavior: one base move, then call move() again later
+        // Birds move twice per tick: once before and once after re-steering.
         this.baseTickMove(engine, game);
 
         if (this.getLifespan() != null) {

@@ -7,8 +7,6 @@ package builder.world;
  * <p>As this exception occurs when reading from a world encoding, two alternative constructors
  * ({@link #WorldLoadException(String, int)} and {@link #WorldLoadException(String, int, int)}) are
  * used to provide additional line number and character position information in the error message.
- *
- * @provided
  */
 public class WorldLoadException extends Exception {
     /** The world tile row number where loading failed. */

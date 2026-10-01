@@ -72,7 +72,7 @@ public class GuardBee extends Npc implements Expirable {
 
     @Override
     public void tick(EngineState state, GameState game) {
-        // Keep legacy double-move: one via base, then an explicit second move
+        // Bees take two movement steps per tick; their speed and range are tuned to this.
         super.tick(state);
         this.move();
 

@@ -14,8 +14,6 @@ import engine.game.Entity;
  * An entity that is stacked on an {@link builder.entities.tiles.OreVein} and yields coins when
  * mined. The ore initially has 10 coins and can be mined by the player using the jackhammer. The
  * ore is initially rendered as 'default' within {@link SpriteGallery#rock}.
- *
- * @stage3
  */
 public class Ore extends Entity implements Usable {
 

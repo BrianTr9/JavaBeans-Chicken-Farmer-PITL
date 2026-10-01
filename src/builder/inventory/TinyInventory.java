@@ -19,7 +19,7 @@ public class TinyInventory implements Inventory {
     /**
      * Construct a new tiny inventory instance with the given capacity.
      *
-     * @param size The maximum capacity of the inventory; must be <= 10.
+     * @param size The maximum capacity of the inventory; at most 10.
      */
     public TinyInventory(int size) {
         assert size <= 10;
@@ -29,7 +29,7 @@ public class TinyInventory implements Inventory {
     /**
      * Construct a new tiny inventory instance with initial resources.
      *
-     * @param size The maximum capacity of the inventory; must be <= 10.
+     * @param size The maximum capacity of the inventory; at most 10.
      * @param coins The initial coin amount.
      * @param food The initial food amount.
      */

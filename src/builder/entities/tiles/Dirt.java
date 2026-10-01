@@ -14,9 +14,9 @@ import engine.art.sprites.SpriteGroup;
 
 /**
  * A dirt tile may be used for farming. A dirt tile has two states: tilled and untilled. The tile
- * should begin untilled and may become tilled by using a hoe on it (in stage 3). When untilled,
- * dirt is rendered as {@link SpriteGallery#field}, when tilled, dirt is rendered as {@link
- * SpriteGallery#tilled}. (Stage 3) A bucket can be used on dirt to plant a cabbage on it.
+ * begins untilled and becomes tilled when a hoe is used on it. When untilled, dirt is rendered
+ * as {@link SpriteGallery#field}, when tilled, dirt is rendered as {@link SpriteGallery#tilled}.
+ * A bucket plants a cabbage on tilled dirt, and a pole builds a scarecrow on it.
  */
 public class Dirt extends Tile {
 
@@ -79,8 +79,7 @@ public class Dirt extends Tile {
      * <p>The cost of the cabbage should be subtracted from the inventory if it is successfully
      * planted.
      *
-     * <p>This method implements the stage 3 behaviour for using tools on dirt: hoe, bucket, and
-     * pole interactions are handled here.
+     * <p>Hoe, bucket and pole interactions are handled here.
      */
     @Override
     public void use(EngineState state, GameState game) {

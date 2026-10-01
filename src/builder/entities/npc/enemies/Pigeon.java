@@ -71,7 +71,7 @@ public class Pigeon extends AbstractBird {
 
     @Override
     public void tick(EngineState engine, GameState game) {
-        // Original behavior: call super.tick(engine, game) then call move() later as well
+        // Birds move twice per tick: once before and once after re-steering.
         this.baseTickMove(engine, game);
 
         if (!this.getAttacking()) {

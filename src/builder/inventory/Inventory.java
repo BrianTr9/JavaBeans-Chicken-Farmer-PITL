@@ -9,7 +9,6 @@ import builder.inventory.items.Item;
  * @invariant getFood() >= 0
  * @invariant getCoins() >= 0
  * @invariant getCapacity() >= 0
- * @provided
  */
 public interface Inventory {
     /**

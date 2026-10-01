@@ -16,8 +16,6 @@ import java.util.List;
 
 /**
  * Displays onscreen indicators for the amount of food and coins in the player's inventory.
- *
- * @provided
  */
 public class ResourceOverlay implements Overlay {
 

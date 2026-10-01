@@ -192,8 +192,7 @@ abstract class AbstractBird extends Enemy implements Expirable {
      * @param game the game state
      */
     protected void baseTickMove(EngineState engine, GameState game) {
-        super.tick(engine, game); // one move via Npc.tick
-        // no extra move here; subclasses may call move() later as per original classes
+        super.tick(engine, game); // moves once along the current heading
     }
 
     /**

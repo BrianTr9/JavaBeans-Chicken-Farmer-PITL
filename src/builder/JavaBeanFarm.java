@@ -49,8 +49,6 @@ import builder.world.WorldLoadException;
  *
  * <p>This class manages the world instance, player manager, and the inventory instance. The
  * inventory and resource overlays are also managed by this class.
- *
- * <p>In stage 0, this class will store the Brutus character to wander around.
  */
 public class JavaBeanFarm implements Game {
 

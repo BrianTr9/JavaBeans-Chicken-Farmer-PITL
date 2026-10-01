@@ -10,8 +10,6 @@ import engine.EngineState;
  *
  * <p>When the player left-clicks anywhere on the screen, the {@link #use(EngineState, GameState)}
  * method of any {@link Usable} entities underneath the player will be called.
- *
- * @stage3
  */
 public interface Usable {
 

@@ -61,14 +61,13 @@ public class Eagle extends AbstractBird {
      */
     @Override
     public void tick(EngineState engine, GameState game) {
-        // Preserve original ordering: one move via base, later a second move below
+        // Birds move twice per tick: once before and once after re-steering.
         this.baseTickMove(engine, game);
 
         tickLifespanAndMaybeDespawn();
         tryStealFromPlayerIfAttacking(engine, game);
         tryDespawnAtSpawnIfReturning(engine);
 
-        // Second move (as per original code)
         this.move();
 
         updateHeadingAndSprite();

@@ -11,8 +11,6 @@ import engine.EngineState;
  * space.
  *
  * <p>Note that for left-click behaviour, {@link Usable} should be used instead.
- *
- * @stage3
  */
 public interface Interactable {
 

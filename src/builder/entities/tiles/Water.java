@@ -7,8 +7,6 @@ import engine.art.sprites.SpriteGroup;
 /**
  * A water tile is a tile that cannot be walked over. A water tile is rendered as {@link
  * SpriteGallery#water}.
- *
- * @stage2
  */
 public class Water extends Tile {
 

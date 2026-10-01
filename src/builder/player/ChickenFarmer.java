@@ -152,7 +152,6 @@ public class ChickenFarmer extends Entity implements Player {
      * animation.
      *
      * @param item The item that the player is currently holding.
-     * @stage3
      */
     public void use(Item item) {
         if (item != null && item.useAnimation().isPresent()) {

@@ -13,8 +13,6 @@ import java.util.function.Predicate;
  * <p>A world consists of a grid of tiles. The tiles at a pixel x and y position can be queried via
  * {@link #tilesAtPosition(int, int, Dimensions)}. New tiles can be placed on the world (at the
  * position contained within the tile instance) using {@link #place(Tile)}.
- *
- * @stage2
  */
 public interface World {
 

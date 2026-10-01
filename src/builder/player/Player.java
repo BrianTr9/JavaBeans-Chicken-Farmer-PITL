@@ -5,8 +5,6 @@ import engine.renderer.HasUUID;
 
 /**
  * An interface to query the player entity in the game.
- *
- * @stage1
  */
 public interface Player extends HasPosition, HasUUID {
     /**
